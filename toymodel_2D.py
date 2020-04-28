@@ -13,10 +13,10 @@ luts_to_load = ('luts/lut_gem.csv','luts/lut_fire.csv')
 
 # Parameters for auxin
 auxin_range = (0, 1)
-diffusionFactor = 0.05		# Proportion of molecules that cross between two adjacent cells per cycle
+diffusionFactor = 0.1		# Proportion of molecules that cross between two adjacent cells per cycle
 synthesis = 0.0005	     	# Absolute amount of molecules synthesised per cycle
 lossRate = 0.75
-nbr_iterations = 100
+nbr_iterations = 300
 
 
 # === LOAD DATA
