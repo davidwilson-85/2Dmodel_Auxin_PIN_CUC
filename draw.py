@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from PIL import Image, ImageDraw
 
 
@@ -26,4 +28,4 @@ y = y_origin
 
 ImageDraw.Draw(im).line([(x+1,y+2),(x+cellSide-1,y+2)], fill='red', width=3)
 
-im.save('squares.png')
+im.save('images/squares.png')
