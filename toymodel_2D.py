@@ -5,13 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 
-#import PIL
-#import glob
-
-#tilings.draw_tiling(tilings.generate_hexagons,  filename='hexagons.png')
-#data = np.full((5, 5), 0)
-#data[2,2] = 100
-
 
 # === SET PARAMETERS
 
@@ -23,7 +16,7 @@ auxin_range = (0, 1)
 diffusionFactor = 0.05		# Proportion of molecules that cross between two adjacent cells per cycle
 synthesis = 0.0005	     	# Absolute amount of molecules synthesised per cycle
 lossRate = 0.75
-nbr_iterations = 20
+nbr_iterations = 100
 
 
 # === LOAD DATA
@@ -119,29 +112,32 @@ for iteration in range(nbr_iterations):
 
 			nbr_cell_neighbours = 0
 			
-			try: 
+			if i-1 >= 0:
 				diffusionFromLeft = diffusionVectors[i-1,j]
-				nbr_cell_neighbours	
-			except IndexError:
-				diffusionLeft = 0
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromLeft = 0
 	
 			try: 
 				diffusionFromRight = diffusionVectors[i+1,j]
+				nbr_cell_neighbours	+=1
 			except IndexError:
-				diffusionRight = 0
+				diffusionFromRight = 0
 				
-			try: 
+			if j-1 >= 0:
 				diffusionFromTop = diffusionVectors[i,j-1]
-			except IndexError:
-				diffusionTop = 0
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromTop = 0
 				
 			try: 
 				diffusionFromBottom = diffusionVectors[i,j+1]
+				nbr_cell_neighbours	+=1
 			except IndexError:
-				diffusionBottom = 0
+				diffusionFromBottom = 0
 	
-			data[i,j] = data[i,j] - diffusionVectors[i,j] * 4 + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
-			data[4,4] = data[4,4] + synthesis
+			data[i,j] = data[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
+			#data[4,4] = data[4,4] + synthesis
 
 
 
