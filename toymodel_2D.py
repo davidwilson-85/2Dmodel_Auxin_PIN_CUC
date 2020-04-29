@@ -8,23 +8,32 @@ from PIL import Image, ImageDraw
 
 # === SET PARAMETERS
 
-template = 'templates/2Dcell_template'
-luts_to_load = ('luts/lut_gem.csv','luts/lut_fire.csv')
+auxin_template = 'templates/auxin_template'
+pin1_template = 'templates/pin1_template'
+cuc_template = 'templates/...'
 
-# Parameters for auxin
+# Parameters
 auxin_range = (0, 1)
-diffusionFactor = 0.1		# Proportion of molecules that cross between two adjacent cells per cycle
-synthesis = 0.0005	     	# Absolute amount of molecules synthesised per cycle
-lossRate = 0.75
-nbr_iterations = 300
+auxin_diffusionFactor = 0.1		# Relative amount of molecules that cross between two adjacent cells per cycle
+auxin_synthesis = 0.5	     		# Absolute amount of molecules synthesised per cycle
+auxin_lossRate = 0.75
+
+pin1_range = (0, 9)
+cuc_range = (0, 1)
+
+nbr_iterations = 1
 
 
 # === LOAD DATA
 
-data = np.loadtxt(template, delimiter=',', unpack=True)
-matrix_shape = data.shape
+auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
+matrix_shape = auxin.shape
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,3)) # Format is [z,y,x]
 
-lut1 = np.loadtxt(luts_to_load[1], delimiter=',', unpack=True, dtype=('int'))
+# LUTs
+lut_auxin = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'))
+lut_pin1 = np.loadtxt('luts/lut_gem.csv', delimiter=',', unpack=True, dtype=('int'))
+lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'))
 
 
 # === FUNCTIONS
@@ -55,7 +64,7 @@ def index_to_rgb(lut, level, range):
 # Create cell plot using pil
 def create_cell_plot(matrix_shape):
 	
-	im = Image.new('RGB', size=(501,501))
+	im = Image.new('RGBA', size=(501,501))
 	x_origin = 0
 	y_origin = 0
 	cellSide = 50
@@ -67,9 +76,14 @@ def create_cell_plot(matrix_shape):
 		for j in range(matrix_shape[1]):
 			
 			# Draw cell outline
-			ImageDraw.Draw(im).polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline='white', fill=index_to_rgb(lut1, data[i,j], auxin_range))
-			# Draw PIN1
-			#ImageDraw.Draw(im).line([(x+1,y+2),(x+cellSide-1,y+2)], fill='red', width=3)
+			ImageDraw.Draw(im).polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline=(50,50,50,255), fill=index_to_rgb(lut_auxin, auxin[i,j], auxin_range))
+			
+			# Draw PIN1 (top, right, bottom, left)
+			ImageDraw.Draw(im).line([(x+1,y+2),(x+cellSide-1,y+2)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
+			ImageDraw.Draw(im).line([(x+cellSide-2,y+2),(x+cellSide-2,y+cellSide-1)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
+			ImageDraw.Draw(im).line([(x+1,y+cellSide-2),(x+cellSide-1,y+cellSide-2)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
+			ImageDraw.Draw(im).line([(x+2,y+2),(x+2,y+cellSide-2)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
+			
 			# Draw CUC		
 			#ImageDraw.Draw(im).ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], fill='green')
 			
@@ -100,8 +114,8 @@ for iteration in range(nbr_iterations):
 	diffusionVectors = np.zeros(matrix_shape, dtype=(float,1))	
 	for i in range(matrix_shape[0]):
 		for j in range(matrix_shape[1]):
-			#print data[i,j]
-			diffusionVectors[i,j] = data[i,j] * diffusionFactor
+			#print auxin[i,j]
+			diffusionVectors[i,j] = auxin[i,j] * auxin_diffusionFactor
 			
 	#print diffusionVectors
 	
@@ -110,8 +124,10 @@ for iteration in range(nbr_iterations):
 	for i in range(matrix_shape[0]):
 		for j in range(matrix_shape[1]):
 
+			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
 			nbr_cell_neighbours = 0
 			
+			# numpy arrays accept negative indexes, so testing if an index exists at the left and top of the grid, and at the right and bottom, must be done in a different way: 
 			if i-1 >= 0:
 				diffusionFromLeft = diffusionVectors[i-1,j]
 				nbr_cell_neighbours	+=1
@@ -135,9 +151,11 @@ for iteration in range(nbr_iterations):
 				nbr_cell_neighbours	+=1
 			except IndexError:
 				diffusionFromBottom = 0
+			
+			# Update the concentration in each cell
+			auxin[i,j] = auxin[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
 	
-			data[i,j] = data[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
-			#data[4,4] = data[4,4] + synthesis
+	#auxin[4,4] = auxin[4,4] + synthesis
 
 
 
