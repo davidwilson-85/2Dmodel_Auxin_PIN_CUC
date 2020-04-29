@@ -13,15 +13,15 @@ pin1_template = 'templates/pin1_template'
 cuc_template = 'templates/...'
 
 # Parameters
-auxin_range = (0, 1)
+auxin_range = (0, 9)
 auxin_diffusionFactor = 0.1		# Relative amount of molecules that cross between two adjacent cells per cycle
-auxin_synthesis = 0.5	     		# Absolute amount of molecules synthesised per cycle
+auxin_synthesis = 1	     		# Absolute amount of molecules synthesised per cycle
 auxin_lossRate = 0.75
 
 pin1_range = (0, 9)
 cuc_range = (0, 1)
 
-nbr_iterations = 1
+nbr_iterations = 300
 
 
 # === LOAD DATA
@@ -31,9 +31,9 @@ matrix_shape = auxin.shape
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,3)) # Format is [z,y,x]
 
 # LUTs
-lut_auxin = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'))
-lut_pin1 = np.loadtxt('luts/lut_gem.csv', delimiter=',', unpack=True, dtype=('int'))
-lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'))
+lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 
 # === FUNCTIONS
@@ -155,7 +155,7 @@ for iteration in range(nbr_iterations):
 			# Update the concentration in each cell
 			auxin[i,j] = auxin[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
 	
-	#auxin[4,4] = auxin[4,4] + synthesis
+	auxin[0,0] = auxin[0,0] + auxin_synthesis
 
 
 
