@@ -26,7 +26,7 @@ pin1_transp = 0.1				# = Nbr auxin molecules transported / ( PIN1 molecule * cyc
 
 cuc_range = (0, 1)
 
-nbr_iterations = 10
+nbr_iterations = 500
 
 
 # === LOAD DATA
@@ -40,6 +40,9 @@ pin1_matrix_shape = pin1.shape
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+
+
+matrix_num_columns, matrix_num_rows = auxin.shape[0], auxin.shape[1]
 
 
 # === FUNCTIONS
@@ -109,6 +112,69 @@ def create_cell_plot(matrix_shape):
 
 	im.save('images/test/image' + str(iteration) +'.png')
 
+def auxin_diffusion(auxin_diffusionFactor):
+	
+	#
+	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
+	#
+	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
+	#
+	# k = diffusion factor constant
+	#
+
+	# Create absolute efflux diffusion values for each cell
+	diffusionVectors = np.zeros(auxin_matrix_shape, dtype=(float,1))	
+	for y in range(matrix_num_columns):
+		for x in range(matrix_num_rows):
+			#print auxin[i,j]
+			diffusionVectors[y,x] = auxin[y,x] * auxin_diffusionFactor
+			
+	#print diffusionVectors
+	
+	# Apply diffusion to auxin concentration values
+	for y in range(matrix_num_columns):
+		for x in range(matrix_num_rows):
+
+			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
+			nbr_cell_neighbours = 0
+			
+			# numpy arrays accept negative indexes, so testing if an index exists at the left and top of the grid, and at the right and bottom, must be done in a different way: 
+			
+			# Left
+			if y-1 >= 0:
+				diffusionFromLeft = diffusionVectors[y-1,x]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromLeft = 0
+			
+			# Right
+			try: 
+				diffusionFromRight = diffusionVectors[y+1,x]
+				nbr_cell_neighbours	+=1
+			except IndexError:
+				diffusionFromRight = 0
+			
+			# Top	
+			if x-1 >= 0:
+				diffusionFromTop = diffusionVectors[y,x-1]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromTop = 0
+			
+			# Bottom
+			try: 
+				diffusionFromBottom = diffusionVectors[y,x+1]
+				nbr_cell_neighbours	+=1
+			except IndexError:
+				diffusionFromBottom = 0
+			
+			# Update the concentration in each cell
+			auxin[y,x] = auxin[y,x] - ( diffusionVectors[y,x] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
+
+
+	
+# =====================================================================================
+# =====================================================================================
 
 
 # === PROCESS DATA
@@ -123,62 +189,8 @@ for iteration in range(nbr_iterations):
 
 	
 	# AUXIN DIFUSSION
-	#
-	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
-	#
-	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
-	#
-	# k = diffusion factor constant
-	#
 
-	# Create absolute efflux diffusion values for each cell
-	diffusionVectors = np.zeros(auxin_matrix_shape, dtype=(float,1))	
-	for i in range(auxin_matrix_shape[0]):
-		for j in range(auxin_matrix_shape[1]):
-			#print auxin[i,j]
-			diffusionVectors[i,j] = auxin[i,j] * auxin_diffusionFactor
-			
-	#print diffusionVectors
-	
-	# Apply diffusion to auxin concentration values
-	for i in range(auxin_matrix_shape[0]):
-		for j in range(auxin_matrix_shape[1]):
-
-			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
-			nbr_cell_neighbours = 0
-			
-			# numpy arrays accept negative indexes, so testing if an index exists at the left and top of the grid, and at the right and bottom, must be done in a different way: 
-			
-			# Left
-			if i-1 >= 0:
-				diffusionFromLeft = diffusionVectors[i-1,j]
-				nbr_cell_neighbours	+=1
-			else:
-				diffusionFromLeft = 0
-			
-			# Right
-			try: 
-				diffusionFromRight = diffusionVectors[i+1,j]
-				nbr_cell_neighbours	+=1
-			except IndexError:
-				diffusionFromRight = 0
-			
-			# Top	
-			if j-1 >= 0:
-				diffusionFromTop = diffusionVectors[i,j-1]
-				nbr_cell_neighbours	+=1
-			else:
-				diffusionFromTop = 0
-			
-			# Bottom
-			try: 
-				diffusionFromBottom = diffusionVectors[i,j+1]
-				nbr_cell_neighbours	+=1
-			except IndexError:
-				diffusionFromBottom = 0
-			
-			# Update the concentration in each cell
-			#auxin[i,j] = auxin[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
+	auxin_diffusion(auxin_diffusionFactor)
 
 
 	# Apply PIN1 transport to auxin concentration values
@@ -191,8 +203,8 @@ for iteration in range(nbr_iterations):
 	# Create absolute efflux transport values for each cell
 	transpVectors = np.zeros(pin1_matrix_shape, dtype=(float,1)) # 3D array = (cell_face, column, row)
 	
-	for y in range(pin1_matrix_shape[1]):
-		for x in range(pin1_matrix_shape[2]):
+	for y in range(matrix_num_columns):
+		for x in range(matrix_num_rows):
 			#print auxin[i,j]
 
 			total_molecules = auxin[y,x]
@@ -203,7 +215,7 @@ for iteration in range(nbr_iterations):
 			if ratio > 1: ratio = 1
 
 
-			transpVectors[0,j,i] = auxin[y,x] * auxin_diffusionFactor
+			#transpVectors[0,j,i] = auxin[y,x] * auxin_diffusionFactor
 	
 	for y in range(pin1_matrix_shape[0]):
 		for x in range(pin1_matrix_shape[1]):
