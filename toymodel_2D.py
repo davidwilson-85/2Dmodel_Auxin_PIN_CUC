@@ -178,7 +178,7 @@ for iteration in range(nbr_iterations):
 				diffusionFromBottom = 0
 			
 			# Update the concentration in each cell
-			auxin[i,j] = auxin[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
+			#auxin[i,j] = auxin[i,j] - ( diffusionVectors[i,j] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
 
 
 	# Apply PIN1 transport to auxin concentration values
