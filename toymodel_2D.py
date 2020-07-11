@@ -36,7 +36,7 @@ pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cy
 
 cuc_range = (0, 1)
 
-nbr_iterations = 500
+nbr_iterations = 300
 
 
 # === LOAD DATA
