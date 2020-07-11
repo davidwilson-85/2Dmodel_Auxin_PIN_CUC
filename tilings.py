@@ -98,7 +98,7 @@ def generate_unit_hexagons(image_width, image_height):
     #         (x - 1/2 y + h) +           + (x + 3/2, y + h)
     #                          \         /
     #                           \       /
-    #                 (x, y + 2h) +-----+ (x + 1, y + 2h)
+    #                (x, y + 2h) +-----+ (x + 1, y + 2h)
     #
     # In each row we generate hexagons in the following pattern
     #
@@ -108,9 +108,9 @@ def generate_unit_hexagons(image_width, image_height):
     # and the next row is offset to fill in the gaps. So after two rows,
     # we'd have the following pattern:
     #
-    #         /‾‾‾\   /‾‾‾\   /‾‾‾\
-    #         \___/‾‾‾\___/‾‾‾\___/‾‾‾\
-    #             \___/   \___/   \___/
+    #         /‾‾\  /‾‾\  /‾‾\
+    #         \__/‾‾\__/‾‾\__/‾‾\
+    #            \__/  \__/  \__/
     #
     # There are offsets to ensure we fill the entire canvas.
 

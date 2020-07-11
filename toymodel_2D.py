@@ -9,9 +9,19 @@ from PIL import Image, ImageDraw
 
 # === SET PARAMETERS
 
+# Templates
 auxin_template = 'templates/auxin_template'
 pin1_template = 'templates/pin1_template'
 cuc_template = 'templates/...'
+
+# Switches
+Diffusion = True
+PIN1_UTG = False
+PIN1_WTF_linear = False
+PIN1_WTF_cuadratic = False
+PIN1_transport = False
+AUX_LAX_transport = False
+CUC = False
 
 # Parameters
 auxin_range = (0, 9)
@@ -22,7 +32,7 @@ auxin_lossRate = 0.75
 
 pin1_range = (0, 9)
 pin1_UTGresponsiveness = 0.01	# Relative amount of molecules that can change cell face per cycle
-pin1_transp = 0.1				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
+pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
 
 cuc_range = (0, 1)
 
@@ -33,7 +43,7 @@ nbr_iterations = 500
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
-pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,11,11)) # Format is [z,y,x]
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,20,20)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
 # LUTs
@@ -126,7 +136,7 @@ def auxin_diffusion(auxin_diffusionFactor):
 	diffusionVectors = np.zeros(auxin_matrix_shape, dtype=(float,1))	
 	for y in range(matrix_num_columns):
 		for x in range(matrix_num_rows):
-			#print auxin[i,j]
+			# Amount of auxin that is lost per cell face
 			diffusionVectors[y,x] = auxin[y,x] * auxin_diffusionFactor
 			
 	#print diffusionVectors
@@ -168,7 +178,7 @@ def auxin_diffusion(auxin_diffusionFactor):
 			except IndexError:
 				diffusionFromBottom = 0
 			
-			# Update the concentration in each cell
+			# Update the auxin concentration in each cell
 			auxin[y,x] = auxin[y,x] - ( diffusionVectors[y,x] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
 
 
@@ -181,6 +191,9 @@ def auxin_diffusion(auxin_diffusionFactor):
 
 for iteration in range(nbr_iterations):
 
+	print iteration
+	print auxin
+
 	# Plot data in heatmap
 	#create_heatmap(data=data)
 
@@ -190,9 +203,12 @@ for iteration in range(nbr_iterations):
 	
 	# AUXIN DIFUSSION
 
-	auxin_diffusion(auxin_diffusionFactor)
+	if Diffusion == True:
 
+		auxin_diffusion(auxin_diffusionFactor)
 
+	
+	# AUXIN TRANSPORT
 	# Apply PIN1 transport to auxin concentration values
 	#
 	# PIN1_Tr = Nbr auxin molecules / ( PIN1 molecule * cycle )
@@ -205,31 +221,75 @@ for iteration in range(nbr_iterations):
 	
 	for y in range(matrix_num_columns):
 		for x in range(matrix_num_rows):
-			#print auxin[i,j]
 
-			total_molecules = auxin[y,x]
+			auxin_molecules = auxin[y,x]
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
-			transported_molecules = total_pin1 * pin1_transp
+			transported_molecules_total = auxin_molecules * total_pin1 * pin1_transp
 
-			ratio = total_molecules / transported_molecules
-			if ratio > 1: ratio = 1
+			# Manually limit transport if it exceeds the amount of auxin molecules
+			# Later on: calculate excess ratio and then use to reduce the the value of the vector below
+			if transported_molecules_total > auxin_molecules:
+				transported_molecules_total = auxin_molecules
+				print 'warning: transported molecules had to be manually adjusted in cell ' + y, x
 
+			# To top (y,x -> y-1,x)
+			if y >= 0:
+				transpVectors[0,y,x] = auxin_molecules * pin1[0,y,x] * pin1_transp
+			else:
+				transpVectors[0,y,x] = 0
 
-			#transpVectors[0,j,i] = auxin[y,x] * auxin_diffusionFactor
-	
-	for y in range(pin1_matrix_shape[0]):
-		for x in range(pin1_matrix_shape[1]):
+			# To right (y,x -> y,x+1)
+			if x < matrix_num_columns - 1:
+				transpVectors[1,y,x] = auxin_molecules * pin1[1,y,x] * pin1_transp
+			else:
+				transpVectors[1,y,x] = 0
 
-			# Top
-			transpFromTop = 0
+			# To bottom (y,x -> y+1,x)
+			if y < matrix_num_rows - 1:
+				transpVectors[2,y,x] = auxin_molecules * pin1[2,y,x] * pin1_transp
+			else:
+				transpVectors[2,y,x] = 0
 
+			# To left (y,x -> y,x-1)
+			if x >= 0:
+				transpVectors[3,y,x] = auxin_molecules * pin1[3,y,x] * pin1_transp
+			else:
+				transpVectors[3,y,x] = 0
+
+	for y in range(matrix_num_columns):
+		for x in range(matrix_num_rows):
+
+			# From top (y,x <- y-1,x)
+			if y >= 0:
+				transpFromTop = transpVectors[2,y-1,x]
+			else:
+				transpFromTop = 0
+
+			# From right (y,x <- y,x+1)
+			if x < matrix_num_columns - 1:
+				transpFromRight = transpVectors[3,y,x+1]
+			else:
+				transpFromRight = 0 
+
+			# From bottom (y,x <- y+1,x)
+			if y < matrix_num_rows - 1:
+				transpFromBottom = transpVectors[0,y+1,x]
+			else:
+				transpFromBottom = 0
+
+			# From left (y,x <- y,x-1)
+			if x >= 0:
+				transpFromLeft = transpVectors[1,y,x-1]
+			else:
+				transpFromLeft = 0
 
 			# Update the auxin concentration in each cell
-			#auxin[i,j] = auxin[i,j] - ( transpVectors[i,j] * nbr_cell_neighbours ) + transpFromLeft + transpFromRight + transpFromTop + transpFromBottom
+			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
+			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 
-	
 
 
+	# PIN1 UTG
 
 	# Calculate updated PIN1 allocation
 	for y in range(auxin_matrix_shape[0]):
@@ -281,11 +341,11 @@ for iteration in range(nbr_iterations):
 
 			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
 
-
+	
 
 	
-	auxin[3,3] = auxin[3,3] + auxin_synthesis
-	auxin[10,5] = 0.5
+	#auxin[3,3] = auxin[3,3] + auxin_synthesis
+	#auxin[10,5] = 0.5
 	#auxin[9,11] = auxin[9,11] + auxin_synthesis
 
 
@@ -304,7 +364,7 @@ for iteration in range(nbr_iterations):
 # pin1[0,0,5] = 5 refers to top wall of cell in 1st row, 6th column
 # 
 # 
-# 
+# Set diffusion to 0 at faces that are outer boundaries
 # 
 # 
 
