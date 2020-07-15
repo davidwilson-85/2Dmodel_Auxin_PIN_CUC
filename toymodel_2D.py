@@ -4,7 +4,8 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
+import functions
 
 
 # === SET PARAMETERS
@@ -36,14 +37,14 @@ pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cy
 
 cuc_range = (0, 1)
 
-nbr_iterations = 300
+nbr_iterations = 1
 
 
 # === LOAD DATA
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
-pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,20,20)) # Format is [z,y,x]
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,4)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
 # LUTs
@@ -52,7 +53,10 @@ lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('
 lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 
-matrix_num_columns, matrix_num_rows = auxin.shape[0], auxin.shape[1]
+matrix_num_rows, matrix_num_columns = auxin.shape[0], auxin.shape[1]
+print 'shape', auxin.shape
+print 'cols: ', matrix_num_columns
+print 'rows: ', matrix_num_rows
 
 
 # === FUNCTIONS
@@ -96,13 +100,8 @@ def create_cell_plot(matrix_shape):
 			
 			# Draw cell outline and fill
 			ImageDraw.Draw(im).polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline=(50,50,50,255), fill=index_to_rgb(lut_auxin, auxin[i,j], auxin_range))
-			
-			# Draw PIN1 (top, right, bottom, left)
-			#ImageDraw.Draw(im).line([(x+1,y+2),(x+cellSide-1,y+2)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
-			#ImageDraw.Draw(im).line([(x+cellSide-2,y+2),(x+cellSide-2,y+cellSide-1)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
-			#ImageDraw.Draw(im).line([(x+1,y+cellSide-2),(x+cellSide-1,y+cellSide-2)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
-			#ImageDraw.Draw(im).line([(x+2,y+2),(x+2,y+cellSide-2)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
 
+			# Draw PIN1
 			ImageDraw.Draw(im).line([(x+4,y+3),(x+cellSide-4,y+3)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
 			ImageDraw.Draw(im).line([(x+cellSide-3,y+4),(x+cellSide-3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
 			ImageDraw.Draw(im).line([(x+4,y+cellSide-3),(x+cellSide-4,y+cellSide-3)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
@@ -110,6 +109,9 @@ def create_cell_plot(matrix_shape):
 			
 			# Draw CUC		
 			#ImageDraw.Draw(im).ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], fill='green')
+
+			# Draw auxin concentration
+			ImageDraw.Draw(im).text((x+20,y+20), str(round(auxin[i,j],1)), fill=(255, 255, 0))
 			
 			x = x + cellSide
 		
@@ -122,28 +124,29 @@ def create_cell_plot(matrix_shape):
 
 	im.save('images/test/image' + str(iteration) +'.png')
 
+
 def auxin_diffusion(auxin_diffusionFactor):
 	
-	#
+	# 
 	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
-	#
+	# 
 	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
-	#
+	# 
 	# k = diffusion factor constant
-	#
+	# 
 
 	# Create absolute efflux diffusion values for each cell
 	diffusionVectors = np.zeros(auxin_matrix_shape, dtype=(float,1))	
-	for y in range(matrix_num_columns):
-		for x in range(matrix_num_rows):
+	for y in range(matrix_num_rows):
+		for x in range(matrix_num_columns):
 			# Amount of auxin that is lost per cell face
 			diffusionVectors[y,x] = auxin[y,x] * auxin_diffusionFactor
 			
 	#print diffusionVectors
 	
 	# Apply diffusion to auxin concentration values
-	for y in range(matrix_num_columns):
-		for x in range(matrix_num_rows):
+	for y in range(matrix_num_rows):
+		for x in range(matrix_num_columns):
 
 			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
 			nbr_cell_neighbours = 0
@@ -192,7 +195,6 @@ def auxin_diffusion(auxin_diffusionFactor):
 for iteration in range(nbr_iterations):
 
 	print iteration
-	print auxin
 
 	# Plot data in heatmap
 	#create_heatmap(data=data)
@@ -200,12 +202,68 @@ for iteration in range(nbr_iterations):
 	# Plot data in cell tilling
 	create_cell_plot(auxin_matrix_shape)
 
+
+	# PIN1 UTG
+
+	# Calculate updated PIN1 allocation
+	for y in range(matrix_num_rows):
+		for x in range(matrix_num_columns):
+
+			# Left
+			if x > 0:
+				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
+			else:
+				utg_auxinRatioL = 1.0
+			
+			# Right
+			if x < matrix_num_columns - 1:
+				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
+			else:
+				utg_auxinRatioR = 1.0
+			
+			# Top	
+			if y > 0:
+				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
+			else:
+				utg_auxinRatioT = 1.0
+			
+			# Bottom
+			if y < matrix_num_rows - 1:
+				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
+			else:
+				utg_auxinRatioB = 1.0
+
+			# Calculate updated normalized PIN1 concentration values per cell face
+			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
+
+			updated_pin1_T = pin1[0,y,x] * utg_auxinRatioT
+			updated_pin1_R = pin1[1,y,x] * utg_auxinRatioR
+			updated_pin1_B = pin1[2,y,x] * utg_auxinRatioB
+			updated_pin1_L = pin1[3,y,x] * utg_auxinRatioL
+
+			total_pin1_updated = updated_pin1_T + updated_pin1_R + updated_pin1_B + updated_pin1_L
+
+			normalization_ratio = total_pin1 / total_pin1_updated
+
+			# Normalize (force the sum of PIN1 in all faces in the cell to remain unchanged)
+			pin1[0,y,x] = updated_pin1_T * normalization_ratio
+			pin1[1,y,x] = updated_pin1_R * normalization_ratio
+			pin1[2,y,x] = updated_pin1_B * normalization_ratio
+			pin1[3,y,x] = updated_pin1_L * normalization_ratio
+
+			#pin1[0,0,5] = 9
+
+			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
+
+			print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+
+
 	
 	# AUXIN DIFUSSION
 
 	if Diffusion == True:
 
-		auxin_diffusion(auxin_diffusionFactor)
+		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin)
 
 	
 	# AUXIN TRANSPORT
@@ -219,8 +277,8 @@ for iteration in range(nbr_iterations):
 	# Create absolute efflux transport values for each cell
 	transpVectors = np.zeros(pin1_matrix_shape, dtype=(float,1)) # 3D array = (cell_face, column, row)
 	
-	for y in range(matrix_num_columns):
-		for x in range(matrix_num_rows):
+	for y in range(matrix_num_rows):
+		for x in range(matrix_num_columns):
 
 			auxin_molecules = auxin[y,x]
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
@@ -256,8 +314,8 @@ for iteration in range(nbr_iterations):
 			else:
 				transpVectors[3,y,x] = 0
 
-	for y in range(matrix_num_columns):
-		for x in range(matrix_num_rows):
+	for y in range(matrix_num_rows):
+		for x in range(matrix_num_columns):
 
 			# From top (y,x <- y-1,x)
 			if y >= 0:
@@ -286,62 +344,9 @@ for iteration in range(nbr_iterations):
 			# Update the auxin concentration in each cell
 			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
-
-
-
-	# PIN1 UTG
-
-	# Calculate updated PIN1 allocation
-	for y in range(auxin_matrix_shape[0]):
-		for x in range(auxin_matrix_shape[1]):
-
-			# Left
-			if x-1 >= 0:
-				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
-			else:
-				utg_auxinRatioL = 1.0
-			
-			# Right
-			try:
-				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
-			except IndexError:
-				utg_auxinRatioR = 1.0
-			
-			# Top	
-			if y-1 >= 0:
-				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
-			else:
-				utg_auxinRatioT = 1.0
-			
-			# Bottom
-			try:
-				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
-			except IndexError:
-				utg_auxinRatioB = 1.0
-
-			# Calculate updated normalized PIN1 concentration values per cell face
-			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
-
-			updated_pin1_T = pin1[0,y,x] * utg_auxinRatioT
-			updated_pin1_R = pin1[1,y,x] * utg_auxinRatioR
-			updated_pin1_B = pin1[2,y,x] * utg_auxinRatioB
-			updated_pin1_L = pin1[3,y,x] * utg_auxinRatioL
-
-			total_pin1_updated = updated_pin1_T + updated_pin1_R + updated_pin1_B + updated_pin1_L
-
-			normalization_ratio = total_pin1 / total_pin1_updated
-
-			# Normalize (force the sum of PIN1 in all faces in the cell to remain unchanged)
-			pin1[0,y,x] = updated_pin1_T * normalization_ratio
-			pin1[1,y,x] = updated_pin1_R * normalization_ratio
-			pin1[2,y,x] = updated_pin1_B * normalization_ratio
-			pin1[3,y,x] = updated_pin1_L * normalization_ratio
-
-			#pin1[0,0,5] = 9
-
-			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
-
 	
+
+	print pin1
 
 	
 	#auxin[3,3] = auxin[3,3] + auxin_synthesis
