@@ -32,19 +32,31 @@ auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
 auxin_lossRate = 0.75
 
 pin1_range = (0, 9)
-pin1_UTGresponsiveness = 0.01	# Relative amount of molecules that can change cell face per cycle
+pin1_UTGresponsiveness = 0.001	# Relative amount of molecules that can change cell face per cycle
+###################################
+#
+# Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
+#
+###################################
 pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
 
 cuc_range = (0, 1)
+auxin_on_cuc = 0
+cuc_on_pin1Pol = 0
 
-nbr_iterations = 1
+nbr_iterations = 200
+
+# Local synthesis or degradation (absolute or relative)
+	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
+
+	# Example: marginSynthesis = new Local(type='synth', mode='abs', coords=(2,4,0), cycles=(0-4)) 
 
 
 # === LOAD DATA
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
-pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,4)) # Format is [z,y,x]
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,21,21)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
 # LUTs
@@ -87,7 +99,7 @@ def index_to_rgb(lut, level, range):
 # Create cell plot using pil
 def create_cell_plot(matrix_shape):
 	
-	im = Image.new('RGBA', size=(700,700))
+	im = Image.new('RGBA', size=(1100,1100))
 	x_origin = 0
 	y_origin = 0
 	cellSide = 50
@@ -124,67 +136,6 @@ def create_cell_plot(matrix_shape):
 
 	im.save('images/test/image' + str(iteration) +'.png')
 
-
-def auxin_diffusion(auxin_diffusionFactor):
-	
-	# 
-	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
-	# 
-	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
-	# 
-	# k = diffusion factor constant
-	# 
-
-	# Create absolute efflux diffusion values for each cell
-	diffusionVectors = np.zeros(auxin_matrix_shape, dtype=(float,1))	
-	for y in range(matrix_num_rows):
-		for x in range(matrix_num_columns):
-			# Amount of auxin that is lost per cell face
-			diffusionVectors[y,x] = auxin[y,x] * auxin_diffusionFactor
-			
-	#print diffusionVectors
-	
-	# Apply diffusion to auxin concentration values
-	for y in range(matrix_num_rows):
-		for x in range(matrix_num_columns):
-
-			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
-			nbr_cell_neighbours = 0
-			
-			# numpy arrays accept negative indexes, so testing if an index exists at the left and top of the grid, and at the right and bottom, must be done in a different way: 
-			
-			# Left
-			if y-1 >= 0:
-				diffusionFromLeft = diffusionVectors[y-1,x]
-				nbr_cell_neighbours	+=1
-			else:
-				diffusionFromLeft = 0
-			
-			# Right
-			try: 
-				diffusionFromRight = diffusionVectors[y+1,x]
-				nbr_cell_neighbours	+=1
-			except IndexError:
-				diffusionFromRight = 0
-			
-			# Top	
-			if x-1 >= 0:
-				diffusionFromTop = diffusionVectors[y,x-1]
-				nbr_cell_neighbours	+=1
-			else:
-				diffusionFromTop = 0
-			
-			# Bottom
-			try: 
-				diffusionFromBottom = diffusionVectors[y,x+1]
-				nbr_cell_neighbours	+=1
-			except IndexError:
-				diffusionFromBottom = 0
-			
-			# Update the auxin concentration in each cell
-			auxin[y,x] = auxin[y,x] - ( diffusionVectors[y,x] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
-
-
 	
 # =====================================================================================
 # =====================================================================================
@@ -203,6 +154,15 @@ for iteration in range(nbr_iterations):
 	create_cell_plot(auxin_matrix_shape)
 
 
+	# AUXIN DIFUSSION
+
+	if Diffusion == True:
+
+		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin)
+
+
+
+	
 	# PIN1 UTG
 
 	# Calculate updated PIN1 allocation
@@ -255,15 +215,8 @@ for iteration in range(nbr_iterations):
 
 			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
 
-			print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
-
-
+			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 	
-	# AUXIN DIFUSSION
-
-	if Diffusion == True:
-
-		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin)
 
 	
 	# AUXIN TRANSPORT
@@ -288,10 +241,10 @@ for iteration in range(nbr_iterations):
 			# Later on: calculate excess ratio and then use to reduce the the value of the vector below
 			if transported_molecules_total > auxin_molecules:
 				transported_molecules_total = auxin_molecules
-				print 'warning: transported molecules had to be manually adjusted in cell ' + y, x
+				print 'warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x)
 
 			# To top (y,x -> y-1,x)
-			if y >= 0:
+			if y > 0:
 				transpVectors[0,y,x] = auxin_molecules * pin1[0,y,x] * pin1_transp
 			else:
 				transpVectors[0,y,x] = 0
@@ -309,7 +262,7 @@ for iteration in range(nbr_iterations):
 				transpVectors[2,y,x] = 0
 
 			# To left (y,x -> y,x-1)
-			if x >= 0:
+			if x > 0:
 				transpVectors[3,y,x] = auxin_molecules * pin1[3,y,x] * pin1_transp
 			else:
 				transpVectors[3,y,x] = 0
@@ -318,7 +271,7 @@ for iteration in range(nbr_iterations):
 		for x in range(matrix_num_columns):
 
 			# From top (y,x <- y-1,x)
-			if y >= 0:
+			if y > 0:
 				transpFromTop = transpVectors[2,y-1,x]
 			else:
 				transpFromTop = 0
@@ -336,7 +289,7 @@ for iteration in range(nbr_iterations):
 				transpFromBottom = 0
 
 			# From left (y,x <- y,x-1)
-			if x >= 0:
+			if x > 0:
 				transpFromLeft = transpVectors[1,y,x-1]
 			else:
 				transpFromLeft = 0
@@ -346,10 +299,10 @@ for iteration in range(nbr_iterations):
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 	
 
-	print pin1
+	#print pin1
 
 	
-	#auxin[3,3] = auxin[3,3] + auxin_synthesis
+	auxin[10,10] = auxin[10,10] + auxin_synthesis
 	#auxin[10,5] = 0.5
 	#auxin[9,11] = auxin[9,11] + auxin_synthesis
 
