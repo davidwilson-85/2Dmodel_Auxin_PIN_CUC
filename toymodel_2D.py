@@ -59,6 +59,8 @@ auxin_matrix_shape = auxin.shape
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,21,21)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
+diff_vectors = np.zeros_like(pin1) # where z[0] => dx and z[1] => dy
+
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
@@ -71,7 +73,7 @@ print 'cols: ', matrix_num_columns
 print 'rows: ', matrix_num_rows
 
 
-# === FUNCTIONS
+# === FUNCTIONS (To move to functions.py)
 
 # Create a heatmap using matplotlib's imshow()
 def create_heatmap(data):
@@ -81,62 +83,6 @@ def create_heatmap(data):
 	plt.close()
 
 
-# Maps an integer representing the amount of a magnitude (e.g. [auxin]) and translates it to the corresponding RGB triplet of the selected LUT
-def index_to_rgb(lut, level, range):
-
-	# Clip values out of range
-	if level < range[0]: level = range[0]
-	if level > range[1]: level = range[1]
-
-	# Rescale range to 0-255 (this is typical lut range)
-	rescaled_level = int( ( level / range[1] ) * 255 )
-	
-	# Create RGB triplet
-	rgb_triplet = (lut[1,rescaled_level],lut[2,rescaled_level],lut[3,rescaled_level])
-	return rgb_triplet
-
-
-# Create cell plot using pil
-def create_cell_plot(matrix_shape):
-	
-	im = Image.new('RGBA', size=(1100,1100))
-	x_origin = 0
-	y_origin = 0
-	cellSide = 50
-	y = y_origin
-
-	for i in range(matrix_shape[0]):
-		x = x_origin
-		
-		for j in range(matrix_shape[1]):
-			
-			# Draw cell outline and fill
-			ImageDraw.Draw(im).polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline=(50,50,50,255), fill=index_to_rgb(lut_auxin, auxin[i,j], auxin_range))
-
-			# Draw PIN1
-			ImageDraw.Draw(im).line([(x+4,y+3),(x+cellSide-4,y+3)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
-			ImageDraw.Draw(im).line([(x+cellSide-3,y+4),(x+cellSide-3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
-			ImageDraw.Draw(im).line([(x+4,y+cellSide-3),(x+cellSide-4,y+cellSide-3)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
-			ImageDraw.Draw(im).line([(x+3,y+4),(x+3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
-			
-			# Draw CUC		
-			#ImageDraw.Draw(im).ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], fill='green')
-
-			# Draw auxin concentration
-			ImageDraw.Draw(im).text((x+20,y+20), str(round(auxin[i,j],1)), fill=(255, 255, 0))
-			
-			x = x + cellSide
-		
-		y = y + cellSide
-
-	x = x_origin
-	y = y_origin
-
-	#ImageDraw.Draw(im).line([(x+1,y+2),(x+cellSide-1,y+2)], fill='red', width=3)
-
-	im.save('images/test/image' + str(iteration) +'.png')
-
-	
 # =====================================================================================
 # =====================================================================================
 
@@ -151,14 +97,14 @@ for iteration in range(nbr_iterations):
 	#create_heatmap(data=data)
 
 	# Plot data in cell tilling
-	create_cell_plot(auxin_matrix_shape)
+	functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, diff_vectors)
 
 
 	# AUXIN DIFUSSION
 
 	if Diffusion == True:
 
-		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin)
+		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin, diff_vectors)
 
 
 
@@ -297,9 +243,6 @@ for iteration in range(nbr_iterations):
 			# Update the auxin concentration in each cell
 			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
-	
-
-	#print pin1
 
 	
 	auxin[10,10] = auxin[10,10] + auxin_synthesis
