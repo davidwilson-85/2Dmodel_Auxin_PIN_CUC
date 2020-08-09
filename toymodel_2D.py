@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 #import tilings
-import math
+import os, shutil, math, random
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
+
 import functions
 
 
@@ -18,18 +19,18 @@ cuc_template = 'templates/...'
 # Switches
 Diffusion = True
 PIN1_UTG = False
-PIN1_WTF_linear = False
-PIN1_WTF_cuadratic = False
+PIN1_WTF_linear = 'linear' # linear, cuadratic...
 PIN1_transport = False
 AUX_LAX_transport = False
 CUC = False
+Auxin_noise = False
 
 # Parameters
-auxin_range = (0, 9)
+auxin_range = (0, 19)
 auxin_diffusionFactor = 0.1		# Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1     		# Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
-auxin_lossRate = 0.75
+auxin_noise_factor = 0.1
 
 pin1_range = (0, 9)
 pin1_UTGresponsiveness = 0.001	# Relative amount of molecules that can change cell face per cycle
@@ -38,13 +39,15 @@ pin1_UTGresponsiveness = 0.001	# Relative amount of molecules that can change ce
 # Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
 #
 ###################################
-pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
+pin1_transp = 0.001				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
 
 cuc_range = (0, 1)
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
-nbr_iterations = 200
+nbr_iterations = 300
+img_dest_folder = 'images/test'
+cell_plot_frequency = 1
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -56,10 +59,10 @@ nbr_iterations = 200
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
-pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,21,21)) # Format is [z,y,x]
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,3)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
-diff_vectors = np.zeros_like(pin1) # where z[0] => dx and z[1] => dy
+array_netFlux_vectors = np.zeros_like(pin1) # where z[0] => dx and z[1] => dy
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
@@ -89,25 +92,58 @@ def create_heatmap(data):
 
 # === PROCESS DATA
 
+
+# Perform simulation cycles
+
 for iteration in range(nbr_iterations):
 
 	print iteration
 
 	# Plot data in heatmap
 	#create_heatmap(data=data)
+	
+	#*************************************************************************************
 
 	# Plot data in cell tilling
-	functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, diff_vectors)
+	
+	# Cleanup destination folder (remove and create)
+	if iteration == 0:
+		shutil.rmtree(img_dest_folder) 
+		os.mkdir(img_dest_folder)
+	
+	# Draw cell plot 
+	if iteration % cell_plot_frequency == 0:
+		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, array_netFlux_vectors, img_dest_folder)
+	
+	#*************************************************************************************
+	
+	# Apply noise to auxin
+	
+	if Auxin_noise == True:
+	
+		for y in range(matrix_num_rows):
+			for x in range(matrix_num_columns):
+			
+				auxin[x,y] = auxin[x,y] + random.uniform(-auxin_noise_factor, auxin_noise_factor)
+			
+				if auxin[x,y] < 0:
+					auxin[x,y] = float(0.0000001)
+	
+	#*************************************************************************************
 
-
-	# AUXIN DIFUSSION
+	# AUXIN DIFFUSION
 
 	if Diffusion == True:
 
-		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin, diff_vectors)
+		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin, array_netFlux_vectors, iteration)
 
+	#*************************************************************************************
 
+	# AUXIN SYNTHESIS / DEGRADATION
 
+	auxin[1,1] = auxin[1,1] + 1
+
+	#*************************************************************************************
 	
 	# PIN1 UTG
 
@@ -115,30 +151,30 @@ for iteration in range(nbr_iterations):
 	for y in range(matrix_num_rows):
 		for x in range(matrix_num_columns):
 
-			# Left
-			if x > 0:
-				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
-			else:
-				utg_auxinRatioL = 1.0
-			
-			# Right
-			if x < matrix_num_columns - 1:
-				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
-			else:
-				utg_auxinRatioR = 1.0
-			
 			# Top	
 			if y > 0:
 				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioT = 1.0
 			
+			# Right
+			if x < matrix_num_columns - 1:
+				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
+			else:
+				utg_auxinRatioR = 1.0
+				
 			# Bottom
 			if y < matrix_num_rows - 1:
 				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioB = 1.0
-
+				
+			# Left
+			if x > 0:
+				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
+			else:
+				utg_auxinRatioL = 1.0
+			
 			# Calculate updated normalized PIN1 concentration values per cell face
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 
@@ -163,7 +199,7 @@ for iteration in range(nbr_iterations):
 
 			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 	
-
+	'''
 	
 	# AUXIN TRANSPORT
 	# Apply PIN1 transport to auxin concentration values
@@ -244,8 +280,9 @@ for iteration in range(nbr_iterations):
 			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 
+	'''
 	
-	auxin[10,10] = auxin[10,10] + auxin_synthesis
+	#auxin[10,10] = auxin[10,10] + auxin_synthesis
 	#auxin[10,5] = 0.5
 	#auxin[9,11] = auxin[9,11] + auxin_synthesis
 
@@ -268,5 +305,4 @@ for iteration in range(nbr_iterations):
 # Set diffusion to 0 at faces that are outer boundaries
 # 
 # 
-
 
