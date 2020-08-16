@@ -26,7 +26,7 @@ CUC = False
 Auxin_noise = False
 
 # Parameters
-auxin_range = (0, 19)
+auxin_range = (0, 9)
 auxin_diffusionFactor = 0.1		# Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1     		# Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
@@ -45,9 +45,9 @@ cuc_range = (0, 1)
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
-nbr_iterations = 300
+nbr_iterations = 1000
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 20
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -59,21 +59,21 @@ cell_plot_frequency = 1
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
-pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,3,3)) # Format is [z,y,x]
+tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
+pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
-array_netFlux_vectors = np.zeros_like(pin1) # where z[0] => dx and z[1] => dy
+array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
+#array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
-
-matrix_num_rows, matrix_num_columns = auxin.shape[0], auxin.shape[1]
 print 'shape', auxin.shape
-print 'cols: ', matrix_num_columns
-print 'rows: ', matrix_num_rows
+print 'cols: ', tissue_columns
+print 'rows: ', tissue_rows
 
 
 # === FUNCTIONS (To move to functions.py)
@@ -113,7 +113,7 @@ for iteration in range(nbr_iterations):
 	
 	# Draw cell plot 
 	if iteration % cell_plot_frequency == 0:
-		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, array_netFlux_vectors, img_dest_folder)
+		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, array_auxin_fluxes, img_dest_folder)
 	
 	#*************************************************************************************
 	
@@ -121,8 +121,8 @@ for iteration in range(nbr_iterations):
 	
 	if Auxin_noise == True:
 	
-		for y in range(matrix_num_rows):
-			for x in range(matrix_num_columns):
+		for y in range(tissue_rows):
+			for x in range(tissue_columns):
 			
 				auxin[x,y] = auxin[x,y] + random.uniform(-auxin_noise_factor, auxin_noise_factor)
 			
@@ -135,21 +135,25 @@ for iteration in range(nbr_iterations):
 
 	if Diffusion == True:
 
-		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, matrix_num_columns, matrix_num_rows, auxin, array_netFlux_vectors, iteration)
+		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, array_auxin_fluxes, iteration)
 
 	#*************************************************************************************
 
 	# AUXIN SYNTHESIS / DEGRADATION
 
-	auxin[1,1] = auxin[1,1] + 1
+	#auxin[2,2] = auxin[2,2] + 1
+	auxin[7,6] = 9
+	auxin[17,14] = 7
+	auxin[3,16] = 0.0000001
+	auxin[14,2] = 2
 
 	#*************************************************************************************
 	
 	# PIN1 UTG
 
 	# Calculate updated PIN1 allocation
-	for y in range(matrix_num_rows):
-		for x in range(matrix_num_columns):
+	for y in range(tissue_rows):
+		for x in range(tissue_columns):
 
 			# Top	
 			if y > 0:
@@ -158,13 +162,13 @@ for iteration in range(nbr_iterations):
 				utg_auxinRatioT = 1.0
 			
 			# Right
-			if x < matrix_num_columns - 1:
+			if x < tissue_columns - 1:
 				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
 			else:
 				utg_auxinRatioR = 1.0
 				
 			# Bottom
-			if y < matrix_num_rows - 1:
+			if y < tissue_rows - 1:
 				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioB = 1.0
@@ -212,8 +216,8 @@ for iteration in range(nbr_iterations):
 	# Create absolute efflux transport values for each cell
 	transpVectors = np.zeros(pin1_matrix_shape, dtype=(float,1)) # 3D array = (cell_face, column, row)
 	
-	for y in range(matrix_num_rows):
-		for x in range(matrix_num_columns):
+	for y in range(tissue_rows):
+		for x in range(tissue_columns):
 
 			auxin_molecules = auxin[y,x]
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
@@ -232,13 +236,13 @@ for iteration in range(nbr_iterations):
 				transpVectors[0,y,x] = 0
 
 			# To right (y,x -> y,x+1)
-			if x < matrix_num_columns - 1:
+			if x < tissue_columns - 1:
 				transpVectors[1,y,x] = auxin_molecules * pin1[1,y,x] * pin1_transp
 			else:
 				transpVectors[1,y,x] = 0
 
 			# To bottom (y,x -> y+1,x)
-			if y < matrix_num_rows - 1:
+			if y < tissue_rows - 1:
 				transpVectors[2,y,x] = auxin_molecules * pin1[2,y,x] * pin1_transp
 			else:
 				transpVectors[2,y,x] = 0
@@ -249,8 +253,8 @@ for iteration in range(nbr_iterations):
 			else:
 				transpVectors[3,y,x] = 0
 
-	for y in range(matrix_num_rows):
-		for x in range(matrix_num_columns):
+	for y in range(tissue_rows):
+		for x in range(tissue_columns):
 
 			# From top (y,x <- y-1,x)
 			if y > 0:
@@ -259,13 +263,13 @@ for iteration in range(nbr_iterations):
 				transpFromTop = 0
 
 			# From right (y,x <- y,x+1)
-			if x < matrix_num_columns - 1:
+			if x < tissue_columns - 1:
 				transpFromRight = transpVectors[3,y,x+1]
 			else:
 				transpFromRight = 0 
 
 			# From bottom (y,x <- y+1,x)
-			if y < matrix_num_rows - 1:
+			if y < tissue_rows - 1:
 				transpFromBottom = transpVectors[0,y+1,x]
 			else:
 				transpFromBottom = 0
