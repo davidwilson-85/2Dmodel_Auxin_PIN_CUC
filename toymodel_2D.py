@@ -14,13 +14,13 @@ import functions
 # Templates
 auxin_template = 'templates/auxin_template'
 pin1_template = 'templates/pin1_template'
-cuc_template = 'templates/...'
+cuc_template = 'templates/cuc_template'
 
 # Switches
 Diffusion = True
-PIN1_UTG = False
-PIN1_WTF_linear = 'linear' # linear, cuadratic...
-PIN1_transport = False
+PIN1_UTG = True
+PIN1_WTF = 'linear' # linear, cuadratic...
+PIN1_transport = True
 AUX_LAX_transport = False
 CUC = False
 Auxin_noise = False
@@ -39,15 +39,15 @@ pin1_UTGresponsiveness = 0.001	# Relative amount of molecules that can change ce
 # Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
 #
 ###################################
-pin1_transp = 0.001				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
+pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
 
-cuc_range = (0, 1)
+cuc_range = (0, 9)
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
-nbr_iterations = 1000
+nbr_iterations = 25
 img_dest_folder = 'images/test'
-cell_plot_frequency = 20
+cell_plot_frequency = 2
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -63,13 +63,15 @@ tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
+cuc = np.loadtxt(cuc_template, delimiter=',', unpack=False)
+
 array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
-lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_gray.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 print 'shape', auxin.shape
 print 'cols: ', tissue_columns
@@ -113,7 +115,7 @@ for iteration in range(nbr_iterations):
 	
 	# Draw cell plot 
 	if iteration % cell_plot_frequency == 0:
-		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, iteration, array_auxin_fluxes, img_dest_folder)
+		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_auxin_fluxes, img_dest_folder)
 	
 	#*************************************************************************************
 	
@@ -141,11 +143,11 @@ for iteration in range(nbr_iterations):
 
 	# AUXIN SYNTHESIS / DEGRADATION
 
-	#auxin[2,2] = auxin[2,2] + 1
-	auxin[7,6] = 9
-	auxin[17,14] = 7
-	auxin[3,16] = 0.0000001
-	auxin[14,2] = 2
+	source = 7
+	sink = 3
+
+	auxin[5,5] = auxin[5,5] + 0.5 
+
 
 	#*************************************************************************************
 	
@@ -203,9 +205,9 @@ for iteration in range(nbr_iterations):
 
 			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 	
-	'''
 	
-	# AUXIN TRANSPORT
+	
+	# PIN1-MEDIATED AUXIN TRANSPORT
 	# Apply PIN1 transport to auxin concentration values
 	#
 	# PIN1_Tr = Nbr auxin molecules / ( PIN1 molecule * cycle )
@@ -284,7 +286,7 @@ for iteration in range(nbr_iterations):
 			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 
-	'''
+	
 	
 	#auxin[10,10] = auxin[10,10] + auxin_synthesis
 	#auxin[10,5] = 0.5
