@@ -45,9 +45,9 @@ cuc_range = (0, 9)
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
-nbr_iterations = 25
+nbr_iterations = 500
 img_dest_folder = 'images/test'
-cell_plot_frequency = 2
+cell_plot_frequency = 20
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -71,7 +71,7 @@ array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out,
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
-lut_cuc = np.loadtxt('luts/lut_gray.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 print 'shape', auxin.shape
 print 'cols: ', tissue_columns

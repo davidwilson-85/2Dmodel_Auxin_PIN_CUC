@@ -43,8 +43,11 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 			# Write auxin concentration
 			#ImageDraw.Draw(im).text((x+20,y+20), str(round(auxin[i,j],1)), fill=(255, 255, 0))
 
-			# Draw CUC		
-			draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
+			# Draw CUC
+			# outline=None or outline with same value as fill does not work. To solve this I use the same color as the auxin citoplasm background.	
+			draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], outline=index_to_rgb(lut_auxin, auxin[i,j], auxin_range), fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
+
+			#fill=(0, 0, 255, 25)
 			
 			x = x + cellSide
 		
@@ -68,13 +71,9 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 
 	x = x_origin
 	y = y_origin
-
-	draw.polygon([(50, 0), (100, 100), (0, 100)], (255, 0, 0, 125))
-
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration+1000) +'.png')
-
 
 
 
@@ -102,8 +101,9 @@ def index_to_rgba(lut, level, range):
 	# Rescale range to 0-255 (this is typical lut range)
 	rescaled_level = int( ( level / range[1] ) * 255 )
 	
-	# Create RGB triplet
-	rgba = (lut[1,rescaled_level],lut[2,rescaled_level],lut[3,rescaled_level],lut[4,level])
+	# Create RGBA tuple
+	rgba = (lut[1,rescaled_level],lut[2,rescaled_level],lut[3,rescaled_level],lut[0,rescaled_level])
+	#print rgba
 	return rgba
 
 
