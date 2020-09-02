@@ -188,3 +188,99 @@ def auxin_diffusion(auxin_diffusionFactor, gridShape, tissue_columns, tissue_row
 
 			auxin[y,x] = auxin[y,x] - (array_af[0,y,x] + array_af[2,y,x] + array_af[4,y,x] + array_af[6,y,x]) + (array_af[1,y,x] + array_af[3,y,x] + array_af[5,y,x] + array_af[7,y,x])
 
+	
+			
+	
+	
+
+
+def auxin_diffusion_old(auxin_diffusionFactor, gridShape, columns, rows, auxin, diff_vectors, iteration):
+	
+	#
+	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
+	#
+	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
+	#
+	# k = diffusion factor constant
+	#
+
+
+	# Calculate absolute outgoing auxin to each neighbour (= per cell face)
+	
+	array_auxinLossPerCellFace = np.zeros(gridShape, dtype=(float,1))
+	
+	for y in range(rows):
+		for x in range(columns):
+			# Amount of auxin that is lost per cell face
+			array_auxinLossPerCellFace[y,x] = auxin[y,x] * auxin_diffusionFactor
+	
+	# Calculate absolute incoming auxin from each neighbour (= per cell face). Then, update the auxin concentration in each cell
+	
+	for y in range(rows):
+		print 'y', y, 'rows', rows
+		for x in range(columns):
+			
+			# REWRITE THIS TO MAKE IT SIMPLER (BOUNDARY ALSO AFFECTS OUTGOING AUXIN)
+
+			# Count how many neighbours the cell has, to calculate the amount of efflux diffusion
+			nbr_cell_neighbours = 0
+			
+			# numpy arrays accept negative indexes, so testing if an index exists at the left and top of the grid, and at the right and bottom, must be done in a different way: 
+			
+			# From top	
+			if y > 0:
+				diffusionFromTop = array_auxinLossPerCellFace[y,x-1]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromTop = 0
+			
+			# From right
+			if x < columns - 1:
+				diffusionFromRight = array_auxinLossPerCellFace[y+1,x]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromRight = 0
+			
+			# From bottom
+			if y < rows - 1:
+				diffusionFromBottom = array_auxinLossPerCellFace[y,x+1]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromBottom = 0
+			
+			# From left
+			if x > 0:
+				diffusionFromLeft = array_auxinLossPerCellFace[y-1,x]
+				nbr_cell_neighbours	+=1
+			else:
+				diffusionFromLeft = 0
+
+			# Update the auxin concentration in each cell
+			auxin[y,x] = auxin[y,x] - ( array_auxinLossPerCellFace[y,x] * nbr_cell_neighbours ) + diffusionFromLeft + diffusionFromRight + diffusionFromTop + diffusionFromBottom
+
+			
+			# Calculate direction vectors
+			
+			# BUG HERE: I NEED TO CHECK IF THERE IS NEIGHBOR BEFORE CALCULATING AUXIN LOSS.......
+			
+			# Net flux top face
+			netFlux_T_face = array_auxinLossPerCellFace[y,x] - diffusionFromTop
+			
+			# Net flux right face
+			netFlux_R_face = array_auxinLossPerCellFace[y,x] - diffusionFromRight
+			
+			# Net flux bottom face
+			netFlux_B_face = - array_auxinLossPerCellFace[y,x] + diffusionFromBottom
+			
+			# Net flux left face
+			netFlux_L_face = - array_auxinLossPerCellFace[y,x] + diffusionFromLeft
+			
+			x_component = netFlux_L_face + netFlux_R_face
+			y_component = netFlux_T_face + netFlux_B_face
+
+			diff_vectors[0,y,x] = x_component
+			diff_vectors[1,y,x] = y_component
+			
+			if y == 1 and x == 0 and iteration == 0:
+				print 'diffusionFromTop', diffusionFromTop
+				print netFlux_T_face, netFlux_R_face, netFlux_B_face, netFlux_L_face			

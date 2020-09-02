@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 
 import functions
+import func_pin
+import func_cuc
 
 
 # === SET PARAMETERS
@@ -27,7 +29,7 @@ Auxin_noise = False
 
 # Parameters
 auxin_range = (0, 9)
-auxin_diffusionFactor = 0.1		# Relative amount of molecules that cross between two adjacent cells per cycle
+auxin_diffusionFactor = 0.2		# Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1     		# Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
 auxin_noise_factor = 0.1
@@ -47,7 +49,7 @@ cuc_on_pin1Pol = 0
 
 nbr_iterations = 500
 img_dest_folder = 'images/test'
-cell_plot_frequency = 20
+cell_plot_frequency = 1
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -146,7 +148,7 @@ for iteration in range(nbr_iterations):
 	source = 7
 	sink = 3
 
-	auxin[5,5] = auxin[5,5] + 0.5 
+	#auxin[5,5] = auxin[5,5] + 0.5 
 
 
 	#*************************************************************************************
@@ -287,10 +289,7 @@ for iteration in range(nbr_iterations):
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 
 	
-	
-	#auxin[10,10] = auxin[10,10] + auxin_synthesis
-	#auxin[10,5] = 0.5
-	#auxin[9,11] = auxin[9,11] + auxin_synthesis
+
 
 
 
