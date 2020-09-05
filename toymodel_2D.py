@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 #import tilings
-import os, shutil, math, random
+import os, shutil, random
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 
-import functions
-import func_pin
+import func_graph
+import func_auxin
 import func_cuc
+import func_pin
 
 
 # === SET PARAMETERS
@@ -19,37 +20,33 @@ pin1_template = 'templates/pin1_template'
 cuc_template = 'templates/cuc_template'
 
 # Switches
-Diffusion = True
 PIN1_UTG = True
 PIN1_WTF = 'linear' # linear, cuadratic...
-PIN1_transport = True
 AUX_LAX_transport = False
 CUC = False
-Auxin_noise = False
 
 # Parameters
-auxin_range = (0, 9)
-auxin_diffusionFactor = 0.2		# Relative amount of molecules that cross between two adjacent cells per cycle
+auxin_range = (0, 9)            # This is only to map variable values to heatmap values
+k_auxin_diffusion = 0.2			# Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1     		# Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
-auxin_noise_factor = 0.1
+auxin_noise_factor = 0
 
 pin1_range = (0, 9)
-pin1_UTGresponsiveness = 0.001	# Relative amount of molecules that can change cell face per cycle
+k_pin1_UTGresponsiveness = 0.01	# Relative amount of molecules that can change cell face per cycle
 ###################################
 #
 # Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
 #
 ###################################
-pin1_transp = 0.01				# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
-
-cuc_range = (0, 9)
+k_pin1_transp = 0.01			# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
+cuc_range = (0, 9)				# This is only to map variable values to heatmap values
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
 nbr_iterations = 500
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 499
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -80,16 +77,6 @@ print 'cols: ', tissue_columns
 print 'rows: ', tissue_rows
 
 
-# === FUNCTIONS (To move to functions.py)
-
-# Create a heatmap using matplotlib's imshow()
-def create_heatmap(data):
-	
-	fig = plt.imshow(data, cmap="plasma", vmin=0, vmax=1, interpolation='none')
-	plt.savefig('images/test/image' + str(iteration) + '.png')
-	plt.close()
-
-
 # =====================================================================================
 # =====================================================================================
 
@@ -117,13 +104,13 @@ for iteration in range(nbr_iterations):
 	
 	# Draw cell plot 
 	if iteration % cell_plot_frequency == 0:
-		functions.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_auxin_fluxes, img_dest_folder)
+		func_graph.create_cell_plot(auxin_matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_auxin_fluxes, img_dest_folder)
 	
 	#*************************************************************************************
 	
 	# Apply noise to auxin
 	
-	if Auxin_noise == True:
+	if auxin_noise_factor > 0:
 	
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
@@ -137,9 +124,9 @@ for iteration in range(nbr_iterations):
 
 	# AUXIN DIFFUSION
 
-	if Diffusion == True:
+	if k_auxin_diffusion > 0:
 
-		functions.auxin_diffusion(auxin_diffusionFactor, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, array_auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion(k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, array_auxin_fluxes, iteration)
 
 	#*************************************************************************************
 
@@ -150,143 +137,23 @@ for iteration in range(nbr_iterations):
 
 	#auxin[5,5] = auxin[5,5] + 0.5 
 
-
-	#*************************************************************************************
+	#*************************************************************************************	
 	
 	# PIN1 UTG
 
-	# Calculate updated PIN1 allocation
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
+	if k_pin1_UTGresponsiveness > 0:
 
-			# Top	
-			if y > 0:
-				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
-			else:
-				utg_auxinRatioT = 1.0
-			
-			# Right
-			if x < tissue_columns - 1:
-				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
-			else:
-				utg_auxinRatioR = 1.0
-				
-			# Bottom
-			if y < tissue_rows - 1:
-				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
-			else:
-				utg_auxinRatioB = 1.0
-				
-			# Left
-			if x > 0:
-				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
-			else:
-				utg_auxinRatioL = 1.0
-			
-			# Calculate updated normalized PIN1 concentration values per cell face
-			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
+		func_pin.auxin_on_pin_polarity(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_columns)
 
-			updated_pin1_T = pin1[0,y,x] * utg_auxinRatioT
-			updated_pin1_R = pin1[1,y,x] * utg_auxinRatioR
-			updated_pin1_B = pin1[2,y,x] * utg_auxinRatioB
-			updated_pin1_L = pin1[3,y,x] * utg_auxinRatioL
+	#*************************************************************************************
 
-			total_pin1_updated = updated_pin1_T + updated_pin1_R + updated_pin1_B + updated_pin1_L
+	# PIN1-MEDIATED AUXIN EFFLUX
 
-			normalization_ratio = total_pin1 / total_pin1_updated
+	if k_pin1_transp > 0:
 
-			# Normalize (force the sum of PIN1 in all faces in the cell to remain unchanged)
-			pin1[0,y,x] = updated_pin1_T * normalization_ratio
-			pin1[1,y,x] = updated_pin1_R * normalization_ratio
-			pin1[2,y,x] = updated_pin1_B * normalization_ratio
-			pin1[3,y,x] = updated_pin1_L * normalization_ratio
-
-			#pin1[0,0,5] = 9
-
-			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
-
-			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+		func_auxin.pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
 	
 	
-	
-	# PIN1-MEDIATED AUXIN TRANSPORT
-	# Apply PIN1 transport to auxin concentration values
-	#
-	# PIN1_Tr = Nbr auxin molecules / ( PIN1 molecule * cycle )
-	#
-	#
-	#
-
-	# Create absolute efflux transport values for each cell
-	transpVectors = np.zeros(pin1_matrix_shape, dtype=(float,1)) # 3D array = (cell_face, column, row)
-	
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
-
-			auxin_molecules = auxin[y,x]
-			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
-			transported_molecules_total = auxin_molecules * total_pin1 * pin1_transp
-
-			# Manually limit transport if it exceeds the amount of auxin molecules
-			# Later on: calculate excess ratio and then use to reduce the the value of the vector below
-			if transported_molecules_total > auxin_molecules:
-				transported_molecules_total = auxin_molecules
-				print 'warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x)
-
-			# To top (y,x -> y-1,x)
-			if y > 0:
-				transpVectors[0,y,x] = auxin_molecules * pin1[0,y,x] * pin1_transp
-			else:
-				transpVectors[0,y,x] = 0
-
-			# To right (y,x -> y,x+1)
-			if x < tissue_columns - 1:
-				transpVectors[1,y,x] = auxin_molecules * pin1[1,y,x] * pin1_transp
-			else:
-				transpVectors[1,y,x] = 0
-
-			# To bottom (y,x -> y+1,x)
-			if y < tissue_rows - 1:
-				transpVectors[2,y,x] = auxin_molecules * pin1[2,y,x] * pin1_transp
-			else:
-				transpVectors[2,y,x] = 0
-
-			# To left (y,x -> y,x-1)
-			if x > 0:
-				transpVectors[3,y,x] = auxin_molecules * pin1[3,y,x] * pin1_transp
-			else:
-				transpVectors[3,y,x] = 0
-
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
-
-			# From top (y,x <- y-1,x)
-			if y > 0:
-				transpFromTop = transpVectors[2,y-1,x]
-			else:
-				transpFromTop = 0
-
-			# From right (y,x <- y,x+1)
-			if x < tissue_columns - 1:
-				transpFromRight = transpVectors[3,y,x+1]
-			else:
-				transpFromRight = 0 
-
-			# From bottom (y,x <- y+1,x)
-			if y < tissue_rows - 1:
-				transpFromBottom = transpVectors[0,y+1,x]
-			else:
-				transpFromBottom = 0
-
-			# From left (y,x <- y,x-1)
-			if x > 0:
-				transpFromLeft = transpVectors[1,y,x-1]
-			else:
-				transpFromLeft = 0
-
-			# Update the auxin concentration in each cell
-			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
-			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
 
 	
 
@@ -309,5 +176,5 @@ for iteration in range(nbr_iterations):
 # 
 # Set diffusion to 0 at faces that are outer boundaries
 # 
-# 
+# Check inner working of func_pin.auxin_on_pin_polarity()
 
