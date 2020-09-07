@@ -5,24 +5,39 @@ import math
 
 
 
-def auxin_on_pin_expression():
+def pin_expression(pin1, auxin, cuc):
 
 	#
 	# Auxin promotes PIN1 expression. To model this, assume that auxin increases PIN1 expression and PIN1 has a constant turnover/decay
 	#
-	#
-
-	pass
-
-
-def cuc_on_pin_expression():
-
-	#
-	# The same as for auxin
+	# P' = A*P*K(AP) + C*P*K(CP) - P*K(Pdecay)
 	#
 	#
+	
+	for y in range(auxin.shape[0]):
+		for x in range(auxin.shape[1]):
+		
+			pin1_cell = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
+			auxin_cell = auxin[y,x]
+			cuc_cell = cuc[y,x]
+			
+			k_auxin_pin1 = 0.0005
+			k_cuc_pin1 = 0.0005
+			k_pin1_decay = 0.003
+			
+			pin1_cell_updated = pin1_cell + auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay
+			
+			if pin1_cell_updated < 0:
+				pin1_cell_updated = 0
+			
+			pin1_ratio = float(pin1_cell_updated / pin1_cell)
+			
+			pin1[0,y,x] = pin1[0,y,x] * pin1_ratio
+			pin1[1,y,x] = pin1[1,y,x] * pin1_ratio
+			pin1[2,y,x] = pin1[2,y,x] * pin1_ratio
+			pin1[3,y,x] = pin1[3,y,x] * pin1_ratio
 
-	pass
+
 
 
 def auxin_on_pin_polarity(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_columns):

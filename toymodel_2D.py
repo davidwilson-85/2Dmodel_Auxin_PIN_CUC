@@ -18,6 +18,7 @@ import func_pin
 auxin_template = 'templates/auxin_template'
 pin1_template = 'templates/pin1_template'
 cuc_template = 'templates/cuc_template'
+middle_domain_template = 'templates/middle_domain_template'
 
 # Switches
 PIN1_UTG = True
@@ -27,26 +28,27 @@ CUC = False
 
 # Parameters
 auxin_range = (0, 9)            # This is only to map variable values to heatmap values
-k_auxin_diffusion = 0.2			# Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.3			# Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1     		# Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     	# Absolute amount of molecules destroyed per cycle
 auxin_noise_factor = 0
 
-pin1_range = (0, 9)
+pin1_range = (0, 19)
 k_pin1_UTGresponsiveness = 0.01	# Relative amount of molecules that can change cell face per cycle
 ###################################
 #
 # Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
 #
 ###################################
-k_pin1_transp = 0.01			# = Nbr auxin molecules transported / ( PIN1 molecule * cycle )
+k_pin1_transp = 0					# = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
+
 cuc_range = (0, 9)				# This is only to map variable values to heatmap values
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
 
-nbr_iterations = 500
+nbr_iterations = 1000
 img_dest_folder = 'images/test'
-cell_plot_frequency = 499
+cell_plot_frequency = 10
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
@@ -59,10 +61,13 @@ cell_plot_frequency = 499
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin_matrix_shape = auxin.shape
 tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
+
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]
 pin1_matrix_shape = pin1.shape
 
 cuc = np.loadtxt(cuc_template, delimiter=',', unpack=False)
+
+middle_domain = np.loadtxt(middle_domain_template, delimiter=',', unpack=False)
 
 array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
@@ -70,7 +75,7 @@ array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out,
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
-lut_cuc = np.loadtxt('luts/lut_fire.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 print 'shape', auxin.shape
 print 'cols: ', tissue_columns
@@ -78,6 +83,17 @@ print 'rows: ', tissue_rows
 
 
 # =====================================================================================
+'''
+# Tests
+
+for iteration in range(nbr_iterations):
+
+	func_cuc.cuc_expression(middle_domain, auxin, cuc)
+	
+	print cuc
+
+quit()
+'''
 # =====================================================================================
 
 
@@ -119,6 +135,18 @@ for iteration in range(nbr_iterations):
 			
 				if auxin[x,y] < 0:
 					auxin[x,y] = float(0.0000001)
+	
+	#*************************************************************************************
+	
+	# AUXIN AND CUC EFFECT ON PIN1 EXPRESSION
+	
+	func_pin.pin_expression(pin1, auxin, cuc)
+	
+	#*************************************************************************************
+	 
+	# CUC EXPRESSION
+	
+	func_cuc.cuc_expression(middle_domain, auxin, cuc)
 	
 	#*************************************************************************************
 
