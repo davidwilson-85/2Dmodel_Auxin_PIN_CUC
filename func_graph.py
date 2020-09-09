@@ -18,12 +18,18 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	#img = Image.new('RGB', (100, 100))
 	#draw = ImageDraw.Draw(img, 'RGBA')
 	#drw.polygon([(50, 0), (100, 100), (0, 100)], (255, 0, 0, 125))
-	
-	im = Image.new('RGB', size=(600,800))
-	draw = ImageDraw.Draw(im, 'RGBA')
+
 	x_origin = 0
 	y_origin = 0
 	cellSide = 50
+
+	# Calculate required image dimensions
+	height = x_origin + auxin.shape[0] * cellSide
+	width = y_origin + auxin.shape[1] * cellSide
+	
+	im = Image.new('RGB', size=(width,height))
+	draw = ImageDraw.Draw(im, 'RGBA')
+	
 	y = y_origin
 
 	for i in range(matrix_shape[0]):
@@ -45,7 +51,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 
 			# Draw CUC
 			# outline=None or outline with same value as fill does not work. To solve this I use the same color as the auxin citoplasm background.	
-			draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], outline=index_to_rgb(lut_auxin, auxin[i,j], auxin_range), fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
+			#draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], outline=index_to_rgb(lut_auxin, auxin[i,j], auxin_range), fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
 
 			#fill=(0, 0, 255, 25)
 			

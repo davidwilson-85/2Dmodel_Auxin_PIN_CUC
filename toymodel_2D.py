@@ -150,9 +150,17 @@ for iteration in range(params.nbr_iterations):
 	
 	# PIN1 UTG
 
-	if params.k_UTG > 1:
+	if params.utg_function == 'smith2006':
+		
+		# Smith 2006
+		if params.k_UTG > 1:
+			func_pin.pin_utg_smith2006(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
 
-		func_pin.pin_polarity(auxin, pin1, params.k_UTG, tissue_rows, tissue_columns, cuc, params.cuc_threshold_pin1)
+	if params.utg_function == 'ratio':
+		
+		# My method:
+		if params.k_UTG > 0:
+			func_pin.pin_utg_ratio(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
 
 	#*************************************************************************************
 
@@ -172,8 +180,7 @@ for iteration in range(params.nbr_iterations):
 #===========================================
 # TO DO:
 # -Implement transport of auxin by PIN and see if instabilities in auxin distribution trigger patterning
-# -Create quick way of swutching ON/OFF features like UTG, WTF, CUC2
-# -Add auxin effect on PIN1 expression
+# -Create quick way of switching ON/OFF features like UTG, WTF, CUC2
 # 
 # 
 # matrix_shape[0] -> number of rows = y

@@ -40,7 +40,7 @@ def pin_expression(pin1, auxin, cuc):
 
 
 
-def pin_polarity(auxin, pin1, k_UTG, tissue_rows, tissue_columns, cuc, cuc_threshold_pin1):
+def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 	#
 	# Auxin affect PIN1 subcellular localization (up-the-gradient model = UTG)
@@ -48,19 +48,17 @@ def pin_polarity(auxin, pin1, k_UTG, tissue_rows, tissue_columns, cuc, cuc_thres
 	# 
 	# I use formula from Smith 2006 and Bilsborough 2011:
 	#
-	#                         b^A[i]
-	# PIN[ij] = PIN[i] * ---------------
-	#                     SUM[k] b^A[k] 
-	# 
-	# 
-	# 
+	#                                    b^A[i]
+	# PIN[ij] (potential) = PIN[i] * ---------------
+	#                                 SUM[k] b^A[k] 
+	#
 	
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_UTG
 	
 	
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
+	for y in range(auxin.shape[0]):
+		for x in range(auxin.shape[1]):
 		
 			# Current PIN1 total amount in the cell
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
@@ -73,13 +71,13 @@ def pin_polarity(auxin, pin1, k_UTG, tissue_rows, tissue_columns, cuc, cuc_thres
 				auxin_top = auxin[y,x]
 			
 			# Right
-			if x < tissue_columns - 1:
+			if x < auxin.shape[1] - 1:
 				auxin_right = auxin[y,x+1]
 			else:
 				auxin_right = auxin[y,x]
 			
 			# Bottom
-			if y < tissue_rows - 1:
+			if y < auxin.shape[0] - 1:
 				auxin_bottom = auxin[y+1,x]
 			else:
 				auxin_bottom = auxin[y,x]
@@ -116,7 +114,7 @@ def pin_polarity(auxin, pin1, k_UTG, tissue_rows, tissue_columns, cuc, cuc_thres
 
 
 
-def pin_polarity_old(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_columns, cuc, cuc_threshold_pin1):
+def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 	#
 	# Auxin affect PIN1 subcellular localization (up-the-gradient model = UTG)
@@ -125,44 +123,32 @@ def pin_polarity_old(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_
 	#
 
 	# Calculate updated PIN1 allocation
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
-		
-			print auxin[y,x]
+	for y in range(auxin.shape[0]):
+		for x in range(auxin.shape[1]):
 
 			# Top	
 			if y > 0:
-				print auxin[y-1,x]
 				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioT = 1.0
-				print '1'
 			
 			# Right
-			if x < tissue_columns - 1:
-				print auxin[y,x+1]
+			if x < auxin.shape[1] - 1:
 				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
 			else:
 				utg_auxinRatioR = 1.0
-				print '1'
 				
 			# Bottom
-			if y < tissue_rows - 1:
-				print auxin[y+1,x]
+			if y < auxin.shape[0] - 1:
 				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioB = 1.0
-				print '1'
 				
 			# Left
 			if x > 0:
-				print auxin[y,x-1]
 				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
 			else:
 				utg_auxinRatioL = 1.0
-				print '1'
-				
-			print '======================'
 			
 			# Calculate updated normalized PIN1 concentration values per cell face
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
