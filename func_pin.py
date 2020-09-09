@@ -21,9 +21,9 @@ def pin_expression(pin1, auxin, cuc):
 			auxin_cell = auxin[y,x]
 			cuc_cell = cuc[y,x]
 			
-			k_auxin_pin1 = 0.0005
-			k_cuc_pin1 = 0.0005
-			k_pin1_decay = 0.003
+			k_auxin_pin1 = 0 #0.0001
+			k_cuc_pin1 = 0 #0.0001
+			k_pin1_decay = 0 # 0.004
 			
 			pin1_cell_updated = pin1_cell + auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay
 			
@@ -40,42 +40,129 @@ def pin_expression(pin1, auxin, cuc):
 
 
 
-def auxin_on_pin_polarity(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_columns):
+def pin_polarity(auxin, pin1, k_UTG, tissue_rows, tissue_columns, cuc, cuc_threshold_pin1):
 
 	#
-	# Auxin promotes PIN1 exppression
-	# It also affect its subcellular localization (up-the-gradient model = UTG)
-	# UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration 
+	# Auxin affect PIN1 subcellular localization (up-the-gradient model = UTG)
+	# UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
+	# 
+	# I use formula from Smith 2006 and Bilsborough 2011:
+	#
+	#                         b^A[i]
+	# PIN[ij] = PIN[i] * ---------------
+	#                     SUM[k] b^A[k] 
+	# 
+	# 
+	# 
+	
+	# Base of exponential function to tweak with UTG responsiveness
+	b = k_UTG
+	
+	
+	for y in range(tissue_rows):
+		for x in range(tissue_columns):
+		
+			# Current PIN1 total amount in the cell
+			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
+	
+			# Correct boundary effect
+			# Top
+			if y > 0:
+				auxin_top = auxin[y-1,x]
+			else:
+				auxin_top = auxin[y,x]
+			
+			# Right
+			if x < tissue_columns - 1:
+				auxin_right = auxin[y,x+1]
+			else:
+				auxin_right = auxin[y,x]
+			
+			# Bottom
+			if y < tissue_rows - 1:
+				auxin_bottom = auxin[y+1,x]
+			else:
+				auxin_bottom = auxin[y,x]
+			
+			# Left
+			if x > 0:
+				auxin_left = auxin[y,x-1]
+			else:
+				auxin_left = auxin[y,x]
+	
+			# Calculate normalization factor (eq. denominator)
+			norm_factor = b**auxin_top + b**auxin_right + b**auxin_bottom + b**auxin_left
+	
+			pin1[0,y,x] = total_pin1 * ( b**auxin_top / norm_factor )
+			pin1[1,y,x] = total_pin1 * ( b**auxin_right / norm_factor )
+			pin1[2,y,x] = total_pin1 * ( b**auxin_bottom / norm_factor )
+			pin1[3,y,x] = total_pin1 * ( b**auxin_left / norm_factor )
+
+
+			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
+
+			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+			
+			# CUC effect on PIN1 polarity
+			# For now, simply reverse the values in the X and Y axes. This will be in favour of the auxin gradient.
+			if cuc[y,x] > cuc_threshold_pin1:
+				
+				pin1[0,y,x] = pin1[2,y,x]
+				pin1[1,y,x] = pin1[3,y,x]
+				pin1[2,y,x] = pin1[0,y,x]
+				pin1[3,y,x] = pin1[1,y,x]
+
+
+
+
+
+def pin_polarity_old(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, tissue_columns, cuc, cuc_threshold_pin1):
+
+	#
+	# Auxin affect PIN1 subcellular localization (up-the-gradient model = UTG)
+	# UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
 	# 
 	#
 
 	# Calculate updated PIN1 allocation
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
+		
+			print auxin[y,x]
 
 			# Top	
 			if y > 0:
+				print auxin[y-1,x]
 				utg_auxinRatioT = math.sqrt(auxin[y-1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioT = 1.0
+				print '1'
 			
 			# Right
 			if x < tissue_columns - 1:
+				print auxin[y,x+1]
 				utg_auxinRatioR = math.sqrt(auxin[y,x+1] / auxin[y,x])
 			else:
 				utg_auxinRatioR = 1.0
+				print '1'
 				
 			# Bottom
 			if y < tissue_rows - 1:
+				print auxin[y+1,x]
 				utg_auxinRatioB = math.sqrt(auxin[y+1,x] / auxin[y,x])
 			else:
 				utg_auxinRatioB = 1.0
+				print '1'
 				
 			# Left
 			if x > 0:
+				print auxin[y,x-1]
 				utg_auxinRatioL = math.sqrt(auxin[y,x-1] / auxin[y,x])
 			else:
 				utg_auxinRatioL = 1.0
+				print '1'
+				
+			print '======================'
 			
 			# Calculate updated normalized PIN1 concentration values per cell face
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
@@ -100,6 +187,15 @@ def auxin_on_pin_polarity(auxin, pin1, k_pin1_UTGresponsiveness, tissue_rows, ti
 			#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]
 
 			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+			
+			# CUC effect on PIN1 polarity
+			# For now, simply reverse the values in the X and Y axes. This will be in favour of the auxin gradient.
+			if cuc[y,x] > cuc_threshold_pin1:
+				
+				pin1[0,y,x] = pin1[2,y,x]
+				pin1[1,y,x] = pin1[3,y,x]
+				pin1[2,y,x] = pin1[0,y,x]
+				pin1[3,y,x] = pin1[1,y,x]
 
 
 
@@ -116,4 +212,8 @@ def cuc_on_pin_polarity():
 
 	pass
 
+
+
+if __name__ == '__main__':
+    pass
 

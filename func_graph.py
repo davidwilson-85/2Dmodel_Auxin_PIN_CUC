@@ -19,7 +19,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	#draw = ImageDraw.Draw(img, 'RGBA')
 	#drw.polygon([(50, 0), (100, 100), (0, 100)], (255, 0, 0, 125))
 	
-	im = Image.new('RGB', size=(400,700))
+	im = Image.new('RGB', size=(600,800))
 	draw = ImageDraw.Draw(im, 'RGBA')
 	x_origin = 0
 	y_origin = 0

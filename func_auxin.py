@@ -108,9 +108,11 @@ def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_m
 			auxin_molecules = auxin[y,x]
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 			transported_molecules_total = auxin_molecules * total_pin1 * k_pin1_transp
+			
+			#excess_ratio = transported_molecules_total / 
 
 			# Manually limit transport if it exceeds the amount of auxin molecules
-			# Later on: calculate excess ratio and then use to reduce the the value of the vector below
+			# Later on: calculate excess ratio and then use to reduce the value of the vector below
 			if transported_molecules_total > auxin_molecules:
 				transported_molecules_total = auxin_molecules
 				print 'warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x)
@@ -172,7 +174,8 @@ def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_m
 
 
 
-
+if __name__ == '__main__':
+    pass
 
 
 

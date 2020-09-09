@@ -2,9 +2,9 @@
 
 
 # General
-nbr_iterations = 100
+nbr_iterations = 500
 img_dest_folder = 'images/test'
-cell_plot_frequency = 10
+cell_plot_frequency = 1
 
 # Switches
 PIN1_UTG = True
@@ -13,20 +13,21 @@ AUX_LAX_transport = False
 CUC = False
 
 # Auxin
-auxin_range = (0, 9)        # This is only to map variable values to heatmap values
-k_auxin_diffusion = 0.3     # Relative amount of molecules that cross between two adjacent cells per cycle
+auxin_range = (0, 99)       # This is only to map variable values to heatmap values
+k_auxin_diffusion = 0.1     # Relative amount of molecules that cross between two adjacent cells per cycle
 auxin_synthesis = 0.1       # Absolute amount of molecules synthesized per cycle
 auxin_destruction = 0.1     # Absolute amount of molecules destroyed per cycle
 auxin_noise_factor = 0
 
 # PIN1
-pin1_range = (0, 19)
-k_pin1_UTGresponsiveness = 0.01     # Relative amount of molecules that can change cell face per cycle
-k_pin1_transp = 0                   # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
+pin1_range = (0, 9)
+k_UTG = 1.3 #6										# Relative amount of molecules that can change cell face per cycle
+k_pin1_transp = 0.001        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 
 # CUC
-cuc_range = (0, 9)                  # This is only to map variable values to heatmap values
+cuc_range = (0, 9)          # This is only to map variable values to heatmap values
 auxin_on_cuc = 0
 cuc_on_pin1Pol = 0
+cuc_threshold_pin1 = 500
 
 

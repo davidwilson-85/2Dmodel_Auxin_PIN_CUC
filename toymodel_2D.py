@@ -28,6 +28,7 @@ cuc_template = 'templates/cuc_template'
 middle_domain_template = 'templates/middle_domain_template'
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
+auxin = auxin * 10
 auxin_matrix_shape = auxin.shape
 tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]
@@ -39,9 +40,9 @@ array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out,
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # LUTs
-lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_auxin = np.loadtxt('luts/lut_red_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
-lut_cuc = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_green_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 print 'shape', auxin.shape
 print 'cols: ', tissue_columns
@@ -143,15 +144,15 @@ for iteration in range(params.nbr_iterations):
 	source = 7
 	sink = 3
 
-	#auxin[5,5] = auxin[5,5] + 0.5 
+	auxin[5,4] = auxin[5,4] + 0.1
 
 	#*************************************************************************************	
 	
 	# PIN1 UTG
 
-	if params.k_pin1_UTGresponsiveness > 0:
+	if params.k_UTG > 1:
 
-		func_pin.auxin_on_pin_polarity(auxin, pin1, params.k_pin1_UTGresponsiveness, tissue_rows, tissue_columns)
+		func_pin.pin_polarity(auxin, pin1, params.k_UTG, tissue_rows, tissue_columns, cuc, params.cuc_threshold_pin1)
 
 	#*************************************************************************************
 
