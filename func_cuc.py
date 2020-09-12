@@ -4,7 +4,7 @@ import numpy as np
 
 
 	
-def cuc_expression(middle_domain, auxin, cuc):
+def cuc_expression(middle_domain, auxin, cuc, k_md_cuc, k_auxin_cuc, k_cuc_decay):
 
 	#
 	# CUC expression is promoted in the middle domain, repressed by auxin, and decays at a constant rate.
@@ -19,10 +19,6 @@ def cuc_expression(middle_domain, auxin, cuc):
 			cuc_cell = cuc[y,x]
 			auxin_cell = auxin[y,x]
 			md_cell = middle_domain[x]
-			
-			k_md_cuc = 0.01
-			k_auxin_cuc = 0.001
-			k_cuc_decay = 0.01
 			
 			cuc_cell_updated = cuc_cell + md_cell * k_md_cuc - auxin_cell * k_auxin_cuc - cuc_cell * k_cuc_decay
 			

@@ -11,6 +11,12 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	#
 	# Create cell plot using PIL
 	#
+	
+	draw_auxin = True
+	draw_pin = True
+	draw_cuc = True
+	draw_values_text = False
+	draw_vectors = True
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 10
@@ -38,22 +44,28 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 		for j in range(matrix_shape[1]):
 			
 			# Draw cell outline and auxin fill
-			draw.polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline=(50,50,50,255), fill=index_to_rgb(lut_auxin, auxin[i,j], auxin_range))
+			if draw_auxin == True:
+				draw.polygon([(x,y),(x+cellSide,y),(x+cellSide,y+cellSide),(x,y+cellSide)], outline=(50,50,50,255), fill=index_to_rgb(lut_auxin, auxin[i,j], auxin_range))
 
 			# Draw PIN1
-			draw.line([(x+4,y+3),(x+cellSide-4,y+3)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
-			draw.line([(x+cellSide-3,y+4),(x+cellSide-3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
-			draw.line([(x+4,y+cellSide-3),(x+cellSide-4,y+cellSide-3)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
-			draw.line([(x+3,y+4),(x+3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
-
-			# Write auxin concentration
-			#ImageDraw.Draw(im).text((x+20,y+20), str(round(auxin[i,j],1)), fill=(255, 255, 0))
-
-			# Draw CUC
-			# outline=None or outline with same value as fill does not work. To solve this I use the same color as the auxin citoplasm background.	
-			#draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], outline=index_to_rgb(lut_auxin, auxin[i,j], auxin_range), fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
-
-			#fill=(0, 0, 255, 25)
+			if draw_pin == True:
+				draw.line([(x+4,y+3),(x+cellSide-4,y+3)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
+				draw.line([(x+cellSide-3,y+4),(x+cellSide-3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
+				draw.line([(x+4,y+cellSide-3),(x+cellSide-4,y+cellSide-3)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
+				draw.line([(x+3,y+4),(x+3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
+			
+			if draw_cuc == True:
+				# Draw CUC
+				# outline=None or outline with same value as fill does not work. To solve this I use the same color as the auxin citoplasm background.	
+				draw.ellipse([(x+15,y+15),(x+cellSide-15,y+cellSide-15)], outline=index_to_rgb(lut_auxin, auxin[i,j], auxin_range), fill=index_to_rgba(lut_cuc, cuc[i,j], cuc_range))
+			
+			if draw_values_text == True:
+				# Write auxin concentration (magenta)
+				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
+				# Write PIN1 total concentration (yellow)
+				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				# Write CUC concentration (white)
+				ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
 			x = x + cellSide
 		
@@ -62,21 +74,21 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	x = x_origin
 	y = y_origin
 
-
-	for i in range(matrix_shape[0]):
-		
+	if draw_vectors == True:
+		for i in range(matrix_shape[0]):
+			
+			x = x_origin
+			for j in range(matrix_shape[1]):
+	
+				# Draw auxin diffussion vector
+				draw.line([(x+25,y+25),(x+25+vector_mag*array_af[8,i,j],y+25+vector_mag*array_af[9,i,j])], fill='white', width=2)
+				
+				x = x + cellSide
+			
+			y = y + cellSide
+	
 		x = x_origin
-		for j in range(matrix_shape[1]):
-
-			# Draw auxin diffussion vector
-			draw.line([(x+25,y+25),(x+25+vector_mag*array_af[8,i,j],y+25+vector_mag*array_af[9,i,j])], fill='white', width=2)
-			
-			x = x + cellSide
-		
-		y = y + cellSide
-
-	x = x_origin
-	y = y_origin
+		y = y_origin
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration+1000) +'.png')

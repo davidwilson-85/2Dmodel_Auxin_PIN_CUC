@@ -121,13 +121,28 @@ for iteration in range(params.nbr_iterations):
 	
 	# AUXIN AND CUC EFFECT ON PIN1 EXPRESSION
 	
-	func_pin.pin_expression(pin1, auxin, cuc)
+	if params.k_auxin_pin1 > 0 or params.k_cuc_pin1 > 0 or params.k_pin1_decay > 0:
+		
+		func_pin.pin_expression(pin1, auxin, cuc, params.k_auxin_pin1, params.k_cuc_pin1, params.k_pin1_decay)
 	
 	#*************************************************************************************
 	 
 	# CUC EXPRESSION
 	
-	func_cuc.cuc_expression(middle_domain, auxin, cuc)
+	if params.k_md_cuc > 0 or params.k_auxin_cuc > 0 or params.k_cuc_decay > 0:
+		
+		func_cuc.cuc_expression(middle_domain, auxin, cuc, params.k_md_cuc, params.k_auxin_cuc, params.k_cuc_decay)
+	
+	#*************************************************************************************
+
+	# AUXIN HOMEOSTASIS
+	
+	if params.k_auxin_synth > 0 or params.k_cuc_yuc > 0 or params.k_auxin_decay > 0:
+		
+		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
+	
+	# Integrate local synthesis etc in teh function...
+	#auxin[5,4] = auxin[5,4] + 0.1
 	
 	#*************************************************************************************
 
@@ -136,15 +151,6 @@ for iteration in range(params.nbr_iterations):
 	if params.k_auxin_diffusion > 0:
 
 		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, array_auxin_fluxes, iteration)
-
-	#*************************************************************************************
-
-	# AUXIN SYNTHESIS / DEGRADATION
-
-	source = 7
-	sink = 3
-
-	auxin[5,4] = auxin[5,4] + 0.1
 
 	#*************************************************************************************	
 	

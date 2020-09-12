@@ -4,6 +4,30 @@ import numpy as np
 
 
 
+def auxin_homeostasis(auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
+	
+	#
+	# Here implement: basal synthesis and turnover, possible effect of CUC on YUC,
+	# local modifications like exogenous application, etc
+	#
+	# A' = Synth + C*k(CA) - A*k(Cdecay)
+	#
+	
+	for y in range(auxin.shape[0]):
+		for x in range(auxin.shape[1]):
+			
+			auxin_cell = auxin[y,x]
+			cuc_cell = cuc[y,x]
+			
+			auxin_cell_updated = auxin_cell + k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_decay
+			
+			if auxin_cell_updated < 0:
+				auxin_cell_updated = 0
+				
+			auxin[y,x] = auxin_cell_updated
+
+
+
 def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, auxin, array_af, iteration):
 	
 	#

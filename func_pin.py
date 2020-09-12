@@ -5,7 +5,7 @@ import math
 
 
 
-def pin_expression(pin1, auxin, cuc):
+def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 
 	#
 	# Auxin promotes PIN1 expression. To model this, assume that auxin increases PIN1 expression and PIN1 has a constant turnover/decay
@@ -20,10 +20,6 @@ def pin_expression(pin1, auxin, cuc):
 			pin1_cell = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 			auxin_cell = auxin[y,x]
 			cuc_cell = cuc[y,x]
-			
-			k_auxin_pin1 = 0 #0.0001
-			k_cuc_pin1 = 0 #0.0001
-			k_pin1_decay = 0 # 0.004
 			
 			pin1_cell_updated = pin1_cell + auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay
 			
@@ -52,6 +48,8 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 	# PIN[ij] (potential) = PIN[i] * ---------------
 	#                                 SUM[k] b^A[k] 
 	#
+	# Current problem: As it is now, function does not take into account current PIN1 distribution, so it erases any initial
+	# state defined in the template
 	
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_UTG
