@@ -2,13 +2,13 @@
 
 
 # General
-nbr_iterations = 5000
+nbr_iterations = 5
 img_dest_folder = 'images/test'
-cell_plot_frequency = 20
+cell_plot_frequency = 1
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
-pin1_range = (0, 29)
+pin1_range = (0, 11)
 cuc_range = (0, 9)
 
 # Switches
@@ -21,19 +21,20 @@ CUC = False
 k_auxin_diffusion = 0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
 # Auxin homeostasis
 k_auxin_synth = 0			  				# Basal absolute amount of molecules synthesized per cycle
-k_cuc_yuc = 0.01
-k_auxin_decay = 0.001
+k_cuc_yuc = 0 #0.01
+k_auxin_decay = 0.005
 # Auxin - other params
 auxin_noise_factor = 0
 
 # PIN1 localization/activity
-utg_function = 'smith2006'   # 'smith2006' OR 'ratio'
-k_UTG = 1.3 #6, 1.3			   	 # Relative amount of molecules that can change cell face per cycle
+pin1_pol_mode = 'wtf'   # 'smith2006' OR 'ratio' OR 'wtf'
+k_UTG = 1.3 #6, 1.3
+k_WTF = 10
 k_pin1_transp = 0.005        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
-k_auxin_pin1 = 0.00006 #0.0001
-k_cuc_pin1 = 0.0005 #0.0002
-k_pin1_decay = 0.003 # 0.004
+k_auxin_pin1 = 0 #0.00006 #0.0001
+k_cuc_pin1 = 0 #0.0005 #0.0002
+k_pin1_decay = 0 #0.003 # 0.004
 
 # CUC activity
 cuc_on_pin1Pol = 0

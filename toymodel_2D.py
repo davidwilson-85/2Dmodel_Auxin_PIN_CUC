@@ -36,7 +36,7 @@ pin1_matrix_shape = pin1.shape
 cuc = np.loadtxt(cuc_template, delimiter=',', unpack=False)
 middle_domain = np.loadtxt(middle_domain_template, delimiter=',', unpack=False)
 
-array_auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
+auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # LUTs
@@ -50,17 +50,60 @@ print 'rows: ', tissue_rows
 
 
 # =====================================================================================
-'''
-# Tests
 
+# Tests
+'''
 for iteration in range(params.nbr_iterations):
 
-	func_cuc.cuc_expression(middle_domain, auxin, cuc)
+	print iteration
+
+
+	func_pin.pin_wtf_p(auxin_fluxes, pin1, params.k_WTF)
 	
-	print cuc
+
+	if params.k_auxin_diffusion > 0:
+
+		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
+
+
+	# Cleanup destination folder (remove and create)
+	if iteration == 0:
+		shutil.rmtree(params.img_dest_folder) 
+		os.mkdir(params.img_dest_folder)
+	
+	# Draw cell plot 
+	if iteration % params.cell_plot_frequency == 0:
+		func_graph.create_cell_plot(
+			auxin_matrix_shape,
+			auxin,
+			params.auxin_range,
+			lut_auxin,
+			pin1,
+			params.pin1_range,
+			lut_pin1,
+			cuc,
+			params.cuc_range,
+			lut_cuc,
+			iteration,
+			auxin_fluxes,
+			params.img_dest_folder
+		)
+
+
+	if params.k_pin1_transp > 0:
+
+		func_auxin.pin_on_auxin(auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
+
+
+	if params.k_auxin_synth > 0 or params.k_cuc_yuc > 0 or params.k_auxin_decay > 0:
+		
+		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
+
+	auxin[0,7] = auxin[0,7] * 1.6
 
 quit()
 '''
+
 # =====================================================================================
 
 
@@ -99,7 +142,7 @@ for iteration in range(params.nbr_iterations):
 			params.cuc_range,
 			lut_cuc,
 			iteration,
-			array_auxin_fluxes,
+			auxin_fluxes,
 			params.img_dest_folder
 		)
 	
@@ -142,7 +185,7 @@ for iteration in range(params.nbr_iterations):
 		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
 	
 	# Integrate local synthesis etc in teh function...
-	#auxin[5,4] = auxin[5,4] + 0.1
+	auxin[5,4] = auxin[5,4] + 20
 	
 	#*************************************************************************************
 
@@ -150,23 +193,27 @@ for iteration in range(params.nbr_iterations):
 
 	if params.k_auxin_diffusion > 0:
 
-		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, array_auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
 
 	#*************************************************************************************	
 	
-	# PIN1 UTG
+	# PIN1 polarity
 
-	if params.utg_function == 'smith2006':
+	if params.pin1_pol_mode == 'smith2006':
 		
 		# Smith 2006
 		if params.k_UTG > 1:
 			func_pin.pin_utg_smith2006(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
 
-	if params.utg_function == 'ratio':
+	if params.pin1_pol_mode == 'ratio':
 		
 		# My method:
 		if params.k_UTG > 0:
 			func_pin.pin_utg_ratio(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
+
+	if params.pin1_pol_mode:
+
+		func_pin.pin_wtf_p(auxin_fluxes, pin1, params.k_WTF)
 
 	#*************************************************************************************
 

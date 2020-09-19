@@ -28,7 +28,7 @@ def auxin_homeostasis(auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
 
 
 
-def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, auxin, array_af, iteration):
+def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, auxin, fluxes, iteration):
 	
 	#
 	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
@@ -38,7 +38,7 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 	# k = diffusion factor constant
 	#
 
-	#array_af = np.zeros(shape=(8,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
+	#fluxes = np.zeros(shape=(8,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
 
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
@@ -71,15 +71,14 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 			else:
 				L_out, L_in = 0, 0
 
-			array_af[0,y,x] = T_out
-			array_af[1,y,x] = T_in
-			array_af[2,y,x] = R_out
-			array_af[3,y,x] = R_in
-			array_af[4,y,x] = B_out
-			array_af[5,y,x] = B_in
-			array_af[6,y,x] = L_out
-			array_af[7,y,x] = L_in
-
+			fluxes[0,y,x] = T_out
+			fluxes[1,y,x] = T_in
+			fluxes[2,y,x] = R_out
+			fluxes[3,y,x] = R_in
+			fluxes[4,y,x] = B_out
+			fluxes[5,y,x] = B_in
+			fluxes[6,y,x] = L_out
+			fluxes[7,y,x] = L_in
 
 			# Calculate net fluxes (outbound) to draw vectors
 			T_net_flux = T_out - T_in
@@ -94,10 +93,10 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 			vector_x_component = L_net_flux + R_net_flux
 			vector_y_component = T_net_flux + B_net_flux
 
-			array_af[8,y,x] = vector_x_component
-			array_af[9,y,x] = vector_y_component
+			fluxes[8,y,x] = vector_x_component
+			fluxes[9,y,x] = vector_y_component
 
-	#print array_af[0:8,:,:]
+	#print fluxes[0:8,:,:]
 
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
@@ -106,7 +105,7 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 
 			#auxin[x,y] = auxin[x,y] - (T_out + R_out + B_out + L_out) + (T_in + R_in + B_in + L_in)
 
-			auxin[y,x] = auxin[y,x] - (array_af[0,y,x] + array_af[2,y,x] + array_af[4,y,x] + array_af[6,y,x]) + (array_af[1,y,x] + array_af[3,y,x] + array_af[5,y,x] + array_af[7,y,x])
+			auxin[y,x] = auxin[y,x] - (fluxes[0,y,x] + fluxes[2,y,x] + fluxes[4,y,x] + fluxes[6,y,x]) + (fluxes[1,y,x] + fluxes[3,y,x] + fluxes[5,y,x] + fluxes[7,y,x])
 
 
 

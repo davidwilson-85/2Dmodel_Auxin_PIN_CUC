@@ -42,7 +42,7 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 	# Auxin affect PIN1 subcellular localization (up-the-gradient model = UTG)
 	# UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
 	# 
-	# I use formula from Smith 2006 and Bilsborough 2011:
+	# I use formula from Smith 2006 (also used in Bilsborough 2011):
 	#
 	#                                    b^A[i]
 	# PIN[ij] (potential) = PIN[i] * ---------------
@@ -61,7 +61,7 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 			# Current PIN1 total amount in the cell
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 	
-			# Correct boundary effect
+			# Calculate auxin in neighbours (correcting in boundary cells)
 			# Top
 			if y > 0:
 				auxin_top = auxin[y-1,x]
@@ -181,6 +181,59 @@ def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 				pin1[2,y,x] = pin1[0,y,x]
 				pin1[3,y,x] = pin1[1,y,x]
 
+
+
+
+def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
+
+	# 
+	# Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1.
+	# 
+	# Try using the next flux VS only the efflux
+
+	# Base of exponential function to tweak with UTG responsiveness
+	b = k_WTF
+	
+	
+	for y in range(auxin_fluxes.shape[1]):
+		for x in range(auxin_fluxes.shape[2]):
+		
+			# Current PIN1 total amount in the cell
+			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
+	
+			# Calculate net flux at each cell face
+			netflux_top = auxin_fluxes[0,y-1,x] - auxin_fluxes[1,y-1,x]
+			netflux_right = auxin_fluxes[2,y-1,x] - auxin_fluxes[3,y-1,x]
+			netflux_bottom = auxin_fluxes[4,y-1,x] - auxin_fluxes[5,y-1,x]
+			netflux_left = auxin_fluxes[6,y-1,x] - auxin_fluxes[7,y-1,x]
+
+			if y == 5 and x == 4:
+				print auxin_fluxes[4,y-1,x], auxin_fluxes[5,y-1,x]
+				print netflux_top, netflux_right, netflux_bottom, netflux_left
+	
+			# Calculate normalization factor (eq. denominator)
+			norm_factor = b**netflux_top + b**netflux_right + b**netflux_bottom + b**netflux_left
+			
+			# Calculate new PIN amount at each cell face
+			pin1[0,y,x] = total_pin1 * ( b**netflux_top / norm_factor )
+			pin1[1,y,x] = total_pin1 * ( b**netflux_right / norm_factor )
+			pin1[2,y,x] = total_pin1 * ( b**netflux_bottom / norm_factor )
+			pin1[3,y,x] = total_pin1 * ( b**netflux_left / norm_factor )
+
+
+
+
+def pin1_dual_pol():
+
+	# 
+	# UTG and WTF modes coexist. Default mode is UTG. CUC presence in cell favours WTF.
+	# 
+	# 
+	# 
+	# 
+	# 
+
+	pass
 
 
 
