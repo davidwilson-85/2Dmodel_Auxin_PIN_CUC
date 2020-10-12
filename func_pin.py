@@ -208,8 +208,8 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 			netflux_left = auxin_fluxes[6,y-1,x] - auxin_fluxes[7,y-1,x]
 
 			if y == 5 and x == 4:
-				print auxin_fluxes[4,y-1,x], auxin_fluxes[5,y-1,x]
-				print netflux_top, netflux_right, netflux_bottom, netflux_left
+				print(auxin_fluxes[4,y-1,x], auxin_fluxes[5,y-1,x])
+				print(netflux_top, netflux_right, netflux_bottom, netflux_left)
 	
 			# Calculate normalization factor (eq. denominator)
 			norm_factor = b**netflux_top + b**netflux_right + b**netflux_bottom + b**netflux_left

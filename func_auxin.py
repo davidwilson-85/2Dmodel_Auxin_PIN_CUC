@@ -138,7 +138,7 @@ def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_m
 			# Later on: calculate excess ratio and then use to reduce the value of the vector below
 			if transported_molecules_total > auxin_molecules:
 				transported_molecules_total = auxin_molecules
-				print 'warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x)
+				print('warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x))
 
 			# To top (y,x -> y-1,x)
 			if y > 0:

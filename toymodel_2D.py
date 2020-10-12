@@ -44,9 +44,9 @@ lut_auxin = np.loadtxt('luts/lut_red_sat.csv', delimiter=',', unpack=True, dtype
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_cuc = np.loadtxt('luts/lut_green_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
-print 'shape', auxin.shape
-print 'cols: ', tissue_columns
-print 'rows: ', tissue_rows
+print('shape', auxin.shape)
+print('cols: ', tissue_columns)
+print('rows: ', tissue_rows)
 
 
 # =====================================================================================
@@ -114,7 +114,13 @@ quit()
 
 for iteration in range(params.nbr_iterations):
 
-	print iteration
+	# Print iteration to terminal
+	if iteration < params.nbr_iterations - 1:
+		print(iteration + 1, end='\r')
+	else:
+		print(iteration + 1, end='\n')
+
+	#*************************************************************************************
 
 	# Plot data in heatmap
 	#create_heatmap(data=data)
@@ -155,10 +161,10 @@ for iteration in range(params.nbr_iterations):
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
 			
-				auxin[x,y] = auxin[x,y] + random.uniform(-params.auxin_noise_factor, params.auxin_noise_factor)
+				auxin[y,x] = auxin[y,x] * random.uniform(-params.auxin_noise_factor, params.auxin_noise_factor)
 			
-				if auxin[x,y] < 0:
-					auxin[x,y] = float(0.0000001)
+				if auxin[y,x] < 0:
+					auxin[y,x] = float(0.0000001)
 	
 	#*************************************************************************************
 	
@@ -184,8 +190,8 @@ for iteration in range(params.nbr_iterations):
 		
 		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
 	
-	# Integrate local synthesis etc in teh function...
-	auxin[5,4] = auxin[5,4] + 20
+	# Integrate local synthesis etc in the function...
+	#auxin[5,5] = auxin[5,5] + 100
 	
 	#*************************************************************************************
 
@@ -211,7 +217,7 @@ for iteration in range(params.nbr_iterations):
 		if params.k_UTG > 0:
 			func_pin.pin_utg_ratio(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
 
-	if params.pin1_pol_mode:
+	if params.pin1_pol_mode == 'WTF':
 
 		func_pin.pin_wtf_p(auxin_fluxes, pin1, params.k_WTF)
 
