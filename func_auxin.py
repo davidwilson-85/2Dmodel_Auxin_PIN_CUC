@@ -96,8 +96,13 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 			fluxes[8,y,x] = vector_x_component
 			fluxes[9,y,x] = vector_y_component
 
-	#print fluxes[0:8,:,:]
-
+			'''
+			if y == 3 and x == 2:
+				print(auxin[2,2], auxin[3,2], auxin[4,2])
+				print('T_out', 'T_in', T_out, T_in, 'B_out', 'B_in', B_out, B_in)
+				print(iteration, T_net_flux, B_net_flux, fluxes[9,3,2])
+				print('')
+			'''
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	for y in range(tissue_rows):

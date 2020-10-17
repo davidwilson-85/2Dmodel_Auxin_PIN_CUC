@@ -65,7 +65,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 				# Write PIN1 total concentration (yellow)
 				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
-				ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
+				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
 			x = x + cellSide
 		

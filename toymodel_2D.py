@@ -191,7 +191,8 @@ for iteration in range(params.nbr_iterations):
 		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
 	
 	# Integrate local synthesis etc in the function...
-	#auxin[5,5] = auxin[5,5] + 100
+	#auxin[0,0] = 9
+	#auxin[4,4] = 0
 	
 	#*************************************************************************************
 
@@ -217,7 +218,7 @@ for iteration in range(params.nbr_iterations):
 		if params.k_UTG > 0:
 			func_pin.pin_utg_ratio(auxin, pin1, params.k_UTG, cuc, params.cuc_threshold_pin1)
 
-	if params.pin1_pol_mode == 'WTF':
+	if params.pin1_pol_mode == 'wtf':
 
 		func_pin.pin_wtf_p(auxin_fluxes, pin1, params.k_WTF)
 
@@ -229,7 +230,7 @@ for iteration in range(params.nbr_iterations):
 
 		func_auxin.pin_on_auxin(auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
 	
-	
+	auxin[3,3] = auxin[3,3] + 10
 
 	
 

@@ -88,7 +88,8 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 	
 			# Calculate normalization factor (eq. denominator)
 			norm_factor = b**auxin_top + b**auxin_right + b**auxin_bottom + b**auxin_left
-	
+
+			# Calculate PIN1 alocation at each cell face
 			pin1[0,y,x] = total_pin1 * ( b**auxin_top / norm_factor )
 			pin1[1,y,x] = total_pin1 * ( b**auxin_right / norm_factor )
 			pin1[2,y,x] = total_pin1 * ( b**auxin_bottom / norm_factor )
@@ -189,7 +190,7 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 	# 
 	# Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1.
 	# 
-	# Try using the next flux VS only the efflux
+	# Try using the net flux VS only the efflux
 
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_WTF
@@ -202,15 +203,18 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 	
 			# Calculate net flux at each cell face
-			netflux_top = auxin_fluxes[0,y-1,x] - auxin_fluxes[1,y-1,x]
-			netflux_right = auxin_fluxes[2,y-1,x] - auxin_fluxes[3,y-1,x]
-			netflux_bottom = auxin_fluxes[4,y-1,x] - auxin_fluxes[5,y-1,x]
-			netflux_left = auxin_fluxes[6,y-1,x] - auxin_fluxes[7,y-1,x]
+			netflux_top = auxin_fluxes[0,y,x] - auxin_fluxes[1,y,x]
+			netflux_right = auxin_fluxes[2,y,x] - auxin_fluxes[3,y,x]
+			netflux_bottom = auxin_fluxes[4,y,x] - auxin_fluxes[5,y,x]
+			netflux_left = auxin_fluxes[6,y,x] - auxin_fluxes[7,y,x]
 
-			if y == 5 and x == 4:
-				print(auxin_fluxes[4,y-1,x], auxin_fluxes[5,y-1,x])
+			'''
+			if y == 1 and x == 1:
+				print(auxin_fluxes[4,y,x], auxin_fluxes[5,y,x])
 				print(netflux_top, netflux_right, netflux_bottom, netflux_left)
-	
+				print('')
+			'''
+			
 			# Calculate normalization factor (eq. denominator)
 			norm_factor = b**netflux_top + b**netflux_right + b**netflux_bottom + b**netflux_left
 			
