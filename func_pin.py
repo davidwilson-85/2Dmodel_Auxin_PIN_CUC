@@ -195,7 +195,6 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_WTF
 	
-	
 	for y in range(auxin_fluxes.shape[1]):
 		for x in range(auxin_fluxes.shape[2]):
 		
@@ -224,7 +223,7 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 			pin1[2,y,x] = total_pin1 * ( b**netflux_bottom / norm_factor )
 			pin1[3,y,x] = total_pin1 * ( b**netflux_left / norm_factor )
 
-
+	print(b)
 
 
 def pin1_dual_pol():

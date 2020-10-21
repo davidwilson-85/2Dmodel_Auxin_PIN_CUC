@@ -113,13 +113,13 @@ quit()
 # Perform simulation cycles
 
 for iteration in range(params.nbr_iterations):
-
+	'''
 	# Print iteration to terminal
 	if iteration < params.nbr_iterations - 1:
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
-
+	'''
 	#*************************************************************************************
 
 	# Plot data in heatmap
@@ -231,6 +231,11 @@ for iteration in range(params.nbr_iterations):
 		func_auxin.pin_on_auxin(auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
 	
 	auxin[3,3] = auxin[3,3] + 10
+	auxin[9,3] = auxin[9,3] + 10
+	auxin[0,] = 0
+	auxin[13,] = 0
+	auxin[:,0] = 0
+	auxin[:,6] = 0
 
 	
 
