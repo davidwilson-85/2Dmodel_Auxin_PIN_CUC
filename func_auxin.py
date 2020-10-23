@@ -4,14 +4,14 @@ import numpy as np
 
 
 
-def auxin_homeostasis(auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
+def auxin_homeostasis(h, auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
 	
-	#
-	# Here implement: basal synthesis and turnover, possible effect of CUC on YUC,
-	# local modifications like exogenous application, etc
-	#
-	# A' = Synth + C*k(CA) - A*k(Cdecay)
-	#
+	'''
+	Here implement: basal synthesis and turnover, possible effect of CUC on YUC, local modifications like exogenous application, etc
+	
+	A' = Synth + C*k(CA) - A*k(Cdecay)
+	
+	'''
 	
 	for y in range(auxin.shape[0]):
 		for x in range(auxin.shape[1]):
@@ -19,7 +19,7 @@ def auxin_homeostasis(auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
 			auxin_cell = auxin[y,x]
 			cuc_cell = cuc[y,x]
 			
-			auxin_cell_updated = auxin_cell + k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_decay
+			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_decay )
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = 0
@@ -28,12 +28,12 @@ def auxin_homeostasis(auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
 
 
 
-def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, auxin, fluxes, iteration):
+def auxin_diffusion(h, k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, auxin, fluxes, iteration):
 	
 	#
 	# [auxin](i,j) = [auxin](i,j) - out_diff + in_diff_T + in_diff_R + in_diff_B + in_diff_L
 	#
-	# Rate of diffusion from cell i to j: dD(i->j)/dt = [auxin(i)] * k
+	# Rate of diffusion from cell i to j: dD(i->j)/dt = h * ( [auxin(i)] * k )
 	#
 	# k = diffusion factor constant
 	#
@@ -45,29 +45,29 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 			
 			# Top face
 			if y > 0:
-				T_out = auxin[y,x] * k_auxin_diffusion
-				T_in = auxin[y-1,x] * k_auxin_diffusion
+				T_out = h * ( auxin[y,x] * k_auxin_diffusion )
+				T_in  = h * ( auxin[y-1,x] * k_auxin_diffusion )
 			else:
 				T_out, T_in = 0, 0
 
 			# Right face
 			if x < tissue_columns-1:
-				R_out = auxin[y,x] * k_auxin_diffusion
-				R_in = auxin[y,x+1] * k_auxin_diffusion
+				R_out = h * ( auxin[y,x] * k_auxin_diffusion )
+				R_in  = h * ( auxin[y,x+1] * k_auxin_diffusion )
 			else:
 				R_out, R_in = 0, 0
 
 			# Bottom face
 			if y < tissue_rows-1:
-				B_out = auxin[y,x] * k_auxin_diffusion
-				B_in = auxin[y+1,x] * k_auxin_diffusion
+				B_out = h * ( auxin[y,x] * k_auxin_diffusion )
+				B_in  = h * ( auxin[y+1,x] * k_auxin_diffusion )
 			else:
 				B_out, B_in = 0, 0
 
 			# Left face
 			if x > 0:
-				L_out = auxin[y,x] * k_auxin_diffusion
-				L_in = auxin[y,x-1] * k_auxin_diffusion
+				L_out = h * ( auxin[y,x] * k_auxin_diffusion )
+				L_in  = h * ( auxin[y,x-1] * k_auxin_diffusion )
 			else:
 				L_out, L_in = 0, 0
 
@@ -96,14 +96,6 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 			fluxes[8,y,x] = vector_x_component
 			fluxes[9,y,x] = vector_y_component
 
-			'''
-			if y == 3 and x == 2:
-				print(auxin[2,2], auxin[3,2], auxin[4,2])
-				print('T_out', 'T_in', T_out, T_in, 'B_out', 'B_in', B_out, B_in)
-				print(iteration, T_net_flux, B_net_flux, fluxes[9,3,2])
-				print('')
-			'''
-
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
@@ -114,9 +106,7 @@ def auxin_diffusion(k_auxin_diffusion, gridShape, tissue_columns, tissue_rows, a
 
 
 
-
-
-def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape):
+def pin_on_auxin(h, auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape):
 
 	#
 	# PIN1-MEDIATED AUXIN TRANSPORT
@@ -124,7 +114,7 @@ def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_m
 	#
 	# PIN1_Tr = Nbr auxin molecules / ( PIN1 molecule * cycle )
 	#
-	# Transport rate = [auxin] * [PIN1] * k
+	# Transport rate = h * ( [auxin] * [PIN1] * k )
 	#
 
 	# Create absolute efflux transport values for each cell
@@ -147,25 +137,25 @@ def pin_on_auxin(auxin, pin1, k_pin1_transp, tissue_rows, tissue_columns, pin1_m
 
 			# To top (y,x -> y-1,x)
 			if y > 0:
-				transpVectors[0,y,x] = auxin_molecules * pin1[0,y,x] * k_pin1_transp
+				transpVectors[0,y,x] = h * ( auxin_molecules * pin1[0,y,x] * k_pin1_transp )
 			else:
 				transpVectors[0,y,x] = 0
 
 			# To right (y,x -> y,x+1)
 			if x < tissue_columns - 1:
-				transpVectors[1,y,x] = auxin_molecules * pin1[1,y,x] * k_pin1_transp
+				transpVectors[1,y,x] = h * ( auxin_molecules * pin1[1,y,x] * k_pin1_transp )
 			else:
 				transpVectors[1,y,x] = 0
 
 			# To bottom (y,x -> y+1,x)
 			if y < tissue_rows - 1:
-				transpVectors[2,y,x] = auxin_molecules * pin1[2,y,x] * k_pin1_transp
+				transpVectors[2,y,x] = h * ( auxin_molecules * pin1[2,y,x] * k_pin1_transp )
 			else:
 				transpVectors[2,y,x] = 0
 
 			# To left (y,x -> y,x-1)
 			if x > 0:
-				transpVectors[3,y,x] = auxin_molecules * pin1[3,y,x] * k_pin1_transp
+				transpVectors[3,y,x] = h * ( auxin_molecules * pin1[3,y,x] * k_pin1_transp )
 			else:
 				transpVectors[3,y,x] = 0
 

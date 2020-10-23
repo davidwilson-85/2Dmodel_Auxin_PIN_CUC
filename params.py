@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # General
-euler_step_size = 1               # step size = h
-nbr_iterations = 200
+euler_h = 0.1                 # Euler step size = h; (0 - 1]
+nbr_iterations = 1000
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 10
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
@@ -18,18 +18,18 @@ AUX_LAX_transport = False
 CUC = False
 
 # Auxin diffusion
-k_auxin_diffusion = 0.12 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.2 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
 # Auxin homeostasis
 k_auxin_synth = 0			  	     	 # Basal absolute amount of molecules synthesized per cycle
-k_cuc_yuc = 0 #0.01
-k_auxin_decay = 0.02 #0.001
+k_cuc_yuc = 0 #0.01           WHAT IS THIS????????????
+k_auxin_decay = 0.1
 # Auxin - other params
 auxin_noise_factor = 0
 
 # PIN1 localization/activity
 pin1_pol_mode = 'wtf'   # 'smith2006' OR 'ratio' OR 'wtf'
 k_UTG = 1.3             # 6 (Bilsborough 2011, Smith 2006), 1.3
-k_WTF = 1000
+k_WTF = 2000
 k_pin1_transp = 0.035        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
 k_auxin_pin1 = 0 #0.00006 #0.0001

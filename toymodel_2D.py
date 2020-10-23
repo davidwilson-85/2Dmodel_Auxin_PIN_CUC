@@ -63,7 +63,7 @@ for iteration in range(params.nbr_iterations):
 
 	if params.k_auxin_diffusion > 0:
 
-		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion(params.euler_h, params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
 
 
 	# Cleanup destination folder (remove and create)
@@ -92,12 +92,12 @@ for iteration in range(params.nbr_iterations):
 
 	if params.k_pin1_transp > 0:
 
-		func_auxin.pin_on_auxin(auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
+		func_auxin.pin_on_auxin(params.euler_h, auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
 
 
 	if params.k_auxin_synth > 0 or params.k_cuc_yuc > 0 or params.k_auxin_decay > 0:
 		
-		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
+		func_auxin.auxin_homeostasis(params.euler_h, auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
 
 	auxin[0,7] = auxin[0,7] * 1.6
 
@@ -113,13 +113,13 @@ quit()
 # Perform simulation cycles
 
 for iteration in range(params.nbr_iterations):
-	'''
+	
 	# Print iteration to terminal
 	if iteration < params.nbr_iterations - 1:
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
-	'''
+	
 	#*************************************************************************************
 
 	# Plot data in heatmap
@@ -188,7 +188,7 @@ for iteration in range(params.nbr_iterations):
 	
 	if params.k_auxin_synth > 0 or params.k_cuc_yuc > 0 or params.k_auxin_decay > 0:
 		
-		func_auxin.auxin_homeostasis(auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
+		func_auxin.auxin_homeostasis(params.euler_h, auxin, cuc, params.k_auxin_synth, params.k_cuc_yuc, params.k_auxin_decay)
 	
 	# Integrate local synthesis etc in the function...
 	#auxin[0,0] = 9
@@ -200,7 +200,7 @@ for iteration in range(params.nbr_iterations):
 
 	if params.k_auxin_diffusion > 0:
 
-		func_auxin.auxin_diffusion(params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion(params.euler_h, params.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
 
 	#*************************************************************************************	
 	
@@ -228,10 +228,10 @@ for iteration in range(params.nbr_iterations):
 
 	if params.k_pin1_transp > 0:
 
-		func_auxin.pin_on_auxin(auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
+		func_auxin.pin_on_auxin(params.euler_h, auxin, pin1, params.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
 	
-	auxin[3,3] = auxin[3,3] + 10
-	auxin[9,3] = auxin[9,3] + 10
+	auxin[3,3] = auxin[3,3] + 5
+	auxin[10,3] = auxin[10,3] + 5
 	auxin[0,] = 0
 	auxin[13,] = 0
 	auxin[:,0] = 0

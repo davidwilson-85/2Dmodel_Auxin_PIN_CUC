@@ -7,12 +7,16 @@ import math
 
 def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 
-	#
-	# Auxin promotes PIN1 expression. To model this, assume that auxin increases PIN1 expression and PIN1 has a constant turnover/decay
-	#
-	# P' = A*P*K(AP) + C*P*K(CP) - P*K(Pdecay)
-	#
-	#
+	'''
+	* Auxin promotes PIN1 expression.
+	* ChCUC1 promoted PIN1 expression.
+	
+	To model this, assume that auxin and CUCs increase PIN1 expression and PIN1 has a constant turnover/decay
+	
+	P' = h * ( A*P*K(AP) + C*P*K(CP) - P*K(Pdecay) )
+
+	'''
+
 	
 	for y in range(auxin.shape[0]):
 		for x in range(auxin.shape[1]):
@@ -21,7 +25,7 @@ def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 			auxin_cell = auxin[y,x]
 			cuc_cell = cuc[y,x]
 			
-			pin1_cell_updated = pin1_cell + auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay
+			pin1_cell_updated = pin1_cell + h * ( auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay )
 			
 			if pin1_cell_updated < 0:
 				pin1_cell_updated = 0
@@ -111,8 +115,6 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 
 
-
-
 def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 	#
@@ -188,7 +190,7 @@ def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 
 	# 
-	# Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1.
+	# Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1 instead of nighbour auxin concentrations.
 	# 
 	# Try using the net flux VS only the efflux
 
@@ -222,8 +224,6 @@ def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
 			pin1[1,y,x] = total_pin1 * ( b**netflux_right / norm_factor )
 			pin1[2,y,x] = total_pin1 * ( b**netflux_bottom / norm_factor )
 			pin1[3,y,x] = total_pin1 * ( b**netflux_left / norm_factor )
-
-	print(b)
 
 
 def pin1_dual_pol():

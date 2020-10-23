@@ -19,7 +19,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	draw_vectors = True
 
 	# Vector magnification factor (only changes visualization)
-	vector_mag = 10
+	vector_mag = 50
 
 	#img = Image.new('RGB', (100, 100))
 	#draw = ImageDraw.Draw(img, 'RGBA')
