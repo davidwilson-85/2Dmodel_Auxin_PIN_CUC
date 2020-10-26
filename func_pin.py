@@ -108,10 +108,8 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 			# For now, simply reverse the values in the X and Y axes. This will be in favour of the auxin gradient.
 			if cuc[y,x] > cuc_threshold_pin1:
 				
-				pin1[0,y,x] = pin1[2,y,x]
-				pin1[1,y,x] = pin1[3,y,x]
-				pin1[2,y,x] = pin1[0,y,x]
-				pin1[3,y,x] = pin1[1,y,x]
+				pin1[0,y,x], pin1[2,y,x] = pin1[2,y,x], pin1[0,y,x]
+				pin1[1,y,x], pin1[3,y,x] = pin1[3,y,x], pin1[1,y,x]
 
 
 

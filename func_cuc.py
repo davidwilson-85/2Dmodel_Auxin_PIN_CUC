@@ -2,9 +2,8 @@
 
 import numpy as np
 
-
 	
-def cuc_expression(middle_domain, auxin, cuc, k_md_cuc, k_auxin_cuc, k_cuc_decay):
+def cuc_expression(h, middle_domain, auxin, cuc, k_md_cuc, k_auxin_cuc, k_cuc_decay):
 
 	#
 	# CUC expression is promoted in the middle domain, repressed by auxin, and decays at a constant rate. [Maybe add also turnover]

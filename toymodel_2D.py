@@ -175,12 +175,12 @@ for iteration in range(params.nbr_iterations):
 		func_pin.pin_expression(pin1, auxin, cuc, params.k_auxin_pin1, params.k_cuc_pin1, params.k_pin1_decay)
 	
 	#*************************************************************************************
-	 
+	
 	# CUC EXPRESSION
 	
 	if params.k_md_cuc > 0 or params.k_auxin_cuc > 0 or params.k_cuc_decay > 0:
 		
-		func_cuc.cuc_expression(middle_domain, auxin, cuc, params.k_md_cuc, params.k_auxin_cuc, params.k_cuc_decay)
+		func_cuc.cuc_expression(params.euler_h, middle_domain, auxin, cuc, params.k_md_cuc, params.k_auxin_cuc, params.k_cuc_decay)
 	
 	#*************************************************************************************
 
@@ -204,7 +204,7 @@ for iteration in range(params.nbr_iterations):
 
 	#*************************************************************************************	
 	
-	# PIN1 polarity
+	# PIN1 POLARIZATION
 
 	if params.pin1_pol_mode == 'smith2006':
 		
