@@ -4,7 +4,6 @@ import numpy as np
 import math
 
 
-
 def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 
 	'''
@@ -36,8 +35,6 @@ def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 			pin1[1,y,x] = pin1[1,y,x] * pin1_ratio
 			pin1[2,y,x] = pin1[2,y,x] * pin1_ratio
 			pin1[3,y,x] = pin1[3,y,x] * pin1_ratio
-
-
 
 
 def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
@@ -104,13 +101,14 @@ def pin_utg_smith2006(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 			
+			'''
 			# CUC effect on PIN1 polarity
 			# For now, simply reverse the values in the X and Y axes. This will be in favour of the auxin gradient.
 			if cuc[y,x] > cuc_threshold_pin1:
 				
 				pin1[0,y,x], pin1[2,y,x] = pin1[2,y,x], pin1[0,y,x]
 				pin1[1,y,x], pin1[3,y,x] = pin1[3,y,x], pin1[1,y,x]
-
+			'''
 
 
 def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
@@ -173,6 +171,7 @@ def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 
 			#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 			
+			'''
 			# CUC effect on PIN1 polarity
 			# For now, simply reverse the values in the X and Y axes. This will be in favour of the auxin gradient.
 			if cuc[y,x] > cuc_threshold_pin1:
@@ -181,8 +180,7 @@ def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):
 				pin1[1,y,x] = pin1[3,y,x]
 				pin1[2,y,x] = pin1[0,y,x]
 				pin1[3,y,x] = pin1[1,y,x]
-
-
+			'''
 
 
 def pin_wtf_p(auxin_fluxes, pin1, k_WTF):
@@ -239,16 +237,25 @@ def pin1_dual_pol():
 
 
 
-def cuc_on_pin_polarity():
+def pin_polarity(auxin, cuc):
 
-	# 
-	# CUC genes affect PIN1 subcellular localization
-	# 
-	# It is not clear how. Test different hypotheses (WTF, reversal, non-polar, DTCG, UTG dampening, etc...) 
-	# 
-	# 
+	"""
+	Default PIN1 polarity mode is UTG
+	CUC genes affect PIN1 subcellular localization
+	It is not clear how. Test different hypotheses (WTF, reversal, non-polar, DTCG, UTG dampening, etc...)
+	
+	"""
+	for y in range(auxin.shape[0]):
+		for x in range(auxin.shape[1]):
 
-	pass
+			if cuc[y,x] > cuc_threshold:
+				pin_wtf_p(auxin_fluxes, pin1[y,x], k_WTF)
+			else:
+				pin_utg_smith2006(auxin, pin1[y,x], k_UTG)
+
+				
+
+	
 
 
 
