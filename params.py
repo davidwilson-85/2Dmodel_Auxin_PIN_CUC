@@ -39,8 +39,14 @@ k_pin1_decay = 0 #0.003 # 0.004
 
 # CUC activity
 cuc_on_pin1Pol = 0          # Maybe this is a dead parameter
-cuc_threshold_pin1 = 1000
+cuc_threshold_pin1 = 1
 # CUC expression
 k_md_cuc = 0.05
 k_auxin_cuc = 0.004
 k_cuc_decay = 0.02
+
+# Local synthesis or degradation (absolute or relative)
+	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
+
+	# Example: marginSynthesis = new Local(type='synth', mode='abs', coords=(2,4,0), cycles=(0-4)) 
+
