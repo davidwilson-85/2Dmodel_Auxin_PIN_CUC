@@ -50,11 +50,15 @@ def pin_expression():
 
 
 def pin_polarity():
-
+	
 	"""
+	This function determines, for each cell in the tissue, the PIN1 polarity mode. Then calls
+	the corresponding function [e.g. pin_utg_smith2006() ]
+	
 	Default PIN1 polarity mode is UTG
-	CUC genes affect PIN1 subcellular localization
-	It is not clear how. Test different hypotheses (WTF, reversal, non-polar, DTCG, UTG dampening, etc...)
+	
+	CUC genes affect PIN1 subcellular localization. It is not clear how. Test different
+	hypotheses (WTF, reversal, non-polar, DTCG, UTG dampening, etc...)
 	
 	"""
 
@@ -158,20 +162,6 @@ def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
 	pin1[1] = total_pin1 * ( b**netflux_right / norm_factor )
 	pin1[2] = total_pin1 * ( b**netflux_bottom / norm_factor )
 	pin1[3] = total_pin1 * ( b**netflux_left / norm_factor )
-
-
-def pin1_dual_pol():
-
-	# 
-	# UTG and WTF modes coexist. Default mode is UTG. CUC presence in cell favours WTF.
-	# 
-	# 
-	# 
-	# 
-	# 
-
-	pass
-
 
 
 
