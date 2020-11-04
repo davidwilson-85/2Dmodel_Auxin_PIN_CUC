@@ -40,7 +40,6 @@ for iteration in range(pr.nbr_iterations):
 
 
 	if pr.k_auxin_diffusion > 0:
-
 		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
 
 	# Cleanup destination folder (remove and create)
@@ -183,6 +182,16 @@ for iteration in range(pr.nbr_iterations):
 	
 	# PIN1 POLARIZATION
 
+	func_pin.pin_polarity(pr.pin1_polarity)
+
+	"""
+	BEING REPLACED FOR LOGIC INSIDE pin_polarity() FUNCTION
+
+	if pr.pin1_pol_mode == 'multi':
+		
+		# Polarity mode depends on factors such as CUC level
+		func_pin.pin_polarity()
+	
 	if pr.pin1_pol_mode == 'smith2006':
 		
 		# Smith 2006
@@ -198,6 +207,8 @@ for iteration in range(pr.nbr_iterations):
 	if pr.pin1_pol_mode == 'wtf':
 
 		func_pin.pin_wtf_p(auxin_fluxes, pin1, pr.k_WTF)
+	
+	"""
 
 	#*************************************************************************************
 

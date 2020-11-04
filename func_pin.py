@@ -49,7 +49,7 @@ def pin_expression():
 
 
 
-def pin_polarity():
+def pin_polarity(polarity):
 	
 	"""
 	This function determines, for each cell in the tissue, the PIN1 polarity mode. Then calls
@@ -65,29 +65,42 @@ def pin_polarity():
 	for y in range(ip.auxin.shape[0]):
 		for x in range(ip.auxin.shape[1]):
 
-			if int(ip.cuc[y,x]) > pr.cuc_threshold_pin1:
-				pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
-			else:
-				pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
+			if polarity == 'multi':
+				
+				if int(ip.cuc[y,x]) > pr.cuc_threshold_pin1:
+					pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
+				else:
+					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
+
+			if polarity == 'smith2006':
+				pass
+
+			if polarity == 'ratio':
+				pass
+			
+			if polarity == 'wtf':
+				pass
 
 
 
 def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
-	#
-	# Auxin affects PIN1 subcellular localization (up-the-gradient model = UTG)
-	# UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
-	# 
-	# I use formula from Smith 2006 (also used in Bilsborough 2011):
-	#
-	#                                    b^A[i]
-	# PIN[ij] (potential) = PIN[i] * ---------------
-	#                                 SUM[k] b^A[k] 
-	#
-	# Current problem: As it is now, function does not take into account current PIN1 distribution,
-	# so it erases any initial state defined in the template
-	#
-	# Parameter pin1 here does not refer to whole tissue pin1 array, but to cell y,x
+	'''
+	Auxin affects PIN1 subcellular localization (up-the-gradient model = UTG)
+	UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
+	 
+	I use formula from Smith 2006 (also used in Bilsborough 2011):
+	
+	                                   b^A[i]
+	PIN[ij] (potential) = PIN[i] * ---------------
+	                                SUM[k] b^A[k] 
+	
+	Current problem: As it is now, function does not take into account current PIN1 distribution,
+	so it erases any initial state defined in the template
+	
+	Parameter pin1 here does not refer to whole tissue pin1 array, but to cell y,x.
+
+	'''
 	
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_UTG
@@ -136,11 +149,13 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
 def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
 
-	# 
-	# Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1 instead of nighbour auxin concentrations.
-	# Try using the net flux VS only the efflux
-	#
-	# Parameter pin1 here does not refer to whole tissue pin1 array, but to cell y,x
+	'''
+	Calculation similar to UTG (Smith2006) but using passive (p) net flux to allocate PIN1 instead of nighbour auxin concentrations.
+	Try using the net flux VS only the efflux
+	
+	Parameter pin1 here does not refer to whole tissue pin1 array, but to cell y,x
+	
+	'''
 
 	# Base of exponential function to tweak with UTG responsiveness
 	b = k_WTF
