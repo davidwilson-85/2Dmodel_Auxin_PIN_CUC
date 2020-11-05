@@ -23,9 +23,10 @@ def pin_expression():
 	pin1 = ip.pin1
 	auxin = ip.auxin
 	cuc = ip.cuc
-	k_auxin_pin1 = ip.k_auxin_pin1
-	k_cuc_pin1 = ip.k_cuc_pin1
-	k_pin1_decay = ip.k_pin1_decay
+	k_auxin_pin1 = pr.k_auxin_pin1
+	k_cuc_pin1 = pr.k_cuc_pin1
+	k_pin1_decay = pr.k_pin1_decay
+	h = pr.euler_h
 	
 	# For each cell, calculate updated PIN1 expression value
 	for y in range(auxin.shape[0]):
@@ -67,7 +68,7 @@ def pin_polarity(polarity):
 
 			if polarity == 'multi':
 				
-				if int(ip.cuc[y,x]) > pr.cuc_threshold_pin1:
+				if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
 					pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
 				else:
 					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)

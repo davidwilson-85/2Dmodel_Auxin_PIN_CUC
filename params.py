@@ -23,27 +23,27 @@ k_auxin_diffusion = 0.2 #0.12    		 # Relative amount of molecules that cross be
 # Auxin homeostasis
 k_auxin_synth = 0.1			  	     	 # Basal absolute amount of molecules synthesized per cycle
 k_cuc_yuc = 0.1
-k_auxin_decay = 0.1
+k_auxin_decay = 0.05
 # Auxin - other params
 auxin_noise_factor = 0
 
 # PIN1 localization/activity
 pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf'
 k_UTG = 1.3             # 6 (Bilsborough 2011, Smith 2006), 1.3
-k_WTF = 20000
+k_WTF = 200000
 k_pin1_transp = 0.035        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
-k_auxin_pin1 = 0 #0.00006 #0.0001
-k_cuc_pin1 = 0 #0.0005 #0.0002
-k_pin1_decay = 0 #0.003 # 0.004
+k_auxin_pin1 = 0.0006 #0.0001
+k_cuc_pin1 = 0.005 #0.0002
+k_pin1_decay = 0.03 # 0.004
 
 # CUC activity
 cuc_on_pin1Pol = 0          # Maybe this is a dead parameter
-cuc_threshold_pin1 = 7
+cuc_threshold_pin1 = 5
 # CUC expression
-k_md_cuc = 0.05
-k_auxin_cuc = 0.004
-k_cuc_decay = 0.02
+k_md_cuc = 0.08
+k_auxin_cuc = 0.006
+k_cuc_decay = 0.03
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc

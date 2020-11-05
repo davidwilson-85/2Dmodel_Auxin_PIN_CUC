@@ -22,7 +22,7 @@ print('rows: ', ip.tissue_rows)
 # =====================================================================================
 
 # Tests
-
+'''
 for iteration in range(pr.nbr_iterations):
 
 	# Print iteration to terminal
@@ -77,7 +77,7 @@ for iteration in range(pr.nbr_iterations):
 	ip.auxin[0,4] = ip.auxin[0,4] + 2.5
 
 quit()
-
+'''
 
 # =====================================================================================
 
@@ -112,18 +112,18 @@ for iteration in range(pr.nbr_iterations):
 	# Draw cell plot 
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(
-			auxin_matrix_shape,
-			auxin,
+			ip.auxin_matrix_shape,
+			ip.auxin,
 			pr.auxin_range,
-			lut_auxin,
-			pin1,
+			ip.lut_auxin,
+			ip.pin1,
 			pr.pin1_range,
-			lut_pin1,
-			cuc,
+			ip.lut_pin1,
+			ip.cuc,
 			pr.cuc_range,
-			lut_cuc,
+			ip.lut_cuc,
 			iteration,
-			auxin_fluxes,
+			ip.auxin_fluxes,
 			pr.img_dest_folder
 		)
 	
@@ -156,7 +156,7 @@ for iteration in range(pr.nbr_iterations):
 	
 	if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
 		
-		func_cuc.cuc_expression(pr.euler_h, middle_domain, auxin, cuc, pr.k_md_cuc, pr.k_auxin_cuc, pr.k_cuc_decay)
+		func_cuc.cuc_expression(pr.euler_h, ip.middle_domain, ip.auxin, ip.cuc, pr.k_md_cuc, pr.k_auxin_cuc, pr.k_cuc_decay)
 	
 	#*************************************************************************************
 
@@ -164,7 +164,7 @@ for iteration in range(pr.nbr_iterations):
 	
 	if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
 		
-		func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
+		func_auxin.auxin_homeostasis(pr.euler_h, ip.auxin, ip.cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 	
 	# Integrate local synthesis etc in the function...
 	#auxin[0,0] = 9
@@ -176,7 +176,7 @@ for iteration in range(pr.nbr_iterations):
 
 	if pr.k_auxin_diffusion > 0:
 
-		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, auxin_matrix_shape, tissue_columns, tissue_rows, auxin, auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
 
 	#*************************************************************************************	
 	
@@ -216,14 +216,14 @@ for iteration in range(pr.nbr_iterations):
 
 	if pr.k_pin1_transp > 0:
 
-		func_auxin.pin_on_auxin(pr.euler_h, auxin, pin1, pr.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
+		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
 	
-	auxin[3,3] = auxin[3,3] + 5
-	auxin[10,3] = auxin[10,3] + 5
-	auxin[0,] = 0
-	auxin[13,] = 0
-	auxin[:,0] = 0
-	auxin[:,6] = 0
+	ip.auxin[3,3] = ip.auxin[3,3] + 2
+	#ip.auxin[11,3] = ip.auxin[11,3] + 2
+	#ip.auxin[0,] = 0
+	#ip.auxin[13,] = 0
+	#ip.auxin[:,0] = 0
+	#ip.auxin[:,6] = 0
 
 	
 
