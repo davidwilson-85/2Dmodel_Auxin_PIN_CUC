@@ -2,29 +2,48 @@
 
 import numpy as np
 
+import params as pr
+import inputs as ip
 
 
-def auxin_homeostasis(h, auxin, cuc, k_auxin_synth, k_cuc_yuc, k_auxin_decay):
+def auxin_homeostasis():
 	
 	'''
-	Here implement: basal synthesis and turnover, possible effect of CUC on YUC, local modifications like exogenous application, etc
-	
-	A' = Synth + C*k(CA) - A*k(Cdecay)
+	Here implement: basal synthesis and turnover, possible effect of CUC on YUC,
+	local modifications like exogenous application, etc
+	A' = h * ( Synth + custom_synth_degr + C*k(CY) - A*k(Cdecay) )
 	
 	'''
 	
-	for y in range(auxin.shape[0]):
-		for x in range(auxin.shape[1]):
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
 			
-			auxin_cell = auxin[y,x]
-			cuc_cell = cuc[y,x]
+			# Simplify var names
+			auxin_cell = ip.auxin[y,x]
+			cuc_cell = ip.cuc[y,x]
+			h = pr.euler_h
+			k_cuc_yuc = pr.k_cuc_yuc
+
+			# If current cells has local auxin synth/degr...
+			current_cell = (y,x)
+
+			if current_cell in pr.auxin_custom_synth['cells']:
+				k_auxin_synth = pr.k_auxin_synth + pr.auxin_custom_synth['value']
+			else:
+				k_auxin_synth = pr.k_auxin_synth
 			
-			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_decay )
+			if current_cell in pr.auxin_custom_synth['cells']:
+				k_auxin_degr = pr.k_auxin_degr + pr.auxin_custom_degr['value']
+			else:
+				k_auxin_degr = pr.k_auxin_degr
+			
+			# Calculate change in auxin concentration
+			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_degr )
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = 0
 				
-			auxin[y,x] = auxin_cell_updated
+			ip.auxin[y,x] = auxin_cell_updated
 
 
 

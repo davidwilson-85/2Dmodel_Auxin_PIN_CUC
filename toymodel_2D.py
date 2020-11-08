@@ -162,13 +162,8 @@ for iteration in range(pr.nbr_iterations):
 
 	# AUXIN HOMEOSTASIS
 	
-	if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
-		
-		func_auxin.auxin_homeostasis(pr.euler_h, ip.auxin, ip.cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
-	
-	# Integrate local synthesis etc in the function...
-	#auxin[0,0] = 9
-	#auxin[4,4] = 0
+	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_degr > 0:
+	func_auxin.auxin_homeostasis()
 	
 	#*************************************************************************************
 
@@ -184,32 +179,6 @@ for iteration in range(pr.nbr_iterations):
 
 	func_pin.pin_polarity(pr.pin1_polarity)
 
-	"""
-	BEING REPLACED FOR LOGIC INSIDE pin_polarity() FUNCTION
-
-	if pr.pin1_pol_mode == 'multi':
-		
-		# Polarity mode depends on factors such as CUC level
-		func_pin.pin_polarity()
-	
-	if pr.pin1_pol_mode == 'smith2006':
-		
-		# Smith 2006
-		if pr.k_UTG > 1:
-			func_pin.pin_utg_smith2006(auxin, pin1, pr.k_UTG, cuc, pr.cuc_threshold_pin1)
-
-	if pr.pin1_pol_mode == 'ratio':
-		
-		# My method:
-		if pr.k_UTG > 0:
-			func_pin.pin_utg_ratio(auxin, pin1, pr.k_UTG, cuc, pr.cuc_threshold_pin1)
-
-	if pr.pin1_pol_mode == 'wtf':
-
-		func_pin.pin_wtf_p(auxin_fluxes, pin1, pr.k_WTF)
-	
-	"""
-
 	#*************************************************************************************
 
 	# PIN1-MEDIATED AUXIN EFFLUX
@@ -217,14 +186,6 @@ for iteration in range(pr.nbr_iterations):
 	if pr.k_pin1_transp > 0:
 
 		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
-	
-	ip.auxin[3,3] = ip.auxin[3,3] + 2
-	#ip.auxin[11,3] = ip.auxin[11,3] + 2
-	#ip.auxin[0,] = 0
-	#ip.auxin[13,] = 0
-	#ip.auxin[:,0] = 0
-	#ip.auxin[:,6] = 0
-
 	
 
 

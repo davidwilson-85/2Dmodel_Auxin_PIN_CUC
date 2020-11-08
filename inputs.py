@@ -5,10 +5,13 @@ import numpy as np
 # === LOAD TEMPLATE DATA
 
 # Templates
-auxin_template = 'templates/auxin_template'
-pin1_template = 'templates/pin1_template'
-cuc_template = 'templates/cuc_template'
-middle_domain_template = 'templates/middle_domain_template'
+
+template = '1D'
+
+auxin_template = 'templates/' + template + '/auxin_template'
+pin1_template = 'templates/' + template + '/pin1_template'
+cuc_template = 'templates/' + template + '/cuc_template'
+middle_domain_template = 'templates/' + template + '/middle_domain_template'
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin = auxin * 10

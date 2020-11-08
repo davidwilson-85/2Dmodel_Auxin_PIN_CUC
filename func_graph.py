@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import os, shutil
 
+import inputs as ip
 
 
 def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_af, img_dest_folder):
@@ -30,18 +31,18 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	cellSide = 50
 
 	# Calculate required image dimensions
-	height = x_origin + auxin.shape[0] * cellSide
-	width = y_origin + auxin.shape[1] * cellSide
+	height = x_origin + ip.tissue_rows * cellSide
+	width = y_origin + ip.tissue_columns * cellSide
 	
 	im = Image.new('RGB', size=(width,height))
 	draw = ImageDraw.Draw(im, 'RGBA')
 	
 	y = y_origin
 
-	for i in range(matrix_shape[0]):
+	for i in range(ip.tissue_rows):
 		
 		x = x_origin
-		for j in range(matrix_shape[1]):
+		for j in range(ip.tissue_columns):
 			
 			# Draw cell outline and auxin fill
 			if draw_auxin == True:
@@ -61,7 +62,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 			
 			if draw_values_text == True:
 				# Write auxin concentration (magenta)
-				#ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
+				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
 				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)

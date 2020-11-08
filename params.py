@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
+import func_auxin
+
 # General
 euler_h = 0.1                 # Euler step size = h; (0 - 1]
-nbr_iterations = 1000
+nbr_iterations = 200
 img_dest_folder = 'images/test'
-cell_plot_frequency = 10
+cell_plot_frequency = 1
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
@@ -19,13 +21,25 @@ AUX_LAX_transport = False
 CUC = False
 
 # Auxin diffusion
-k_auxin_diffusion = 0.2 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 2 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
 # Auxin homeostasis
-k_auxin_synth = 0.1			  	     	 # Basal absolute amount of molecules synthesized per cycle
-k_cuc_yuc = 0.1
-k_auxin_decay = 0.05
+k_auxin_synth = 0			  	     	 # Basal absolute amount of molecules synthesized per cycle
+k_cuc_yuc = 0 #0.1
+k_auxin_degr = 0
 # Auxin - other params
 auxin_noise_factor = 0
+# Auxin custom local synthesis
+auxin_custom_synth = {
+  "cells": ((8,0),(8,1)),
+  "iterations": (),
+  "value": 2
+}
+# Auxin custom local degradation
+auxin_custom_degr = {
+  "cells": (),
+  "iterations": (),
+  "value": 0
+}
 
 # PIN1 localization/activity
 pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf'
