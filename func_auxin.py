@@ -24,7 +24,7 @@ def auxin_homeostasis():
 			h = pr.euler_h
 			k_cuc_yuc = pr.k_cuc_yuc
 
-			# If current cells has local auxin synth/degr...
+			# If current cell has local auxin synth/degr...
 			current_cell = (y,x)
 
 			if current_cell in pr.auxin_custom_synth['cells']:
@@ -32,7 +32,7 @@ def auxin_homeostasis():
 			else:
 				k_auxin_synth = pr.k_auxin_synth
 			
-			if current_cell in pr.auxin_custom_synth['cells']:
+			if current_cell in pr.auxin_custom_degr['cells']:
 				k_auxin_degr = pr.k_auxin_degr + pr.auxin_custom_degr['value']
 			else:
 				k_auxin_degr = pr.k_auxin_degr
