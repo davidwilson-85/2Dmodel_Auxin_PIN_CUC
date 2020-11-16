@@ -156,8 +156,8 @@ for iteration in range(pr.nbr_iterations):
 	
 	if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
 		
-		func_cuc.cuc_expression(pr.euler_h, ip.middle_domain, ip.auxin, ip.cuc, pr.k_md_cuc, pr.k_auxin_cuc, pr.k_cuc_decay)
-	
+		func_cuc.cuc_expression()
+
 	#*************************************************************************************
 
 	# AUXIN HOMEOSTASIS

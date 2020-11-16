@@ -22,7 +22,8 @@ def auxin_homeostasis():
 			auxin_cell = ip.auxin[y,x]
 			cuc_cell = ip.cuc[y,x]
 			h = pr.euler_h
-			k_cuc_yuc = pr.k_cuc_yuc
+			k_cuc_yuc1 = pr.k_cuc_yuc1
+			k_cuc_yuc4 = pr.k_cuc_yuc4
 
 			# If current cell has local auxin synth/degr...
 			current_cell = (y,x)
@@ -38,7 +39,7 @@ def auxin_homeostasis():
 				k_auxin_degr = pr.k_auxin_degr
 			
 			# Calculate change in auxin concentration
-			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc - auxin_cell * k_auxin_degr )
+			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc1 + cuc_cell * k_cuc_yuc4 - auxin_cell * k_auxin_degr )
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = 0

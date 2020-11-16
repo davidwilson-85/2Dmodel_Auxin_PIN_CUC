@@ -7,7 +7,6 @@ import params as pr
 import inputs as ip
 
 
-#def pin_expression(pin1, auxin, cuc, k_auxin_pin1, k_cuc_pin1, k_pin1_decay):
 def pin_expression():
 
 	'''

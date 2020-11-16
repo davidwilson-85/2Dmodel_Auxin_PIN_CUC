@@ -6,7 +6,7 @@ import func_auxin
 euler_h = 0.1                 # Euler step size = h; (0 - 1]
 nbr_iterations = 250
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 5
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
@@ -24,10 +24,12 @@ CUC = False
 k_auxin_diffusion = 1 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
 # Auxin homeostasis
 k_auxin_synth = 0			  	     	 # Basal absolute amount of molecules synthesized per cycle
-k_cuc_yuc = 0 #0.1
-k_auxin_degr = 0.05
+k_cuc_yuc1 = 0.3
+k_cuc_yuc4 = 0.1
+k_auxin_degr = 0.06
 # Auxin - other params
 auxin_noise_factor = 0
+
 # Auxin custom local synthesis
 auxin_custom_synth = {
   "cells": ((3,0),(3,1)),
@@ -48,14 +50,14 @@ k_WTF = 200000
 k_pin1_transp = 0.035        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
 k_auxin_pin1 = 0.003 #0.0001
-k_cuc_pin1 = 0 #0.0002
+k_cuc_pin1 = 0.01
 k_pin1_decay = 0.1 # 0.004
 
 # CUC activity
 cuc_on_pin1Pol = 0          # Maybe this is a dead parameter
-cuc_threshold_pin1 = 1000
+cuc_threshold_pin1 = 4.5
 # CUC expression
-k_md_cuc = 0.1
+k_md_cuc = 0.11
 k_auxin_cuc = 0.03
 k_cuc_decay = 0.03
 
