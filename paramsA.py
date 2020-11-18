@@ -21,10 +21,10 @@ AUX_LAX_transport = False
 CUC = False
 
 # Auxin diffusion
-k_auxin_diffusion = 0.1 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 1 #0.12    		 # Relative amount of molecules that cross between two adjacent cells per cycle
 # Auxin homeostasis
 k_auxin_synth = 0			  	     	 # Basal absolute amount of molecules synthesized per cycle
-k_cuc_yuc1 = 0.1 #0.3
+k_cuc_yuc1 = 4 #0.3
 th_cuc_yuc1 = 6
 k_cuc_yuc4 = 0 #0.4
 k_auxin_degr = 0.06
@@ -33,9 +33,9 @@ auxin_noise_factor = 0
 
 # Auxin custom local synthesis
 auxin_custom_synth = {
-  "cells": ((6,0),(6,1)),
-  "iterations": range(0,1000),
-  "value": 100
+  "cells": ((3,0),(3,1)),
+  "iterations": range(1,1000),
+  "value": 10
 }
 # Auxin custom local degradation
 auxin_custom_degr = {
@@ -47,8 +47,8 @@ auxin_custom_degr = {
 # PIN1 localization/activity
 pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf'
 k_UTG = 1.5             # 6 (Bilsborough 2011, Smith 2006), 1.3
-k_WTF = 100000000000000000000000000000000
-k_pin1_transp = 0.1        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
+k_WTF = 200000
+k_pin1_transp = 0.035        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
 k_auxin_pin1 = 0.003 #0.0001
 k_cuc_pin1 = 0.01

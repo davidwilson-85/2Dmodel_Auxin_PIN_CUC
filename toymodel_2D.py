@@ -163,7 +163,7 @@ for iteration in range(pr.nbr_iterations):
 	# AUXIN HOMEOSTASIS
 	
 	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_degr > 0:
-	func_auxin.auxin_homeostasis()
+	func_auxin.auxin_homeostasis(iteration)
 	
 	#*************************************************************************************
 

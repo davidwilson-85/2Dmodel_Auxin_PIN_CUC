@@ -6,12 +6,15 @@ import params as pr
 import inputs as ip
 
 
-def auxin_homeostasis():
+def auxin_homeostasis(iton):
 	
 	'''
 	Here implement: basal synthesis and turnover, possible effect of CUC on YUC,
 	local modifications like exogenous application, etc
 	A' = h * ( Synth + custom_synth_degr + C*k(CY) - A*k(Cdecay) )
+
+	Params:
+	* iton: Iteration of the simulation. This is used for local auxin synth/degr
 	
 	'''
 	
@@ -22,24 +25,40 @@ def auxin_homeostasis():
 			auxin_cell = ip.auxin[y,x]
 			cuc_cell = ip.cuc[y,x]
 			h = pr.euler_h
+			k_auxin_synth = pr.k_auxin_synth
+			k_auxin_degr = pr.k_auxin_degr
+			th_cuc_yuc1 = pr.th_cuc_yuc1
 			k_cuc_yuc1 = pr.k_cuc_yuc1
 			k_cuc_yuc4 = pr.k_cuc_yuc4
 
 			# If current cell has local auxin synth/degr...
 			current_cell = (y,x)
 
-			if current_cell in pr.auxin_custom_synth['cells']:
-				k_auxin_synth = pr.k_auxin_synth + pr.auxin_custom_synth['value']
+			if current_cell in pr.auxin_custom_synth['cells'] and iton in pr.auxin_custom_synth['iterations']:
+				local_synth = pr.auxin_custom_synth['value']
 			else:
-				k_auxin_synth = pr.k_auxin_synth
+				local_synth = 0
 			
-			if current_cell in pr.auxin_custom_degr['cells']:
-				k_auxin_degr = pr.k_auxin_degr + pr.auxin_custom_degr['value']
+			if current_cell in pr.auxin_custom_degr['cells'] and iton in pr.auxin_custom_synth['iterations']:
+				local_degr = pr.auxin_custom_degr['value']
 			else:
-				k_auxin_degr = pr.k_auxin_degr
+				local_degr = 0
+			
+			# Test: Effect of CUC on YUC1 follows a step function
+			if cuc_cell >= th_cuc_yuc1:
+				synth_yuc1 = cuc_cell * k_cuc_yuc1
+			else:
+				synth_yuc1 = 0
 			
 			# Calculate change in auxin concentration
-			auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + cuc_cell * k_cuc_yuc1 + cuc_cell * k_cuc_yuc4 - auxin_cell * k_auxin_degr )
+			auxin_cell_updated = auxin_cell + h * ( \
+				k_auxin_synth + \
+				local_synth - \
+				local_degr + \
+				synth_yuc1 + \
+				cuc_cell * k_cuc_yuc4 - \
+				auxin_cell * k_auxin_degr \
+			)
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = 0
