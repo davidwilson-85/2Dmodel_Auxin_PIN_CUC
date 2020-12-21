@@ -5,7 +5,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 #from PIL import Image, ImageDraw, ImageFont
 
-import params as pr
+import paramsCUCorganizer as pr
 import inputs as ip
 
 import func_graph

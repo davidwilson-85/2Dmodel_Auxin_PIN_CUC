@@ -8,7 +8,7 @@ import inputs as ip
 def cuc_expression():
 
 	#
-	# CUC expression is promoted in the middle domain, repressed by auxin, and decays at a constant rate. [Maybe add also turnover]
+	# CUC expression is promoted in the middle domain, repressed by auxin, and decays at a constant rate.
 	#
 	# C' = h * ( M*k(MC) - A*k(AC) - C*k(Cdecay) )
 	#

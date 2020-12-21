@@ -4,7 +4,7 @@ import func_auxin
 
 # General
 euler_h = 0.1                 # Euler step size = h; (0 - 1]
-nbr_iterations = 250
+nbr_iterations = 100
 img_dest_folder = 'images/test'
 cell_plot_frequency = 1
 
@@ -35,7 +35,7 @@ auxin_noise_factor = 0
 auxin_custom_synth = {
   "cells": ((6,0),(6,1)),
   "iterations": range(0,1000),
-  "value": 50
+  "value": 3
 }
 # Auxin custom local degradation
 auxin_custom_degr = {
@@ -56,11 +56,11 @@ k_pin1_decay = 0.1 # 0.004
 
 # CUC activity
 cuc_on_pin1Pol = 0          # Maybe this is a dead parameter
-cuc_threshold_pin1 = 5
+cuc_threshold_pin1 = 4
 # CUC expression
-k_md_cuc = 0.11
-k_auxin_cuc = 0.03
-k_cuc_decay = 0.03
+k_md_cuc = 0
+k_auxin_cuc = 0
+k_cuc_decay = 0
 
 # Local synthesis or degradation (absolute or relative)
 	# Here define a list of elements, each specifying the cell coordinates, synth/degr, abs/rel, cycles, etc
