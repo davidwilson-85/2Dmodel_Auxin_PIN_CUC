@@ -27,7 +27,7 @@ k_auxin_synth = 0			  	     	 # Basal absolute amount of molecules synthesized p
 k_cuc_yuc1 = 0.1 #0.3
 th_cuc_yuc1 = 6
 k_cuc_yuc4 = 0 #0.4
-k_auxin_degr = 0.06
+k_auxin_degr = 0.01
 # Auxin - other params
 auxin_noise_factor = 0
 
@@ -48,7 +48,7 @@ auxin_custom_degr = {
 pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf'
 k_UTG = 1.5             # 6 (Bilsborough 2011, Smith 2006), 1.3
 k_WTF = 100000000000000000000000000000000
-k_pin1_transp = 0.1        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
+k_pin1_transp = 0.12        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
 k_auxin_pin1 = 0.003 #0.0001
 k_cuc_pin1 = 0.01

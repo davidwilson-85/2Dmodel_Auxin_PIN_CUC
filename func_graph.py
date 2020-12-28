@@ -3,6 +3,7 @@
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import os, shutil
+import cv2
 
 import inputs as ip
 
@@ -135,4 +136,36 @@ def create_heatmap(data):
 	fig = plt.imshow(data, cmap="plasma", vmin=0, vmax=1, interpolation='none')
 	plt.savefig('images/test/image' + str(iteration) + '.png')
 	plt.close()
+
+# Create video from images
+def create_video():
+
+	'''
+	Check also:
+	https://stackoverflow.com/questions/44947505/how-to-make-a-movie-out-of-images-in-python
+	http://tsaith.github.io/combine-images-into-a-video-with-python-3-and-opencv-3.html
+	https://theailearner.com/2018/10/15/creating-video-from-images-using-opencv-python/
+	'''
+
+	image_folder = 'images/20201115_looksLike_cuc2_mutant/imgs'
+	video_name = 'videos/video6.avi'
+
+	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
+	images.sort()
+
+	frame = cv2.imread(os.path.join(image_folder, images[0]))
+	height, width, layers = frame.shape
+	print(height, width)
+
+	video = cv2.VideoWriter(video_name, 0, 10, (width,height))
+
+	for image in images:
+		video.write(cv2.imread(os.path.join(image_folder, image)))
+
+	cv2.destroyAllWindows()
+	video.release()
+
+if __name__ == '__main__':
+	create_video()
+
 
