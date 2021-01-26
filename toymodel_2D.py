@@ -5,7 +5,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 #from PIL import Image, ImageDraw, ImageFont
 
-import paramsCUCorganizer as pr
+import params_WTF as pr
 import inputs as ip
 
 import func_graph
@@ -22,7 +22,7 @@ print('rows: ', ip.tissue_rows)
 # =====================================================================================
 
 # Tests
-'''
+
 for iteration in range(pr.nbr_iterations):
 
 	# Print iteration to terminal
@@ -30,17 +30,6 @@ for iteration in range(pr.nbr_iterations):
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
-
-	# PIN1 polarity
-	func_pin.pin_polarity()
-
-
-	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		func_pin.pin_expression()
-
-
-	if pr.k_auxin_diffusion > 0:
-		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
 
 	# Cleanup destination folder (remove and create)
 	if iteration == 0:
@@ -65,19 +54,32 @@ for iteration in range(pr.nbr_iterations):
 			pr.img_dest_folder
 		)
 
-	#if pr.k_pin1_transp > 0:
+	# PIN1 polarity
+	func_pin.pin_polarity(pr.pin1_polarity)
 
-		#func_auxin.pin_on_auxin(pr.euler_h, auxin, pin1, pr.k_pin1_transp, tissue_rows, tissue_columns, pin1_matrix_shape)
+	#if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
+	#	func_pin.pin_expression()
 
+	# Auxin diffusion
+	if pr.k_auxin_diffusion > 0:
+		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
+
+	# PIN1-mediated auxin transport
+	if pr.k_pin1_transp > 0:
+		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
+	
+	# Cleanup destination folder (remove and create)
+	if iteration == 0:
+		shutil.rmtree(pr.img_dest_folder) 
+		os.mkdir(pr.img_dest_folder)
 
 	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
-		
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
-	ip.auxin[0,4] = ip.auxin[0,4] + 2.5
+	# Custom auxin modification
+	ip.auxin[5,5] = ip.auxin[5,5] + 10
 
 quit()
-'''
 
 # =====================================================================================
 

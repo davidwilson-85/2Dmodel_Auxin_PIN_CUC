@@ -31,7 +31,7 @@ def auxin_homeostasis(iton):
 			k_cuc_yuc1 = pr.k_cuc_yuc1
 			k_cuc_yuc4 = pr.k_cuc_yuc4
 
-			# If current cell has local auxin synth/degr...
+			# If current cell has local/custom auxin synth/degr...
 			current_cell = (y,x)
 
 			if current_cell in pr.auxin_custom_synth['cells'] and iton in pr.auxin_custom_synth['iterations']:

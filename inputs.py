@@ -6,7 +6,7 @@ import numpy as np
 
 # Templates
 
-template = '1D'
+template = '2D'
 
 auxin_template = 'templates/' + template + '/auxin_template'
 pin1_template = 'templates/' + template + '/pin1_template'
@@ -22,7 +22,7 @@ pin1_matrix_shape = pin1.shape
 cuc = np.loadtxt(cuc_template, delimiter=',', unpack=False)
 middle_domain = np.loadtxt(middle_domain_template, delimiter=',', unpack=False)
 
-auxin_fluxes = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
+auxin_fluxes = np.zeros(shape=(8,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # LUTs

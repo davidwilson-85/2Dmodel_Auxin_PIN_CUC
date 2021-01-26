@@ -16,7 +16,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	
 	draw_auxin = True
 	draw_pin = True
-	draw_cuc = True
+	draw_cuc = False
 	draw_values_text = True
 	draw_vectors = True
 

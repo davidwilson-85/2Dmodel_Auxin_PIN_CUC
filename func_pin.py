@@ -18,6 +18,7 @@ def pin_expression():
 	P' = h * ( A*P*K(AP) + C*P*K(CP) - P*K(Pdecay) )
 
 	'''
+
 	# Rename parameters
 	pin1 = ip.pin1
 	auxin = ip.auxin
@@ -73,13 +74,13 @@ def pin_polarity(polarity):
 					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
 			if polarity == 'smith2006':
-				pass
+				pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
 			if polarity == 'ratio':
 				pass
 			
 			if polarity == 'wtf':
-				pass
+				pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
 
 
 
@@ -144,6 +145,22 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
 	#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]	
 	#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+
+
+
+def pin_wtf_abley2016(y, x, auxin_fluxes, pin1, k_WTF):
+
+	'''
+	Based on Abley et al 2016 (Coen lab). Flux = diffusion + PIN1 transport + import.
+	For now I implement only diffusion + PIN1 transport. 
+
+	'''
+
+	# Calculate net flux at each cell face
+	netflux_top = auxin_fluxes[0,y,x] - auxin_fluxes[1,y,x] #+ PIN-mediated out - PIN-mediated in
+
+	# Calculate new PIN amount at each cell face
+	pin1[0] = pin1[0] + (k * netflux_top) - (k * pin1[0])
 
 
 
