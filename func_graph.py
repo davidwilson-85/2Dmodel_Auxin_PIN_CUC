@@ -112,7 +112,6 @@ def index_to_rgb(lut, level, range):
 	return rgb_triplet
 
 
-
 # Maps an integer representing the amount of a magnitude (e.g. [auxin]) and translates it to the corresponding RGBA triplet of the selected LUT
 def index_to_rgba(lut, level, range):
 
@@ -129,13 +128,13 @@ def index_to_rgba(lut, level, range):
 	return rgba
 
 
-
 # Create a heatmap using matplotlib's imshow()
 def create_heatmap(data):
 	
 	fig = plt.imshow(data, cmap="plasma", vmin=0, vmax=1, interpolation='none')
 	plt.savefig('images/test/image' + str(iteration) + '.png')
 	plt.close()
+
 
 # Create video from images
 def create_video():

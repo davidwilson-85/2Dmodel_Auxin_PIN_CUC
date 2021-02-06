@@ -49,7 +49,6 @@ def pin_expression():
 			pin1[3,y,x] = pin1[3,y,x] * pin1_ratio
 
 
-
 def pin_polarity(polarity):
 	
 	"""
@@ -69,7 +68,8 @@ def pin_polarity(polarity):
 			if polarity == 'multi':
 				
 				if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
-					pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
+					#pin_wtf_p(y, x, ip.auxin_fluxes_difusion, ip.pin1[:,y,x], pr.k_WTF)
+					pass
 				else:
 					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
@@ -80,8 +80,10 @@ def pin_polarity(polarity):
 				pass
 			
 			if polarity == 'wtf':
-				pin_wtf_p(y, x, ip.auxin_fluxes, ip.pin1[:,y,x], pr.k_WTF)
+				pin_wtf_p(y, x, ip.auxin_fluxes_difusion, ip.pin1[:,y,x], pr.k_WTF)
 
+			if polarity == 'wtf_abley2016':
+				pin_wtf_abley2016(y, x)
 
 
 def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
@@ -147,21 +149,26 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 	#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
 
 
-
-def pin_wtf_abley2016(y, x, auxin_fluxes, pin1, k_WTF):
+def pin_wtf_abley2016(y, x):
 
 	'''
 	Based on Abley et al 2016 (Coen lab). Flux = diffusion + PIN1 transport + import.
-	For now I implement only diffusion + PIN1 transport. 
+	For now I implement only diffusion + PIN1 transport.
+
+	dPIN(ij) / dt = 
+		if flux(i->j) >= 0: ka * flux(i->j) - kb * PIN(ij)
+		if flux(i->j) <  0: - kb * PIN(ij)
+
+	flux(i->j) = D * (A(i) - A(j)) + T * (PIN(ij) * A(i) - PIN(ji) * A(j))
 
 	'''
 
 	# Calculate net flux at each cell face
-	netflux_top = auxin_fluxes[0,y,x] - auxin_fluxes[1,y,x] #+ PIN-mediated out - PIN-mediated in
+	net_flux_t = flux_diff[0,y,x] - flux_diff[1,y,x] + flux_pin1[0,y,x] - flux_pin1[1,y,x]
+	
 
 	# Calculate new PIN amount at each cell face
 	pin1[0] = pin1[0] + (k * netflux_top) - (k * pin1[0])
-
 
 
 def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
@@ -174,7 +181,7 @@ def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
 	
 	'''
 
-	# Base of exponential function to tweak with UTG responsiveness
+	# Coefficient to tweak WTF responsiveness
 	b = k_WTF
 		
 	# Current PIN1 total amount in the cell
@@ -194,7 +201,6 @@ def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
 	pin1[1] = total_pin1 * ( b**netflux_right / norm_factor )
 	pin1[2] = total_pin1 * ( b**netflux_bottom / norm_factor )
 	pin1[3] = total_pin1 * ( b**netflux_left / norm_factor )
-
 
 
 def pin_utg_ratio(auxin, pin1, k_UTG, cuc, cuc_threshold_pin1):

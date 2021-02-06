@@ -50,7 +50,7 @@ for iteration in range(pr.nbr_iterations):
 			pr.cuc_range,
 			ip.lut_cuc,
 			iteration,
-			ip.auxin_fluxes,
+			ip.auxin_fluxes_difusion,
 			pr.img_dest_folder
 		)
 
@@ -62,22 +62,18 @@ for iteration in range(pr.nbr_iterations):
 
 	# Auxin diffusion
 	if pr.k_auxin_diffusion > 0:
-		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
+		func_auxin.auxin_diffusion()
 
 	# PIN1-mediated auxin transport
 	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
-	
-	# Cleanup destination folder (remove and create)
-	if iteration == 0:
-		shutil.rmtree(pr.img_dest_folder) 
-		os.mkdir(pr.img_dest_folder)
+		#func_auxin.pin_on_auxin_new(ip.pin1_matrix_shape)
+		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 
 	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
 	# Custom auxin modification
-	ip.auxin[5,5] = ip.auxin[5,5] + 10
+	ip.auxin[5,5] = ip.auxin[5,5] + 2
 
 quit()
 
