@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 import os, shutil, random
 import numpy as np
 #import matplotlib.pyplot as plt
@@ -18,10 +19,22 @@ print('shape', ip.auxin.shape)
 print('cols: ', ip.tissue_columns)
 print('rows: ', ip.tissue_rows)
 
+start_time = time.time()
 
 # =====================================================================================
 
 # Tests
+
+# Apply noise to auxin concentrations at begining of simulation
+if pr.auxin_noise_factor > 0:
+	
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+		
+			ip.auxin[y,x] = ip.auxin[y,x] * 1 + ( random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor) )
+		
+			if ip.auxin[y,x] < 0:
+				ip.auxin[y,x] = float(0.0000001)
 
 for iteration in range(pr.nbr_iterations):
 
@@ -51,6 +64,7 @@ for iteration in range(pr.nbr_iterations):
 			ip.lut_cuc,
 			iteration,
 			ip.auxin_fluxes_difusion,
+			ip.auxin_fluxes_pin1,
 			pr.img_dest_folder
 		)
 
@@ -73,7 +87,9 @@ for iteration in range(pr.nbr_iterations):
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
 	# Custom auxin modification
-	ip.auxin[5,5] = ip.auxin[5,5] + 2
+	#ip.auxin[5,5] = ip.auxin[5,5] + 2
+
+print("%s seconds" % (time.time() - start_time))
 
 quit()
 
@@ -186,6 +202,7 @@ for iteration in range(pr.nbr_iterations):
 		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
 	
 
+print("%s seconds" % (time.time() - start_time))
 
 
 

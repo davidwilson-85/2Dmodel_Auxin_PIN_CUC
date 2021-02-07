@@ -8,7 +8,7 @@ import cv2
 import inputs as ip
 
 
-def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_af, img_dest_folder):
+def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_afd, array_afp, img_dest_folder):
 
 	#
 	# Create cell plot using PIL
@@ -18,7 +18,8 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	draw_pin = True
 	draw_cuc = False
 	draw_values_text = True
-	draw_vectors = True
+	draw_vectors_diff = True
+	draw_vectors_pin1 = True
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 50
@@ -76,14 +77,30 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	x = x_origin
 	y = y_origin
 
-	if draw_vectors == True:
+	if draw_vectors_diff == True:
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
 			for j in range(matrix_shape[1]):
 	
 				# Draw auxin diffussion vector
-				draw.line([(x+25,y+25),(x+25+vector_mag*array_af[8,i,j],y+25+vector_mag*array_af[9,i,j])], fill='white', width=2)
+				draw.line([(x+25,y+25),(x+25+vector_mag*array_afd[8,i,j],y+25+vector_mag*array_afd[9,i,j])], fill='white', width=2)
+				
+				x = x + cellSide
+			
+			y = y + cellSide
+	
+		x = x_origin
+		y = y_origin
+	
+	if draw_vectors_pin1 == True:
+		for i in range(matrix_shape[0]):
+			
+			x = x_origin
+			for j in range(matrix_shape[1]):
+	
+				# Draw PIN1 transport vector
+				draw.line([(x+25,y+25),(x+25+vector_mag*array_afp[8,i,j],y+25+vector_mag*array_afp[9,i,j])], fill='yellow', width=3)
 				
 				x = x + cellSide
 			
@@ -144,10 +161,13 @@ def create_video():
 	https://stackoverflow.com/questions/44947505/how-to-make-a-movie-out-of-images-in-python
 	http://tsaith.github.io/combine-images-into-a-video-with-python-3-and-opencv-3.html
 	https://theailearner.com/2018/10/15/creating-video-from-images-using-opencv-python/
+
+	To call this function:
+	$ python3 func_graph.py
 	'''
 
-	image_folder = 'images/20201115_looksLike_cuc2_mutant/imgs'
-	video_name = 'videos/video6.avi'
+	image_folder = 'images/test'
+	video_name = 'videos/video7.avi'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 	images.sort()

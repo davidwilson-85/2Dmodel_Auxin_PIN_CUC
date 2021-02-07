@@ -3,14 +3,14 @@
 import func_auxin
 
 # General
-euler_h = 0.1                 # Euler step size = h; (0 - 1]
-nbr_iterations = 250
+euler_h = 0.1               # Euler step size = h; (0 - 1]
+nbr_iterations = 500
 img_dest_folder = 'images/test'
 cell_plot_frequency = 10
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
-pin1_range = (0, 9)
+pin1_range = (0, 10)
 cuc_range = (0, 9)
 middle_domain = (0, 9)
 
@@ -29,7 +29,7 @@ th_cuc_yuc1 = 6
 k_cuc_yuc4 = 0 #0.4
 k_auxin_degr = 0.06
 # Auxin - other params
-auxin_noise_factor = 0
+auxin_noise_factor = 0.025
 
 # Auxin custom local synthesis
 auxin_custom_synth = {
@@ -45,8 +45,8 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization/activity
-pin1_polarity = 'wtf'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf'
-k_UTG = 1.5             # 6 (Bilsborough 2011, Smith 2006), 1.3
+pin1_polarity = 'wtf_abley2016'   # 'multi' OR 'smith2006' OR 'ratio' OR 'wtf' OR 'wtf_abley2016'
+k_UTG = 1.2             # 6 (Bilsborough 2011, Smith 2006), 1.3
 k_WTF = 100000000000000000000000000000000
 k_pin1_transp = 0.01        # = Nbr auxin molecules transported / ( PIN1 molecule * cycle ); used values=0.01
 # PIN1 expression
