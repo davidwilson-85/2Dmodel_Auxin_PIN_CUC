@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import math
 
 import params as pr
 import inputs as ip
@@ -122,7 +123,7 @@ def auxin_diffusion():
 			else:
 				fluxes[6,y,x], fluxes[7,y,x] = 0, 0
 
-			# Calculate vector components of net flux to draw line
+			# Calculate vector components and angle of net flux to draw line
 
 			# Calculate net fluxes (outbound, out - in) to draw vectors
 			T_net_flux = fluxes[0,y,x] - fluxes[1,y,x]
@@ -209,7 +210,7 @@ def pin_on_auxin(k_pin1_transp):
 			else:
 				fluxes_pin1[6,y,x], fluxes_pin1[7,y,x] = 0, 0
 			
-			# Calculate vector components of net flux to draw line
+			# Calculate vector components and angle of net flux to draw line
 
 			# Calculate net fluxes (outbound, out - in) to draw vectors
 			T_net_flux = fluxes_pin1[0,y,x] - fluxes_pin1[1,y,x]
@@ -217,9 +218,14 @@ def pin_on_auxin(k_pin1_transp):
 			B_net_flux = fluxes_pin1[4,y,x] - fluxes_pin1[5,y,x]
 			L_net_flux = fluxes_pin1[6,y,x] - fluxes_pin1[7,y,x]
 			# Vector X component
-			fluxes_pin1[8,y,x] = R_net_flux - L_net_flux
+			vector_x = fluxes_pin1[8,y,x] = R_net_flux - L_net_flux
 			# Vector Y component
-			fluxes_pin1[9,y,x] = B_net_flux - T_net_flux
+			vector_y = fluxes_pin1[9,y,x] = B_net_flux - T_net_flux
+			# Calculate sine of angle described by vector
+			vector_hyp = math.sqrt(vector_x**2 + vector_y**2)
+			sine = vector_y / vector_hyp
+			# Calculate degres of vector (convert sine to radians and then to degrees)
+			fluxes_pin1[10,y,x] = math.degrees(math.asin(sine))
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	# This could go inside auxin_homeostasis()

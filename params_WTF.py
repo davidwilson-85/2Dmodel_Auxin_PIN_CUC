@@ -4,7 +4,7 @@ import func_auxin
 
 # General
 euler_h = 0.1               # Euler step size = h; (0 - 1]
-nbr_iterations = 500
+nbr_iterations = 250
 img_dest_folder = 'images/test'
 cell_plot_frequency = 10
 
