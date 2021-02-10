@@ -223,9 +223,14 @@ def pin_on_auxin(k_pin1_transp):
 			vector_y = fluxes_pin1[9,y,x] = B_net_flux - T_net_flux
 			# Calculate sine of angle described by vector
 			vector_hyp = math.sqrt(vector_x**2 + vector_y**2)
-			sine = vector_y / vector_hyp
-			# Calculate degres of vector (convert sine to radians and then to degrees)
-			fluxes_pin1[10,y,x] = math.degrees(math.asin(sine))
+			if vector_y != 0 and vector_hyp != 0:
+				sine = vector_y / vector_hyp
+				# Calculate degres of vector (convert sine to radians and then to degrees)
+				fluxes_pin1[10,y,x] = math.degrees(math.asin(sine))
+			else:
+				fluxes_pin1[10,y,x] = 366.0
+
+			#print(vector_y, vector_hyp, fluxes_pin1[10,y,x])
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	# This could go inside auxin_homeostasis()

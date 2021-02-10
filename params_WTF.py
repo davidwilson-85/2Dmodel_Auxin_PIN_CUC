@@ -6,7 +6,7 @@ import func_auxin
 euler_h = 0.1               # Euler step size = h; (0 - 1]
 nbr_iterations = 250
 img_dest_folder = 'images/test'
-cell_plot_frequency = 10
+cell_plot_frequency = 1
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values

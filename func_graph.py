@@ -11,15 +11,16 @@ import inputs as ip
 def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_afd, array_afp, img_dest_folder):
 
 	#
-	# Create cell plot using PIL
+	# Create cell grid using PIL
 	#
 	
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = False
-	draw_values_text = True
-	draw_vectors_diff = True
-	draw_vectors_pin1 = True
+	draw_values_text = False
+	draw_vectors_diff = False
+	draw_vectors_pin1 = False
+	draw_flux_directions = True
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 50
@@ -102,6 +103,27 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 				# Draw PIN1 transport vector
 				draw.line([(x+25,y+25),(x+25+vector_mag*array_afp[8,i,j],y+25+vector_mag*array_afp[9,i,j])], fill='yellow', width=3)
 				
+				x = x + cellSide
+			
+			y = y + cellSide
+	
+		x = x_origin
+		y = y_origin
+	
+	if draw_flux_directions == True:
+
+		im_arrow = Image.open('art/arrow_white_17x17.png')
+
+		for i in range(matrix_shape[0]):
+			
+			x = x_origin
+			for j in range(matrix_shape[1]):
+	
+				# Rotate arrow image and paste it 
+				if array_afp[10,i,j] != 366.0:
+					im_arrow_rotated = im_arrow.rotate(array_afp[10,i,j])
+					im.paste(im_arrow_rotated, (x+10,y+10), im_arrow_rotated) # 3rd parameter is a mask (for transparency)
+
 				x = x + cellSide
 			
 			y = y + cellSide
