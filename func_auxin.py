@@ -210,7 +210,7 @@ def pin_on_auxin(k_pin1_transp):
 			else:
 				fluxes_pin1[6,y,x], fluxes_pin1[7,y,x] = 0, 0
 			
-			# Calculate vector components and angle of net flux to draw line
+			# Calculate vector components of net flux to draw arrow
 
 			# Calculate net fluxes (outbound, out - in) to draw vectors
 			T_net_flux = fluxes_pin1[0,y,x] - fluxes_pin1[1,y,x]
@@ -221,16 +221,19 @@ def pin_on_auxin(k_pin1_transp):
 			vector_x = fluxes_pin1[8,y,x] = R_net_flux - L_net_flux
 			# Vector Y component
 			vector_y = fluxes_pin1[9,y,x] = B_net_flux - T_net_flux
+			
+			'''
 			# Calculate sine of angle described by vector
 			vector_hyp = math.sqrt(vector_x**2 + vector_y**2)
 			if vector_y != 0 and vector_hyp != 0:
-				sine = vector_y / vector_hyp
+				sine = - vector_y / vector_hyp
 				# Calculate degres of vector (convert sine to radians and then to degrees)
 				fluxes_pin1[10,y,x] = math.degrees(math.asin(sine))
 			else:
 				fluxes_pin1[10,y,x] = 366.0
 
 			#print(vector_y, vector_hyp, fluxes_pin1[10,y,x])
+			'''
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	# This could go inside auxin_homeostasis()

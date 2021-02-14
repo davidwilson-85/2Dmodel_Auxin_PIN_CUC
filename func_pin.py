@@ -68,8 +68,7 @@ def pin_polarity(polarity):
 			if polarity == 'multi':
 				
 				if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
-					#pin_wtf_p(y, x, ip.auxin_fluxes_difusion, ip.pin1[:,y,x], pr.k_WTF)
-					pass
+					pin_wtf_abley2016(y, x)
 				else:
 					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 

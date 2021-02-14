@@ -25,7 +25,6 @@ start_time = time.time()
 
 # Tests
 
-'''
 # Apply noise to auxin concentrations at begining of simulation
 if pr.auxin_noise_factor > 0:
 	
@@ -36,7 +35,6 @@ if pr.auxin_noise_factor > 0:
 		
 			if ip.auxin[y,x] < 0:
 				ip.auxin[y,x] = float(0.0000001)
-'''
 
 for iteration in range(pr.nbr_iterations):
 
@@ -88,14 +86,13 @@ for iteration in range(pr.nbr_iterations):
 	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
-	
 	# Custom auxin modification
-	ip.auxin[4,4] += 1.5
-	ip.auxin[18,6] += 0.5
+	#ip.auxin[2,2] += 1.5
+	#ip.auxin[3,3] -= 1.5
 
-	ip.auxin[11,14] -= 1.5
-	ip.auxin[5,17] -= 0.5
-	
+	if iteration == 249:
+		print(ip.auxin_fluxes_pin1[:,1,3])
+
 
 print("%s seconds" % (time.time() - start_time))
 
