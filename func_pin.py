@@ -164,11 +164,11 @@ def pin_wtf_abley2016(y, x):
 
 	'''
 
-	# Simplify var names
+	# Alias var names
 	h = pr.euler_h
-	a = 1 # 4E-3
-	b = 0.005
-	wtf_pin1_max = 9
+	a = pr.k_WTF_a
+	b = pr.k_WTF_b
+	wtf_pin1_max = pr.k_WTF_pin1_max
 	pin1 = ip.pin1
 	flux_diff = ip.auxin_fluxes_difusion
 	flux_pin1 = ip.auxin_fluxes_pin1
@@ -189,10 +189,17 @@ def pin_wtf_abley2016(y, x):
 	if net_flux_b < 0: net_flux_b = 0
 	if net_flux_l < 0: net_flux_l = 0
 
+	# Linear effect of flux on PIN1
 	pin1[0,y,x] = pin1[0,y,x] + (a * net_flux_t) - (b * pin1[0,y,x])
 	pin1[1,y,x] = pin1[1,y,x] + (a * net_flux_r) - (b * pin1[1,y,x])
 	pin1[2,y,x] = pin1[2,y,x] + (a * net_flux_b) - (b * pin1[2,y,x])
 	pin1[3,y,x] = pin1[3,y,x] + (a * net_flux_l) - (b * pin1[3,y,x])
+
+	# Quadratic effect of flux on PIN1
+	#pin1[0,y,x] = pin1[0,y,x] + (net_flux_t**a) - (b * pin1[0,y,x])
+	#pin1[1,y,x] = pin1[1,y,x] + (net_flux_r**a) - (b * pin1[1,y,x])
+	#pin1[2,y,x] = pin1[2,y,x] + (net_flux_b**a) - (b * pin1[2,y,x])
+	#pin1[3,y,x] = pin1[3,y,x] + (net_flux_l**a) - (b * pin1[3,y,x])
 
 	# Abley2016: If [PIN1](ij) reaches a threshold [], no more PIN1 can be allocated to membrane ij
 	if pin1[0,y,x] >= wtf_pin1_max: pin1[0,y,x] = wtf_pin1_max

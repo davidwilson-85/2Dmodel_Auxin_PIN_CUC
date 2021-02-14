@@ -7,28 +7,41 @@ import os, shutil
 import cv2
 
 import inputs as ip
+import params as pr
 
 
-def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_range, lut_pin1, cuc, cuc_range, lut_cuc, iteration, array_afd, array_afp, img_dest_folder):
+def create_cell_plot(iteration):
 
-	#
-	# Create cell grid using PIL
-	#
+	'''
+	Create cell grid using PIL
+	'''
 	
+	# Set aliases
+	matrix_shape = ip.auxin_matrix_shape
+	auxin = ip.auxin
+	auxin_range = pr.auxin_range
+	lut_auxin = ip.lut_auxin
+	pin1 = ip.pin1
+	pin1_range = pr.pin1_range
+	lut_pin1 = ip.lut_pin1
+	cuc = ip.cuc
+	cuc_range = pr.cuc_range
+	lut_cuc = ip.lut_cuc
+	array_afd = ip.auxin_fluxes_difusion
+	array_afp = ip.auxin_fluxes_pin1
+	img_dest_folder = pr.img_dest_folder
+	
+	# Customize element in image
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = False
 	draw_values_text = False
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
-	draw_flux_directions = True
+	draw_pin1_flux_directions = True
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 50
-
-	#img = Image.new('RGB', (100, 100))
-	#draw = ImageDraw.Draw(img, 'RGBA')
-	#drw.polygon([(50, 0), (100, 100), (0, 100)], (255, 0, 0, 125))
 
 	x_origin = 0
 	y_origin = 0
@@ -80,6 +93,9 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	y = y_origin
 
 	if draw_vectors_diff == True:
+
+		# These arrows indicate the net direction and magnitude of diffusion-mediated auxin flux
+
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
@@ -96,6 +112,9 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 		y = y_origin
 	
 	if draw_vectors_pin1 == True:
+
+		# These arrows indicate the net direction and magnitude of PIN1-mediated auxin flux
+
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
@@ -111,7 +130,9 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 		x = x_origin
 		y = y_origin
 	
-	if draw_flux_directions == True:
+	if draw_pin1_flux_directions == True:
+
+		# These arrows only indicate the net direction of PIN1-mediated auxin flux
 
 		im_arrow = Image.open('art/arrow_white_17x17.png')
 
@@ -125,7 +146,7 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 				# Rotate arrow image and paste it 
 				if array_afp[10,i,j] != 361.0:
 					im_arrow_rotated = im_arrow.rotate(array_afp[10,i,j] + 270)
-					im.paste(im_arrow_rotated, (x+10,y+10), im_arrow_rotated) # 3rd parameter is a mask (for transparency)
+					im.paste(im_arrow_rotated, (x+16,y+16), im_arrow_rotated) # 3rd parameter is a mask (for transparency)
 
 				x = x + cellSide
 			
@@ -133,6 +154,9 @@ def create_cell_plot(matrix_shape, auxin, auxin_range, lut_auxin, pin1, pin1_ran
 	
 		x = x_origin
 		y = y_origin
+
+	# Draw iteration
+	ImageDraw.Draw(im).text((8,5), str(iteration), fill=(0, 0, 0))
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration+1000) +'.png')
@@ -267,6 +291,7 @@ def create_video():
 
 	cv2.destroyAllWindows()
 	video.release()
+
 
 if __name__ == '__main__':
 	create_video()

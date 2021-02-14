@@ -6,7 +6,7 @@ import numpy as np
 #import matplotlib.pyplot as plt
 #from PIL import Image, ImageDraw, ImageFont
 
-import params_WTF as pr
+import params as pr
 import inputs as ip
 
 import func_graph
@@ -27,14 +27,8 @@ start_time = time.time()
 
 # Apply noise to auxin concentrations at begining of simulation
 if pr.auxin_noise_factor > 0:
-	
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-		
-			ip.auxin[y,x] = ip.auxin[y,x] * 1 + ( random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor) )
-		
-			if ip.auxin[y,x] < 0:
-				ip.auxin[y,x] = float(0.0000001)
+	func_auxin.auxin_noise()
+
 
 for iteration in range(pr.nbr_iterations):
 
@@ -49,24 +43,9 @@ for iteration in range(pr.nbr_iterations):
 		shutil.rmtree(pr.img_dest_folder) 
 		os.mkdir(pr.img_dest_folder)
 	
-	# Draw cell plot 
+	# Draw cell plot
 	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(
-			ip.auxin_matrix_shape,
-			ip.auxin,
-			pr.auxin_range,
-			ip.lut_auxin,
-			ip.pin1,
-			pr.pin1_range,
-			ip.lut_pin1,
-			ip.cuc,
-			pr.cuc_range,
-			ip.lut_cuc,
-			iteration,
-			ip.auxin_fluxes_difusion,
-			ip.auxin_fluxes_pin1,
-			pr.img_dest_folder
-		)
+		func_graph.create_cell_plot(iteration)
 
 	# PIN1 polarity
 	func_pin.pin_polarity(pr.pin1_polarity)
@@ -80,18 +59,14 @@ for iteration in range(pr.nbr_iterations):
 
 	# PIN1-mediated auxin transport
 	if pr.k_pin1_transp > 0:
-		#func_auxin.pin_on_auxin_new(ip.pin1_matrix_shape)
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 
 	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
 	# Custom auxin modification
-	#ip.auxin[2,2] += 1.5
-	#ip.auxin[3,3] -= 1.5
-
-	if iteration == 249:
-		print(ip.auxin_fluxes_pin1[:,1,3])
+	#ip.auxin[5,5] += 1.5
+	#ip.auxin[14,14] -= 1.5
 
 
 print("%s seconds" % (time.time() - start_time))
@@ -130,21 +105,7 @@ for iteration in range(pr.nbr_iterations):
 	
 	# Draw cell plot 
 	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(
-			ip.auxin_matrix_shape,
-			ip.auxin,
-			pr.auxin_range,
-			ip.lut_auxin,
-			ip.pin1,
-			pr.pin1_range,
-			ip.lut_pin1,
-			ip.cuc,
-			pr.cuc_range,
-			ip.lut_cuc,
-			iteration,
-			ip.auxin_fluxes,
-			pr.img_dest_folder
-		)
+		func_graph.create_cell_plot(iteration)
 	
 	#*************************************************************************************
 	
@@ -158,7 +119,7 @@ for iteration in range(pr.nbr_iterations):
 				auxin[y,x] = auxin[y,x] * random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor)
 			
 				if auxin[y,x] < 0:
-					auxin[y,x] = float(0.0000001)
+					auxin[y,x] = float(0.0000000001)
 	
 	#*************************************************************************************
 	

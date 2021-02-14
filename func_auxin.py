@@ -2,6 +2,7 @@
 
 import numpy as np
 import math
+import random
 
 import params as pr
 import inputs as ip
@@ -123,7 +124,7 @@ def auxin_diffusion():
 			else:
 				fluxes[6,y,x], fluxes[7,y,x] = 0, 0
 
-			# Calculate vector components and angle of net flux to draw line
+			# Calculate vector components to draw line and to orient image with arrow direction
 
 			# Calculate net fluxes (outbound, out - in) to draw vectors
 			T_net_flux = fluxes[0,y,x] - fluxes[1,y,x]
@@ -135,6 +136,8 @@ def auxin_diffusion():
 			# Vector Y component
 			fluxes[9,y,x] = B_net_flux - T_net_flux
 
+			# Angle of net flux is calculated in func_graph module, in functions create_cell_plot() and vector_to_degrees()
+
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	# This could go inside auxin_homeostasis()
 	for y in range(tissue_rows):
@@ -144,6 +147,21 @@ def auxin_diffusion():
 			fluxes_in = fluxes[1,y,x] + fluxes[3,y,x] + fluxes[5,y,x] + fluxes[7,y,x]
 			
 			auxin[y,x] = auxin[y,x] - fluxes_out + fluxes_in
+
+
+def auxin_noise():
+
+	'''
+	...
+	'''
+
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+		
+			ip.auxin[y,x] = ip.auxin[y,x] * 1 + ( random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor) )
+		
+			if ip.auxin[y,x] < 0:
+				ip.auxin[y,x] = float(0.0000001)
 
 
 def pin_on_auxin(k_pin1_transp):
@@ -210,7 +228,7 @@ def pin_on_auxin(k_pin1_transp):
 			else:
 				fluxes_pin1[6,y,x], fluxes_pin1[7,y,x] = 0, 0
 			
-			# Calculate vector components of net flux to draw arrow
+			# Calculate vector components to draw line and to orient image with arrow direction
 
 			# Calculate net fluxes (outbound, out - in) to draw vectors
 			T_net_flux = fluxes_pin1[0,y,x] - fluxes_pin1[1,y,x]
@@ -221,6 +239,8 @@ def pin_on_auxin(k_pin1_transp):
 			vector_x = fluxes_pin1[8,y,x] = R_net_flux - L_net_flux
 			# Vector Y component
 			vector_y = fluxes_pin1[9,y,x] = B_net_flux - T_net_flux
+
+			# Angle of net flux is calculated in func_graph module, in functions create_cell_plot() and vector_to_degrees()
 			
 			'''
 			# Calculate sine of angle described by vector
