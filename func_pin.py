@@ -36,7 +36,9 @@ def pin_expression():
 			auxin_cell = auxin[y,x]
 			cuc_cell = cuc[y,x]
 			
-			pin1_cell_updated = pin1_cell + h * ( auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay )
+			pin1_cell_updated = pin1_cell + h * ( auxin_cell * k_auxin_pin1 + cuc_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay )
+
+			#pin1_cell_updated = pin1_cell + h * ( auxin_cell * pin1_cell * k_auxin_pin1 + cuc_cell * pin1_cell * k_cuc_pin1 - pin1_cell * k_pin1_decay )
 			
 			if pin1_cell_updated < 0:
 				pin1_cell_updated = 0

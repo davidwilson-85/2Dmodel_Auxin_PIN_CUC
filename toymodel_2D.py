@@ -14,7 +14,6 @@ import func_auxin
 import func_cuc
 import func_pin
 
-
 print('shape', ip.auxin.shape)
 print('cols: ', ip.tissue_columns)
 print('rows: ', ip.tissue_rows)
@@ -25,6 +24,7 @@ start_time = time.time()
 
 # NEW SIMULATION
 
+'''
 # Cleanup destination folder (remove and create)
 shutil.rmtree(pr.img_dest_folder) 
 os.mkdir(pr.img_dest_folder)
@@ -72,7 +72,7 @@ for iteration in range(pr.nbr_iterations):
 print("%s seconds" % (time.time() - start_time))
 
 quit()
-
+'''
 # =====================================================================================
 
 # Cleanup destination folder (remove and create)
@@ -92,35 +92,30 @@ for iteration in range(pr.nbr_iterations):
 		func_graph.create_cell_plot(iteration)
 	#*************************************************************************************
 	# Apply noise to auxin [THIS IS BEING MIGRATED TO AUXIN HOMEOSTASIS]
-	if pr.auxin_noise_factor > 0:
-		func_auxin.auxin_noise()
+	#if pr.auxin_noise_factor > 0:
+	#	func_auxin.auxin_noise()
 	#*************************************************************************************
-	# AUXIN AND CUC EFFECT ON PIN1 EXPRESSION
+	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
 	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
 		func_pin.pin_expression()
 	#*************************************************************************************
 	# CUC EXPRESSION
-	if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
-		func_cuc.cuc_expression()
+	#if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
+	#	func_cuc.cuc_expression()
 	#*************************************************************************************
 	# AUXIN HOMEOSTASIS
-	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_degr > 0 or pr.auxin_noise_factor > 0:
-	#	func_auxin.auxin_homeostasis(iteration)
+	func_auxin.auxin_homeostasis(iteration)
 	#*************************************************************************************
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
 		func_auxin.auxin_diffusion()
-	#*************************************************************************************	
-	# PIN1 EXPRESSION
-	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		func_pin.pin_expression()
 	#*************************************************************************************	
 	# PIN1 POLARIZATION
 	func_pin.pin_polarity(pr.pin1_polarity)
 	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.k_pin1_transp
+		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 	# Custom auxin modification [THIS IS GOING SOON TO AUXIN HOMEOSTASIS]
 	#ip.auxin[5,6] += 1.5

@@ -18,22 +18,21 @@ def auxin_homeostasis(iter):
 	- Local synthesis (e.g. CUC effect on YUC)
 	- Local degradation
 	- Local exogenous application, etc
-	
-	A' = h * ( synth + custom_synth_degr + C*k(CY) - A*k(Cdecay) )
+	- Noise: random variation in concentration 
+
+	A' = h * ( k(synth) - A*k(decay) + custom_synth_degr + CUC*k(CY) ) + noise
 
 	Params:
 	* iter: Iteration of the simulation. This is used for local auxin synth/degr
 	
 	'''
 
-	# Simplify var names
+	# Define simpler aliases
 	h = pr.euler_h
 	k_auxin_synth = pr.k_auxin_synth
 	k_auxin_degr = pr.k_auxin_degr
-	th_cuc_yuc1 = pr.th_cuc_yuc1
-	k_cuc_yuc1 = pr.k_cuc_yuc1
-	k_cuc_yuc4 = pr.k_cuc_yuc4
-	
+	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
+		
 	for y in range(ip.tissue_rows):
 		for x in range(ip.tissue_columns):
 			
@@ -44,34 +43,34 @@ def auxin_homeostasis(iter):
 			# If current cell has local/custom auxin synth/degr...
 			current_cell = (y,x)
 
-			if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
-				local_synth = pr.auxin_custom_synth['value']
-			else:
-				local_synth = 0
+			if pr.auxin_custom_synth['value'] > 0:
+				if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
+					auxin_cell += pr.auxin_custom_synth['value']
+					print('synth ON')
 			
-			if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
-				local_degr = pr.auxin_custom_degr['value']
-			else:
-				local_degr = 0
+			if pr.auxin_custom_degr['value'] > 0:
+				if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
+					auxin_cell -= pr.auxin_custom_degr['value']
+					print('degr ON')
 			
-			# Test: Effect of CUC on YUC1 follows a step function
-			if cuc_cell >= th_cuc_yuc1:
-				synth_yuc1 = cuc_cell * k_cuc_yuc1
+			# Noise
+			if pr.auxin_noise['limit'] > 0 and iter in pr.auxin_noise['iterations']:
+				noise = auxin_cell * random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
 			else:
-				synth_yuc1 = 0
+				noise = 0
 			
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + h * ( \
 				k_auxin_synth + \
-				local_synth - \
-				local_degr + \
-				synth_yuc1 + \
-				cuc_cell * k_cuc_yuc4 - \
-				auxin_cell * k_auxin_degr \
-			)
+				k_auxin_degr * auxin_cell + \
+				k_cuc_auxin_synth * cuc_cell \
+			) + noise
+			
+			# Calculate change in auxin concentration (with basal synth and degr)
+			#auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + local_synth - local_degr + synth_yuc1 + auxin_cell * k_auxin_degr ) + noise
 			
 			if auxin_cell_updated < 0:
-				auxin_cell_updated = 0
+				auxin_cell_updated = float(1E-6)
 				
 			ip.auxin[y,x] = auxin_cell_updated
 
@@ -158,6 +157,7 @@ def auxin_diffusion():
 def auxin_noise():
 
 	'''
+	INTEGRATING THIS IN AUXIN HOMEOSTASIS FUNCTION
 	Simply adds noise to axin concetration matrix.
 	It uses uniform distribution.
 	'''
