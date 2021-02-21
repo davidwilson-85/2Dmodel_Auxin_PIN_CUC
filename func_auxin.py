@@ -8,15 +8,21 @@ import params as pr
 import inputs as ip
 
 
-def auxin_homeostasis(iton):
+def auxin_homeostasis(iter):
 	
 	'''
-	Here implement: basal synthesis and turnover, possible effect of CUC on YUC,
-	local modifications like exogenous application, etc
-	A' = h * ( Synth + custom_synth_degr + C*k(CY) - A*k(Cdecay) )
+	This function implements all changes in auxin concentration in which there
+	is not communication between cells. These processes can be:
+	- Basal (global) de novo synthesis
+	- Basal (global) turnover
+	- Local synthesis (e.g. CUC effect on YUC)
+	- Local degradation
+	- Local exogenous application, etc
+	
+	A' = h * ( synth + custom_synth_degr + C*k(CY) - A*k(Cdecay) )
 
 	Params:
-	* iton: Iteration of the simulation. This is used for local auxin synth/degr
+	* iter: Iteration of the simulation. This is used for local auxin synth/degr
 	
 	'''
 
@@ -38,12 +44,12 @@ def auxin_homeostasis(iton):
 			# If current cell has local/custom auxin synth/degr...
 			current_cell = (y,x)
 
-			if current_cell in pr.auxin_custom_synth['cells'] and iton in pr.auxin_custom_synth['iterations']:
+			if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
 				local_synth = pr.auxin_custom_synth['value']
 			else:
 				local_synth = 0
 			
-			if current_cell in pr.auxin_custom_degr['cells'] and iton in pr.auxin_custom_synth['iterations']:
+			if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
 				local_degr = pr.auxin_custom_degr['value']
 			else:
 				local_degr = 0
@@ -152,7 +158,8 @@ def auxin_diffusion():
 def auxin_noise():
 
 	'''
-	...
+	Simply adds noise to axin concetration matrix.
+	It uses uniform distribution.
 	'''
 
 	for y in range(ip.tissue_rows):

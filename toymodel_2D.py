@@ -23,11 +23,11 @@ start_time = time.time()
 
 # =====================================================================================
 
-# Tests
+# NEW SIMULATION
 
-# Apply noise to auxin concentrations at begining of simulation
-if pr.auxin_noise_factor > 0:
-	func_auxin.auxin_noise()
+# Cleanup destination folder (remove and create)
+shutil.rmtree(pr.img_dest_folder) 
+os.mkdir(pr.img_dest_folder)
 
 
 for iteration in range(pr.nbr_iterations):
@@ -37,21 +37,21 @@ for iteration in range(pr.nbr_iterations):
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
-
-	# Cleanup destination folder (remove and create)
-	if iteration == 0:
-		shutil.rmtree(pr.img_dest_folder) 
-		os.mkdir(pr.img_dest_folder)
 	
 	# Draw cell plot
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(iteration)
 
+	# Apply noise to auxin concentrations
+	if pr.auxin_noise_factor > 0 and iteration == 0:
+		func_auxin.auxin_noise()
+
 	# PIN1 polarity
 	func_pin.pin_polarity(pr.pin1_polarity)
 
-	#if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-	#	func_pin.pin_expression()
+	# PIN1 expression
+	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
+		func_pin.pin_expression()
 
 	# Auxin diffusion
 	if pr.k_auxin_diffusion > 0:
@@ -65,8 +65,8 @@ for iteration in range(pr.nbr_iterations):
 		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
 
 	# Custom auxin modification
-	#ip.auxin[5,5] += 1.5
-	#ip.auxin[14,14] -= 1.5
+	#ip.auxin[5,6] += 1.5
+	#ip.auxin[11,6] -= 1.5
 
 
 print("%s seconds" % (time.time() - start_time))
@@ -75,120 +75,79 @@ quit()
 
 # =====================================================================================
 
-
-# === PROCESS DATA
-
+# Cleanup destination folder (remove and create)
+shutil.rmtree(pr.img_dest_folder) 
+os.mkdir(pr.img_dest_folder)
 
 # Perform simulation cycles
-
 for iteration in range(pr.nbr_iterations):
-	
 	# Print iteration to terminal
 	if iteration < pr.nbr_iterations - 1:
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
-	
 	#*************************************************************************************
-
-	# Plot data in heatmap
-	#create_heatmap(data=data)
-	
-	#*************************************************************************************
-
-	# Plot data in cell tilling
-	
-	# Cleanup destination folder (remove and create)
-	if iteration == 0:
-		shutil.rmtree(pr.img_dest_folder) 
-		os.mkdir(pr.img_dest_folder)
-	
-	# Draw cell plot 
+	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(iteration)
-	
 	#*************************************************************************************
-	
-	# Apply noise to auxin
-	
+	# Apply noise to auxin [THIS IS BEING MIGRATED TO AUXIN HOMEOSTASIS]
 	if pr.auxin_noise_factor > 0:
-	
-		for y in range(tissue_rows):
-			for x in range(tissue_columns):
-			
-				auxin[y,x] = auxin[y,x] * random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor)
-			
-				if auxin[y,x] < 0:
-					auxin[y,x] = float(0.0000000001)
-	
+		func_auxin.auxin_noise()
 	#*************************************************************************************
-	
 	# AUXIN AND CUC EFFECT ON PIN1 EXPRESSION
-	
 	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		
-		#func_pin.pin_expression(pin1, auxin, cuc, pr.k_auxin_pin1, pr.k_cuc_pin1, pr.k_pin1_decay)
 		func_pin.pin_expression()
-
 	#*************************************************************************************
-	
 	# CUC EXPRESSION
-	
 	if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
-		
 		func_cuc.cuc_expression()
-
 	#*************************************************************************************
-
 	# AUXIN HOMEOSTASIS
-	
-	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_degr > 0:
-	func_auxin.auxin_homeostasis(iteration)
-	
+	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_degr > 0 or pr.auxin_noise_factor > 0:
+	#	func_auxin.auxin_homeostasis(iteration)
 	#*************************************************************************************
-
 	# AUXIN DIFFUSION
-
 	if pr.k_auxin_diffusion > 0:
-
-		func_auxin.auxin_diffusion(pr.euler_h, pr.k_auxin_diffusion, ip.auxin_matrix_shape, ip.tissue_columns, ip.tissue_rows, ip.auxin, ip.auxin_fluxes, iteration)
-
+		func_auxin.auxin_diffusion()
 	#*************************************************************************************	
-	
+	# PIN1 EXPRESSION
+	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
+		func_pin.pin_expression()
+	#*************************************************************************************	
 	# PIN1 POLARIZATION
-
 	func_pin.pin_polarity(pr.pin1_polarity)
-
 	#*************************************************************************************
-
 	# PIN1-MEDIATED AUXIN EFFLUX
-
 	if pr.k_pin1_transp > 0:
-
-		func_auxin.pin_on_auxin(pr.euler_h, ip.auxin, ip.pin1, pr.k_pin1_transp, ip.tissue_rows, ip.tissue_columns, ip.pin1_matrix_shape)
-	
+		func_auxin.pin_on_auxin(pr.k_pin1_transp
+	#*************************************************************************************
+	# Custom auxin modification [THIS IS GOING SOON TO AUXIN HOMEOSTASIS]
+	#ip.auxin[5,6] += 1.5
+	#ip.auxin[11,6] -= 1.5
 
 print("%s seconds" % (time.time() - start_time))
 
 
+'''
+TO DO:
 
-#===========================================
-# TO DO:
-# -Implement transport of auxin by PIN and see if instabilities in auxin distribution trigger patterning
-# -Create quick way of switching ON/OFF features like UTG, WTF, CUC2
-# 
-# 
-# matrix_shape[0] -> number of rows = y
-# matrix_shape[1] -> number of columns = x
-#
-# auxin[6,11] = 5 refers to 7th row, 12th column
-# pin1[0,0,5] = 5 refers to top wall of cell in 1st row, 6th column
-# 
-# 
-# Set diffusion to 0 at faces that are outer boundaries
-# 
-# Check inner working of func_pin.auxin_on_pin_polarity()
-# 
-# Add pin1_UTGresponsiveness to function!!!!!!!!!!!!!!! It is not used at all at the moment!!!!!!!!!!!!!!!!
-# 
+* Check if the order in which the functions are called has an effect on output of simulations
+* Create quick way of switching ON/OFF features like UTG, WTF, CUC2
+* Set diffusion to 0 at faces that are outer boundaries
+* Add pin1_UTGresponsiveness to function! It is not used at all at the moment!
 
+'''
+
+
+
+'''
+FOR REFERENCE:
+
+matrix_shape[0] -> number of rows = y
+matrix_shape[1] -> number of columns = x
+
+auxin[6,11] = 5 refers to 7th row, 12th column
+pin1[0,0,5] = 5 refers to top wall of cell in 1st row, 6th column
+
+'''

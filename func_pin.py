@@ -75,12 +75,6 @@ def pin_polarity(polarity):
 			if polarity == 'smith2006':
 				pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
-			if polarity == 'ratio':
-				pass
-			
-			if polarity == 'wtf':
-				pin_wtf_p(y, x, ip.auxin_fluxes_difusion, ip.pin1[:,y,x], pr.k_WTF)
-
 			if polarity == 'wtf_abley2016':
 				pin_wtf_abley2016(y, x)
 
@@ -206,6 +200,7 @@ def pin_wtf_abley2016(y, x):
 	if pin1[1,y,x] >= wtf_pin1_max: pin1[1,y,x] = wtf_pin1_max
 	if pin1[2,y,x] >= wtf_pin1_max: pin1[2,y,x] = wtf_pin1_max
 	if pin1[3,y,x] >= wtf_pin1_max: pin1[3,y,x] = wtf_pin1_max
+
 
 def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):
 
