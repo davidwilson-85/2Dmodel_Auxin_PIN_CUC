@@ -46,12 +46,10 @@ def auxin_homeostasis(iter):
 			if pr.auxin_custom_synth['value'] > 0:
 				if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
 					auxin_cell += pr.auxin_custom_synth['value']
-					print('synth ON')
 			
 			if pr.auxin_custom_degr['value'] > 0:
 				if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
 					auxin_cell -= pr.auxin_custom_degr['value']
-					print('degr ON')
 			
 			# Noise
 			if pr.auxin_noise['limit'] > 0 and iter in pr.auxin_noise['iterations']:

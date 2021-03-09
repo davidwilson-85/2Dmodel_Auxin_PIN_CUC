@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-import time
-import os, shutil, random
+import time, os, shutil, random, datetime
 import numpy as np
 #import matplotlib.pyplot as plt
 #from PIL import Image, ImageDraw, ImageFont
@@ -17,6 +16,10 @@ import func_pin
 print('shape', ip.auxin.shape)
 print('cols: ', ip.tissue_columns)
 print('rows: ', ip.tissue_rows)
+
+# Write to log
+now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+shutil.copy('params.py', 'sim_logs/' + str(now) + '_params')
 
 start_time = time.time()
 

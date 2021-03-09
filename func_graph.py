@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
+import math, os, shutil, cv2, glob, datetime
 import numpy as np
-import math
 from PIL import Image, ImageDraw, ImageFont
-import os, shutil
-import cv2
 
 import inputs as ip
 import params as pr
@@ -35,7 +33,7 @@ def create_cell_plot(iteration):
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = False
-	draw_values_text = False
+	draw_values_text = True
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
 	draw_pin1_flux_directions = True
@@ -79,9 +77,9 @@ def create_cell_plot(iteration):
 			
 			if draw_values_text == True:
 				# Write auxin concentration (magenta)
-				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
+				#ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
-				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
 				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
@@ -274,8 +272,10 @@ def create_video():
 	$ python3 func_graph.py
 	'''
 
+	now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+
 	image_folder = 'images/test'
-	video_name = 'videos/video7.avi'
+	video_name = 'videos/vid_' + str(now) + '.avi'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 	images.sort()
@@ -293,7 +293,35 @@ def create_video():
 	video.release()
 
 
+# Create gif from images
+def create_gif(mode=''):
+	
+	'''
+	Params:
+	- mode: [bidir']; changes default unidirectional mode to bidirectional
+	
+	Check also:
+	https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
+
+	To call this function:
+	$ python3 func_graph.py
+	'''
+
+	now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+
+	image_folder = 'images/test/*.png'
+	gif_name = 'videos/gifAnim_' + str(now) + '.gif'
+	img, *imgs = [Image.open(f) for f in sorted(glob.glob(image_folder))]
+
+	# If bidirectional (yo-yo), append list of images in reversed order
+	if mode == 'bidir':
+		imgs = imgs + imgs[::-1]
+
+	# duration (time per frame in ms), loop = number of times to loop (0 = infinite)
+	img.save(fp=gif_name, format='GIF', append_images=imgs, save_all=True, duration=20, loop=0)
+
+
+
+
 if __name__ == '__main__':
-	create_video()
-
-
+	create_gif('bidir')

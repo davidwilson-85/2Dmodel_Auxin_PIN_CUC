@@ -4,9 +4,9 @@ import func_auxin
 
 # General
 euler_h = 0.1               # Euler step size = h; (0 - 1]
-nbr_iterations = 200
+nbr_iterations = 5
 img_dest_folder = 'images/test'
-cell_plot_frequency = 5
+cell_plot_frequency = 1
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
@@ -23,15 +23,15 @@ k_auxin_degr = 0 #0.06
 k_cuc_auxin_synth = 0.1 #0.3
 
 auxin_noise = {
-  'limit': 0.025,
+  'limit': 0, #0.025,
   'iterations': range(0,1)
 }
 
 # Auxin custom local synthesis
 auxin_custom_synth = {
-  "cells": ((5,6),(6,6)),
+  "cells": ((6,6),(100,100)),
   "iterations": range(0,1000),
-  "value": 0 #1.5
+  "value": 1
 }
 # Auxin custom local degradation
 auxin_custom_degr = {
