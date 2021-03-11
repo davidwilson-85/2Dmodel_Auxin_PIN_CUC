@@ -156,7 +156,7 @@ def pin_wtf_abley2016(y, x):
 		if flux(i->j) >= 0: ka * flux(i->j) - kb * PIN(ij)
 		if flux(i->j) <  0: - kb * PIN(ij)
 
-	flux(i->j) = D * (A(i) - A(j)) + T * (PIN(ij) * A(i) - PIN(ji) * A(j))
+	flux(i->j) = D * [ A(i) - A(j) ] + T * [ (PIN(ij) * A(i) - PIN(ji) * A(j) ]
 
 	'''
 
@@ -177,7 +177,7 @@ def pin_wtf_abley2016(y, x):
 
 	# Calculate new PIN amount at each cell face
 	# Fluxes already scaled by euler_h? (CHECK THIS CAREFULY)
-	# But then what about the second the b part of the formula???
+	# But then what about the second b part of the formula???
 	
 	# If net outflux is negative, there is no effect on PIN1 allocation to membrane
 	if net_flux_t < 0: net_flux_t = 0

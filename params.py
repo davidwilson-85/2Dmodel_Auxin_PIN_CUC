@@ -4,9 +4,11 @@ import func_auxin
 
 # General
 euler_h = 0.1               # Euler step size = h; (0 - 1]
-nbr_iterations = 5
+nbr_iterations = 1001
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 20
+create_video = False
+create_gif = False
 
 # Heatmap ranges
 auxin_range = (0, 99)       # This is only to map variable values to heatmap values
@@ -15,13 +17,14 @@ cuc_range = (0, 9)
 middle_domain = (0, 9)
 
 # Auxin diffusion
-k_auxin_diffusion = 0.12 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.2 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
-k_auxin_degr = 0 #0.06
-k_cuc_auxin_synth = 0.1 #0.3
+k_auxin_degr = 0 #0.01 #0.06
+k_cuc_auxin_synth = 0 #0.1 #0.3
 
+# Auxin noise
 auxin_noise = {
   'limit': 0, #0.025,
   'iterations': range(0,1)
@@ -29,20 +32,20 @@ auxin_noise = {
 
 # Auxin custom local synthesis
 auxin_custom_synth = {
-  "cells": ((6,6),(100,100)),
+  "cells": ((1,6),(7,6),(8,6),(100,100)),
   "iterations": range(0,1000),
   "value": 1
 }
 # Auxin custom local degradation
 auxin_custom_degr = {
-  "cells": ((11,6),(12,6)),
+  "cells": ((11,6),(100,100)),
   "iterations": range(0,1000),
-  "value": 0 #1.5
+  "value": 0
 }
 
 # PIN1 localization
-pin1_polarity = 'wtf_abley2016'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
-k_UTG = 1.2 # 6 (6 in Bilsborough 2011, Smith 2006)
+pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+k_UTG = 1.1 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #1 in Abley 2016
 k_WTF_b = 0.005
 k_WTF_pin1_max = 9

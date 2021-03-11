@@ -8,10 +8,10 @@ import numpy as np
 
 template = '2D'
 
-auxin_template = 'templates/' + template + '/auxin_template'
-pin1_template = 'templates/' + template + '/pin1_template'
-cuc_template = 'templates/' + template + '/cuc_template'
-middle_domain_template = 'templates/' + template + '/middle_domain_template'
+auxin_template = 'templates/' + template + '/template_auxin'
+pin1_template = 'templates/' + template + '/template_pin1'
+cuc_template = 'templates/' + template + '/template_cuc'
+middle_domain_template = 'templates/' + template + '/template_middle_domain'
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin = auxin * 10

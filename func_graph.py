@@ -6,9 +6,10 @@ from PIL import Image, ImageDraw, ImageFont
 
 import inputs as ip
 import params as pr
+import func_aux as aux
 
 
-def create_cell_plot(iteration):
+def create_cell_plot(timestamp, iteration):
 
 	'''
 	Create cell grid using PIL
@@ -32,8 +33,8 @@ def create_cell_plot(iteration):
 	# Customize element in image
 	draw_auxin = True
 	draw_pin = True
-	draw_cuc = False
-	draw_values_text = True
+	draw_cuc = True
+	draw_values_text = False
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
 	draw_pin1_flux_directions = True
@@ -77,9 +78,9 @@ def create_cell_plot(iteration):
 			
 			if draw_values_text == True:
 				# Write auxin concentration (magenta)
-				#ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
+				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
-				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
 				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
@@ -153,8 +154,8 @@ def create_cell_plot(iteration):
 		x = x_origin
 		y = y_origin
 
-	# Draw iteration
-	ImageDraw.Draw(im).text((8,5), str(iteration), fill=(0, 0, 0))
+	# Draw text with simulation timestamp and iteration
+	ImageDraw.Draw(im).text((8,5), timestamp + '__' + str(iteration), fill=(0, 0, 0))
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration+1000) +'.png')
@@ -260,7 +261,7 @@ def create_heatmap(data):
 
 
 # Create video from images
-def create_video():
+def create_video(timestamp):
 
 	'''
 	Check also:
@@ -272,10 +273,8 @@ def create_video():
 	$ python3 func_graph.py
 	'''
 
-	now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
-
 	image_folder = 'images/test'
-	video_name = 'videos/vid_' + str(now) + '.avi'
+	video_name = 'videos/vid_' + str(timestamp) + '.avi'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 	images.sort()
@@ -294,10 +293,11 @@ def create_video():
 
 
 # Create gif from images
-def create_gif(mode=''):
+def create_gif(timestamp, mode=''):
 	
 	'''
 	Params:
+	- timestamp: string with date and time info
 	- mode: [bidir']; changes default unidirectional mode to bidirectional
 	
 	Check also:
@@ -307,10 +307,8 @@ def create_gif(mode=''):
 	$ python3 func_graph.py
 	'''
 
-	now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
-
 	image_folder = 'images/test/*.png'
-	gif_name = 'videos/gifAnim_' + str(now) + '.gif'
+	gif_name = 'videos/gifAnim_' + str(timestamp) + '.gif'
 	img, *imgs = [Image.open(f) for f in sorted(glob.glob(image_folder))]
 
 	# If bidirectional (yo-yo), append list of images in reversed order
@@ -321,7 +319,6 @@ def create_gif(mode=''):
 	img.save(fp=gif_name, format='GIF', append_images=imgs, save_all=True, duration=20, loop=0)
 
 
-
-
 if __name__ == '__main__':
-	create_gif('bidir')
+	#create_gif('bidir')
+	create_video()

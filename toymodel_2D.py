@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import time, os, shutil, random, datetime
-import numpy as np
-#import matplotlib.pyplot as plt
-#from PIL import Image, ImageDraw, ImageFont
+import time, os, random, shutil, datetime
 
 import params as pr
 import inputs as ip
@@ -12,70 +9,20 @@ import func_graph
 import func_auxin
 import func_cuc
 import func_pin
+import func_aux
 
 print('shape', ip.auxin.shape)
 print('cols: ', ip.tissue_columns)
 print('rows: ', ip.tissue_rows)
 
-# Write to log
-now = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
-shutil.copy('params.py', 'sim_logs/' + str(now) + '_params')
+current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
+# Write initial state and simulation parameters to log
+func_aux.write_to_log(current_datetime)
+
+# Time execution of simulation
 start_time = time.time()
 
-# =====================================================================================
-
-# NEW SIMULATION
-
-'''
-# Cleanup destination folder (remove and create)
-shutil.rmtree(pr.img_dest_folder) 
-os.mkdir(pr.img_dest_folder)
-
-
-for iteration in range(pr.nbr_iterations):
-
-	# Print iteration to terminal
-	if iteration < pr.nbr_iterations - 1:
-		print(iteration + 1, end='\r')
-	else:
-		print(iteration + 1, end='\n')
-	
-	# Draw cell plot
-	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(iteration)
-
-	# Apply noise to auxin concentrations
-	if pr.auxin_noise_factor > 0 and iteration == 0:
-		func_auxin.auxin_noise()
-
-	# PIN1 polarity
-	func_pin.pin_polarity(pr.pin1_polarity)
-
-	# PIN1 expression
-	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		func_pin.pin_expression()
-
-	# Auxin diffusion
-	if pr.k_auxin_diffusion > 0:
-		func_auxin.auxin_diffusion()
-
-	# PIN1-mediated auxin transport
-	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.k_pin1_transp)
-
-	#if pr.k_auxin_synth > 0 or pr.k_cuc_yuc > 0 or pr.k_auxin_decay > 0:
-		#func_auxin.auxin_homeostasis(pr.euler_h, auxin, cuc, pr.k_auxin_synth, pr.k_cuc_yuc, pr.k_auxin_decay)
-
-	# Custom auxin modification
-	#ip.auxin[5,6] += 1.5
-	#ip.auxin[11,6] -= 1.5
-
-
-print("%s seconds" % (time.time() - start_time))
-
-quit()
-'''
 # =====================================================================================
 
 # Cleanup destination folder (remove and create)
@@ -92,7 +39,7 @@ for iteration in range(pr.nbr_iterations):
 	#*************************************************************************************
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(iteration)
+		func_graph.create_cell_plot(current_datetime, iteration)
 	#*************************************************************************************
 	# Apply noise to auxin [THIS IS BEING MIGRATED TO AUXIN HOMEOSTASIS]
 	#if pr.auxin_noise_factor > 0:
@@ -126,6 +73,17 @@ for iteration in range(pr.nbr_iterations):
 
 print("%s seconds" % (time.time() - start_time))
 
+# =====================================================================================
+
+# Create video/gif files
+
+if pr.create_video == True:
+	func_graph.create_video(current_datetime)
+
+if pr.create_gif == True:
+	func_graph.create_gif(current_datetime)
+
+print("%s seconds" % (time.time() - start_time))
 
 '''
 TO DO:

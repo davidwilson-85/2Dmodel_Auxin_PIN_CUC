@@ -59,7 +59,7 @@ def auxin_homeostasis(iter):
 			
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + h * ( \
-				k_auxin_synth + \
+				k_auxin_synth - \
 				k_auxin_degr * auxin_cell + \
 				k_cuc_auxin_synth * cuc_cell \
 			) + noise
