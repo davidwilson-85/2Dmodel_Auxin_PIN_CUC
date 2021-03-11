@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 
 '''
-
 Auxiliary functions go here
-
 '''
 
 import shutil, datetime
+import inputs as ip
+import numpy as np
+
 
 def write_to_log(timestamp):
     
     ''''
-
     Write contents of inputs and templates files to log file
-
     '''
 
     #timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
@@ -50,7 +49,34 @@ def write_to_log(timestamp):
         log_file.write(template_pin1_contents)
         log_file.write('\n\n')
 
-    return timestamp
+def save_ndarray():
+
+    '''
+    The standard way with Numbpy gives me an error:
+    'Cannot load file containing pickled data when allow_pickle=False'
+    And makes things complicated in other aspects too
+    '''
+
+    #with open('test.npy', 'wb') as f:
+    #    np.save(f, np.array([1, 2]))
+    
+    #with open('test.npy', 'rb') as f:
+    # a = np.load(f)
+
+    with open('templates/2D/template_auxin_1', 'a') as file:
+
+        for y in range(ip.tissue_rows):
+
+            row_values = []
+            
+            for x in range(ip.tissue_columns):
+                row_values.append(str(ip.auxin[y,x]/10)[:4] + ',')
+            
+            file.write(''.join(row_values)[:-1])
+            
+            if y < ip.tissue_rows - 1:
+                file.write('\n')
+    
 
 if __name__ == '__main__':
     write_to_log()

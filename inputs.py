@@ -15,6 +15,8 @@ middle_domain_template = 'templates/' + template + '/template_middle_domain'
 
 auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin = auxin * 10
+#with open('templates/2D/template_auxin_1.npy', 'rb') as file: auxin = np.load(file)
+
 auxin_matrix_shape = auxin.shape
 tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]

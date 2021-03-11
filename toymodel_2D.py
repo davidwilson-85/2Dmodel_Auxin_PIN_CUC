@@ -2,6 +2,8 @@
 
 import time, os, random, shutil, datetime
 
+import numpy as np
+
 import params as pr
 import inputs as ip
 
@@ -41,10 +43,6 @@ for iteration in range(pr.nbr_iterations):
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(current_datetime, iteration)
 	#*************************************************************************************
-	# Apply noise to auxin [THIS IS BEING MIGRATED TO AUXIN HOMEOSTASIS]
-	#if pr.auxin_noise_factor > 0:
-	#	func_auxin.auxin_noise()
-	#*************************************************************************************
 	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
 	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
 		func_pin.pin_expression()
@@ -67,10 +65,14 @@ for iteration in range(pr.nbr_iterations):
 	if pr.k_pin1_transp > 0:
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
-	# Custom auxin modification [THIS IS GOING SOON TO AUXIN HOMEOSTASIS]
-	#ip.auxin[5,6] += 1.5
-	#ip.auxin[11,6] -= 1.5
 
+	if iteration == 100:
+		#print(np.array2string(ip.auxin, separator=','))
+		with open('templates/2D/template_auxin_1', 'wb') as file:
+			#np.save(file, ip.auxin)
+			func_aux.save_ndarray()
+			pass
+	
 print("%s seconds" % (time.time() - start_time))
 
 # =====================================================================================
