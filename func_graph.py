@@ -35,9 +35,9 @@ def create_cell_plot(timestamp, iteration):
 	draw_pin = True
 	draw_cuc = True
 	draw_values_text = False
-	draw_vectors_diff = True
+	draw_vectors_diff = False
 	draw_vectors_pin1 = False
-	draw_pin1_flux_directions = False
+	draw_pin1_flux_directions = True
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 50

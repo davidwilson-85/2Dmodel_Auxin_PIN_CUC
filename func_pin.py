@@ -11,7 +11,7 @@ def pin_expression():
 
 	'''
 	* Auxin promotes PIN1 expression.
-	* ChCUC1 promoted PIN1 expression.
+	* CUC promotes PIN1 expression.
 	
 	To model this, assume that auxin and CUCs increase PIN1 expression and PIN1 has a constant turnover/decay
 	

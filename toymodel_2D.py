@@ -14,8 +14,6 @@ import func_pin
 import func_aux
 
 print('shape', ip.auxin.shape)
-print('cols: ', ip.tissue_columns)
-print('rows: ', ip.tissue_rows)
 
 current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
@@ -48,8 +46,8 @@ for iteration in range(pr.nbr_iterations):
 		func_pin.pin_expression()
 	#*************************************************************************************
 	# CUC EXPRESSION
-	#if pr.k_md_cuc > 0 or pr.k_auxin_cuc > 0 or pr.k_cuc_decay > 0:
-	#	func_cuc.cuc_expression()
+	if pr.k_cuc > 0:
+		func_cuc.cuc_expression()
 	#*************************************************************************************
 	# AUXIN HOMEOSTASIS
 	func_auxin.auxin_homeostasis(iteration)
@@ -66,11 +64,14 @@ for iteration in range(pr.nbr_iterations):
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
-	if iteration == 100:
+	if iteration > 1000:
+		ip.cuc[4:6,5:8] = 8
+		ip.auxin[4:6,5:8] += 0.2
+
+	if iteration == -1:
 		#print(np.array2string(ip.auxin, separator=','))
-		with open('templates/2D/template_auxin_1', 'wb') as file:
-			#np.save(file, ip.auxin)
-			func_aux.save_ndarray()
+		with open('templates/2D/template_auxin_1', 'w') as file:
+			#func_aux.save_ndarray()
 			pass
 	
 print("%s seconds" % (time.time() - start_time))
