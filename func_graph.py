@@ -40,7 +40,7 @@ def create_cell_plot(timestamp, iteration):
 	draw_pin1_flux_directions = True
 
 	# Vector magnification factor (only changes visualization)
-	vector_mag = 50
+	vector_mag = 5
 
 	x_origin = 0
 	y_origin = 0
@@ -101,7 +101,7 @@ def create_cell_plot(timestamp, iteration):
 			for j in range(matrix_shape[1]):
 	
 				# Draw auxin diffussion vector
-				draw.line([(x+25,y+25),(x+25+vector_mag*array_afd[8,i,j],y+25+vector_mag*array_afd[9,i,j])], fill='white', width=2)
+				draw.line([(x+25,y+25),(x+25+vector_mag*array_afd[8,i,j],y+25+vector_mag*array_afd[9,i,j])], fill='blue', width=2)
 				
 				x = x + cellSide
 			
@@ -320,5 +320,5 @@ def create_gif(timestamp, mode=''):
 
 
 if __name__ == '__main__':
-	#create_gif('bidir')
-	create_video()
+	#create_gif(0, 'bidir')
+	create_video(0)

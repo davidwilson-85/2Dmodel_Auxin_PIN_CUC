@@ -4,14 +4,14 @@ import func_auxin
 
 # General
 euler_h = 0.1               # Euler step size = h; (0 - 1]
-nbr_iterations = 2001
+nbr_iterations = 6500
 img_dest_folder = 'images/test'
-cell_plot_frequency = 50
-create_video = False
+cell_plot_frequency = 20
+create_video = True
 create_gif = False
 
 # Heatmap ranges
-auxin_range = (0, 200)       # This is only to map variable values to heatmap values
+auxin_range = (0, 350)       # This is only to map variable values to heatmap values
 pin1_range = (0, 10)
 cuc_range = (0, 9)
 middle_domain = (0, 9)
@@ -22,8 +22,9 @@ k_auxin_diffusion = 0.3 #0.3 0.12  # Relative amount of molecules that cross bet
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
-k_auxin_degr = 0.015 #0.01 #0.06 # Basal relative amount of molecules synthesized per unit of time
-k_cuc_auxin_synth = 0 #0.1 #0.3
+k_auxin_degr = 0.02 #0.01 #0.06 # Relative amount of molecules degreaded per unit of time
+k_cuc_auxin_synth = 0.5 #0.6 #0.3
+k_md_auxin_synth = 0.5
 
 # Auxin noise
 auxin_noise = {
@@ -35,7 +36,7 @@ auxin_noise = {
 auxin_custom_synth = {
   "cells": ((1,6),(100,100)),
   "iterations": range(0,100000),
-  "value": 10
+  "value": 0
 }
 # Auxin custom local degradation
 auxin_custom_degr = {
@@ -61,8 +62,8 @@ k_pin1_transp = 0.01 #0.01   # = auxin molecules transported / ( PIN1 molecule *
 # CUC expression
 k_cuc = 0 #0.09
 k_md_cuc = 0
-k_adab_cuc = 0.02
-k_auxin_cuc = 0.001
+k_adab_cuc = 0
+k_auxin_cuc = 0
 k_cuc_decay = 0
 
 '''

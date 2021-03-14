@@ -30,7 +30,7 @@ shutil.rmtree(pr.img_dest_folder)
 os.mkdir(pr.img_dest_folder)
 
 # Perform simulation cycles
-for iteration in range(pr.nbr_iterations):
+for iteration in range(pr.nbr_iterations + 1):
 	# Print iteration to terminal
 	if iteration < pr.nbr_iterations - 1:
 		print(iteration + 1, end='\r')
@@ -65,8 +65,8 @@ for iteration in range(pr.nbr_iterations):
 	#*************************************************************************************
 
 	if iteration > 1000:
-		ip.cuc[4:6,5:8] = 8
-		ip.auxin[4:6,5:8] += 0.2
+		ip.cuc[5:8,5:8] = 8
+		#ip.auxin[8,6] += 5
 
 	if iteration == -1:
 		#print(np.array2string(ip.auxin, separator=','))

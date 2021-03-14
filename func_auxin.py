@@ -32,6 +32,7 @@ def auxin_homeostasis(iter):
 	k_auxin_synth = pr.k_auxin_synth
 	k_auxin_degr = pr.k_auxin_degr
 	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
+	k_md_auxin_synth = pr.k_md_auxin_synth
 		
 	for y in range(ip.tissue_rows):
 		for x in range(ip.tissue_columns):
@@ -39,6 +40,7 @@ def auxin_homeostasis(iter):
 			# Get auxin and cuc values for current cell
 			auxin_cell = ip.auxin[y,x]
 			cuc_cell = ip.cuc[y,x]
+			md_cell = ip.middle_domain[x]
 
 			# If current cell has local/custom auxin synth/degr...
 			current_cell = (y,x)
@@ -57,11 +59,16 @@ def auxin_homeostasis(iter):
 			else:
 				noise = 0
 			
+			if iter < 1500:
+				#k_md_auxin_synth = 0
+				print('w!')
+			
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + h * ( \
 				k_auxin_synth - \
 				k_auxin_degr * auxin_cell + \
-				k_cuc_auxin_synth * cuc_cell \
+				k_cuc_auxin_synth * cuc_cell + \
+				k_md_auxin_synth * md_cell \
 			) + noise
 			
 			# Calculate change in auxin concentration (with basal synth and degr)
