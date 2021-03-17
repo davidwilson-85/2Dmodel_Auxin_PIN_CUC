@@ -60,7 +60,7 @@ def auxin_homeostasis(iter):
 				noise = 0
 			
 			if iter < 1500:
-				#k_md_auxin_synth = 0
+				k_md_auxin_synth = 0
 				print('w!')
 			
 			# Calculate change in auxin concentration
