@@ -3,6 +3,7 @@
 import math, os, shutil, cv2, glob, datetime
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+import matplotlib.pyplot as plt
 
 import inputs as ip
 import params as pr
@@ -253,10 +254,10 @@ def index_to_rgba(lut, level, range):
 
 
 # Create a heatmap using matplotlib's imshow()
-def create_heatmap(data):
+def create_heatmap(data, iteration):
 	
 	fig = plt.imshow(data, cmap="plasma", vmin=0, vmax=1, interpolation='none')
-	plt.savefig('images/test/image' + str(iteration) + '.png')
+	plt.savefig('images/test/heatmap' + str(iteration) + '.png', bbox_inches='tight')
 	plt.close()
 
 

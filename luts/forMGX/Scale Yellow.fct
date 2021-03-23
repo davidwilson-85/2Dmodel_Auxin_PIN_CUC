@@ -1,0 +1,5 @@
+Interpolation: rgb
+Clamp: true
+ExteriorColor: 0,0,0,0
+ColoredPos: 0-0,0,0,0
+ColoredPos: 1-1,1,0,1

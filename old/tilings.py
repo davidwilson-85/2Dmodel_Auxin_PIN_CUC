@@ -33,7 +33,6 @@ def generate_unit_squares(image_width, image_height):
     #      (x, y) +-----+ (x + 1, y)
     #             |     |
     #             |     |
-    #             |     |
     #  (x, y + 1) +-----+ (x + 1, y + 1)
     #
     for x in range(image_width):

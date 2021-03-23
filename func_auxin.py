@@ -41,17 +41,18 @@ def auxin_homeostasis(iter):
 			auxin_cell = ip.auxin[y,x]
 			cuc_cell = ip.cuc[y,x]
 			md_cell = ip.middle_domain[x]
-
-			# If current cell has local/custom auxin synth/degr...
+			
+			# Local/custom auxin synth/degr...
 			current_cell = (y,x)
+			custom_synth, custom_degr = 0, 0
 
 			if pr.auxin_custom_synth['value'] > 0:
 				if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
-					auxin_cell += pr.auxin_custom_synth['value']
+					custom_synth = pr.auxin_custom_synth['value']
 			
 			if pr.auxin_custom_degr['value'] > 0:
 				if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
-					auxin_cell -= pr.auxin_custom_degr['value']
+					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
 			
 			# Noise
 			if pr.auxin_noise['limit'] > 0 and iter in pr.auxin_noise['iterations']:
@@ -59,17 +60,21 @@ def auxin_homeostasis(iter):
 			else:
 				noise = 0
 			
-			if iter < 1500:
-				k_md_auxin_synth = 0
-				print('w!')
+			#if iter < 1500:
+			#	k_md_auxin_synth = 0
+			#	print('w!')
 			
 			# Calculate change in auxin concentration
-			auxin_cell_updated = auxin_cell + h * ( \
-				k_auxin_synth - \
-				k_auxin_degr * auxin_cell + \
-				k_cuc_auxin_synth * cuc_cell + \
-				k_md_auxin_synth * md_cell \
-			) + noise
+			auxin_cell_updated = auxin_cell + \
+				h * ( \
+					k_auxin_synth - \
+					k_auxin_degr * auxin_cell + \
+					k_cuc_auxin_synth * cuc_cell + \
+					k_md_auxin_synth * md_cell + \
+					custom_synth + \
+					custom_degr \
+				) \
+				+ noise
 			
 			# Calculate change in auxin concentration (with basal synth and degr)
 			#auxin_cell_updated = auxin_cell + h * ( k_auxin_synth + local_synth - local_degr + synth_yuc1 + auxin_cell * k_auxin_degr ) + noise
@@ -78,6 +83,8 @@ def auxin_homeostasis(iter):
 				auxin_cell_updated = float(1E-6)
 				
 			ip.auxin[y,x] = auxin_cell_updated
+			
+			#ip.auxin[y,x] = auxin_cell + h * 0.25 * auxin_cell
 
 
 def auxin_diffusion():

@@ -23,6 +23,13 @@ func_aux.write_to_log(current_datetime)
 # Time execution of simulation
 start_time = time.time()
 
+# temp
+auxin_results = []
+auxin_array_flat = ip.auxin.flatten()
+auxin_results.append(auxin_array_flat[0])
+
+#for iteration in range(pr.nbr_iterations + 1):
+
 # =====================================================================================
 
 # Cleanup destination folder (remove and create)
@@ -64,9 +71,16 @@ for iteration in range(pr.nbr_iterations + 1):
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
-	if iteration > 1000:
-		ip.cuc[5:8,5:8] = 8
-		#ip.auxin[8,6] += 5
+	#print(ip.auxin)
+	#func_graph.create_heatmap(ip.auxin, iteration)
+
+	auxin_array_flat = ip.auxin.flatten()
+	#print(auxin_array_flat[0])
+	auxin_results.append(auxin_array_flat[0])
+
+	#if iteration > 1000:
+	#	ip.cuc[5:8,5:8] = 8
+	#	#ip.auxin[8,6] += 5
 
 	if iteration == -1:
 		#print(np.array2string(ip.auxin, separator=','))
@@ -75,6 +89,7 @@ for iteration in range(pr.nbr_iterations + 1):
 			pass
 	
 print("%s seconds" % (time.time() - start_time))
+print(auxin_results)
 
 # =====================================================================================
 
