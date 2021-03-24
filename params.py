@@ -3,10 +3,10 @@
 import func_auxin
 
 # General
-euler_h = 0.001              # Euler step size = h; (0 - 1]
-nbr_iterations = 30000
+euler_h = .1              # Euler step size = h; (0 - 1]
+simulation_time = 10        # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images/test'
-cell_plot_frequency = 100000
+cell_plot_frequency = 1
 create_video = False
 create_gif = False
 
@@ -29,20 +29,20 @@ k_md_auxin_synth = 0 #0.5 #0
 # Auxin noise
 auxin_noise = {
   'limit': 0, #0.025,
-  'iterations': range(0,1)
+  'sim_time_interval': range(0,1)
 }
 
 # Auxin custom local synthesis (treated as absolute rate)
 auxin_custom_synth = {
   "cells": ((0,0),(100,100)),
-  "iterations": range(0,100000),
-  "value": 0.25
+  "time_interval": range(0,100000),
+  "value": 0
 }
 # Auxin custom local degradation (treated as relative rate)
 auxin_custom_degr = {
   "cells": ((0,0),(100,100)),
-  "iterations": range(0,100000),
-  "value": 0
+  "time_interval": range(0,100000),
+  "value": 0.1
 }
 
 # PIN1 localization

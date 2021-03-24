@@ -13,6 +13,9 @@ import func_cuc
 import func_pin
 import func_aux
 
+# Calculate number of interations based on simulation time and step size
+nbr_iterations = int(pr.simulation_time / pr.euler_h)
+
 print('shape', ip.auxin.shape)
 
 current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
@@ -23,13 +26,6 @@ func_aux.write_to_log(current_datetime)
 # Time execution of simulation
 start_time = time.time()
 
-# temp
-auxin_results = []
-auxin_array_flat = ip.auxin.flatten()
-auxin_results.append(auxin_array_flat[0])
-
-#for iteration in range(pr.nbr_iterations + 1):
-
 # =====================================================================================
 
 # Cleanup destination folder (remove and create)
@@ -37,9 +33,9 @@ shutil.rmtree(pr.img_dest_folder)
 os.mkdir(pr.img_dest_folder)
 
 # Perform simulation cycles
-for iteration in range(pr.nbr_iterations + 1):
+for iteration in range(nbr_iterations + 1):
 	# Print iteration to terminal
-	if iteration < pr.nbr_iterations - 1:
+	if iteration < nbr_iterations:
 		print(iteration + 1, end='\r')
 	else:
 		print(iteration + 1, end='\n')
@@ -57,7 +53,7 @@ for iteration in range(pr.nbr_iterations + 1):
 		func_cuc.cuc_expression()
 	#*************************************************************************************
 	# AUXIN HOMEOSTASIS
-	func_auxin.auxin_homeostasis(iteration)
+	func_auxin.auxin_homeostasis(iteration/pr.euler_h)
 	#*************************************************************************************
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
@@ -71,12 +67,9 @@ for iteration in range(pr.nbr_iterations + 1):
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
-	#print(ip.auxin)
-	#func_graph.create_heatmap(ip.auxin, iteration)
+	# FOR TEMPORARY / TESTING FUNCTIONALY
 
-	auxin_array_flat = ip.auxin.flatten()
-	#print(auxin_array_flat[0])
-	auxin_results.append(auxin_array_flat[0])
+	#func_graph.create_heatmap(ip.auxin, iteration)
 
 	#if iteration > 1000:
 	#	ip.cuc[5:8,5:8] = 8
@@ -89,7 +82,6 @@ for iteration in range(pr.nbr_iterations + 1):
 			pass
 	
 print("%s seconds" % (time.time() - start_time))
-print(auxin_results)
 
 # =====================================================================================
 

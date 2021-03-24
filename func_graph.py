@@ -141,7 +141,7 @@ def create_cell_plot(timestamp, iteration):
 			x = x_origin
 			for j in range(matrix_shape[1]):
 
-				array_afp[10,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
+				array_afp[10,i,j] = vector_to_degrees(array_afp[6,i,j], array_afp[9,i,j])
 
 				# Rotate arrow image and paste it 
 				if array_afp[10,i,j] != 361.0:
@@ -155,11 +155,13 @@ def create_cell_plot(timestamp, iteration):
 		x = x_origin
 		y = y_origin
 
-	# Draw text with simulation timestamp and iteration
-	ImageDraw.Draw(im).text((8,5), timestamp + '__' + str(iteration), fill=(0, 0, 0))
+	# Draw text with timestamp and simulation time formatted appropriately
+	sim_time_formatted = "{:.5f}".format(iteration * pr.euler_h)
+	ImageDraw.Draw(im).text((8,5), timestamp + '__' + str(sim_time_formatted).zfill(9), fill=(0, 0, 0))
+	#print(str(sim_time_formatted).zfill(9))
 	
 	# Save image
-	im.save(img_dest_folder + '/image' + str(iteration+1000) +'.png')
+	im.save(img_dest_folder + '/image' + str(iteration).zfill(6) +'.png')
 
 
 def vector_to_degrees(vector_x, vector_y):

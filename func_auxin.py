@@ -47,15 +47,15 @@ def auxin_homeostasis(iter):
 			custom_synth, custom_degr = 0, 0
 
 			if pr.auxin_custom_synth['value'] > 0:
-				if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['iterations']:
+				if current_cell in pr.auxin_custom_synth['cells'] and iter in pr.auxin_custom_synth['time_interval']:
 					custom_synth = pr.auxin_custom_synth['value']
 			
 			if pr.auxin_custom_degr['value'] > 0:
-				if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['iterations']:
+				if current_cell in pr.auxin_custom_degr['cells'] and iter in pr.auxin_custom_synth['time_interval']:
 					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
 			
 			# Noise
-			if pr.auxin_noise['limit'] > 0 and iter in pr.auxin_noise['iterations']:
+			if pr.auxin_noise['limit'] > 0 and iter in pr.auxin_noise['time_interval']:
 				noise = auxin_cell * random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
 			else:
 				noise = 0
@@ -71,7 +71,7 @@ def auxin_homeostasis(iter):
 					k_auxin_degr * auxin_cell + \
 					k_cuc_auxin_synth * cuc_cell + \
 					k_md_auxin_synth * md_cell + \
-					custom_synth + \
+					custom_synth - \
 					custom_degr \
 				) \
 				+ noise
