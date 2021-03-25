@@ -3,10 +3,10 @@
 import func_auxin
 
 # General
-euler_h = .1              # Euler step size = h; (0 - 1]
-simulation_time = 10        # Arbitrary Units (AU) (let's assume it is hours of development)
+euler_h = .05             # Euler step size = h; (0 - 1]
+simulation_time = 500       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1
+cell_plot_frequency = 1000
 create_video = False
 create_gif = False
 
@@ -18,7 +18,7 @@ middle_domain = (0, 9)
 adab_domain = (0, 9)
 
 # Auxin diffusion
-k_auxin_diffusion = 0 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.15 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
@@ -35,13 +35,13 @@ auxin_noise = {
 # Auxin custom local synthesis (treated as absolute rate)
 auxin_custom_synth = {
   "cells": ((0,0),(100,100)),
-  "time_interval": range(0,100000),
-  "value": 0
+  "time_interval": range(0,10000000000),
+  "value": 0.05
 }
 # Auxin custom local degradation (treated as relative rate)
 auxin_custom_degr = {
-  "cells": ((0,0),(100,100)),
-  "time_interval": range(0,100000),
+  "cells": ((1,0),(100,100)),
+  "time_interval": range(0,10000000000),
   "value": 0.1
 }
 

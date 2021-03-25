@@ -36,9 +36,9 @@ os.mkdir(pr.img_dest_folder)
 for iteration in range(nbr_iterations + 1):
 	# Print iteration to terminal
 	if iteration < nbr_iterations:
-		print(iteration + 1, end='\r')
+		print(iteration + 1 + ' / ' + nbr_iterations + 1, end='\r')
 	else:
-		print(iteration + 1, end='\n')
+		print(iteration + 1 + ' / ' + nbr_iterations + 1, end='\n')
 	#*************************************************************************************
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
@@ -82,7 +82,8 @@ for iteration in range(nbr_iterations + 1):
 			pass
 	
 print("%s seconds" % (time.time() - start_time))
-
+print(ip.auxin)
+rint('warning: bug: using iteration instead of sim time in auxin_homeostasis() !!!!')
 # =====================================================================================
 
 # Create video/gif files
