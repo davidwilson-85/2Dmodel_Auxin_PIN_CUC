@@ -35,7 +35,7 @@ def create_cell_plot(timestamp, iteration):
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = True
-	draw_values_text = False
+	draw_values_text = True
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
 	draw_pin1_flux_directions = True

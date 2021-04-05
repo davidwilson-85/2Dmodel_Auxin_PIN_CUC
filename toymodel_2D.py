@@ -34,11 +34,12 @@ os.mkdir(pr.img_dest_folder)
 
 # Perform simulation cycles
 for iteration in range(nbr_iterations + 1):
+	sim_time = iteration * pr.euler_h
 	# Print iteration to terminal
 	if iteration < nbr_iterations:
-		print(iteration + 1 + ' / ' + nbr_iterations + 1, end='\r')
+		print(str(iteration + 1) + ' / ' + str(nbr_iterations + 1), end='\r')
 	else:
-		print(iteration + 1 + ' / ' + nbr_iterations + 1, end='\n')
+		print(str(iteration + 1) + ' / ' + str(nbr_iterations + 1), end='\n')
 	#*************************************************************************************
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
@@ -53,7 +54,7 @@ for iteration in range(nbr_iterations + 1):
 		func_cuc.cuc_expression()
 	#*************************************************************************************
 	# AUXIN HOMEOSTASIS
-	func_auxin.auxin_homeostasis(iteration/pr.euler_h)
+	func_auxin.auxin_homeostasis(sim_time)
 	#*************************************************************************************
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
@@ -67,7 +68,7 @@ for iteration in range(nbr_iterations + 1):
 		func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
-	# FOR TEMPORARY / TESTING FUNCTIONALY
+	# FOR TEMPORARY/TESTING FUNCTIONALY
 
 	#func_graph.create_heatmap(ip.auxin, iteration)
 
@@ -75,15 +76,13 @@ for iteration in range(nbr_iterations + 1):
 	#	ip.cuc[5:8,5:8] = 8
 	#	#ip.auxin[8,6] += 5
 
-	if iteration == -1:
+	#if iteration == -1:
 		#print(np.array2string(ip.auxin, separator=','))
-		with open('templates/2D/template_auxin_1', 'w') as file:
+		#with open('templates/2D/template_auxin_1', 'w') as file:
 			#func_aux.save_ndarray()
-			pass
+			#pass
 	
 print("%s seconds" % (time.time() - start_time))
-print(ip.auxin)
-rint('warning: bug: using iteration instead of sim time in auxin_homeostasis() !!!!')
 # =====================================================================================
 
 # Create video/gif files

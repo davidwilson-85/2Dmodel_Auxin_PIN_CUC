@@ -3,22 +3,22 @@
 import func_auxin
 
 # General
-euler_h = .05             # Euler step size = h; (0 - 1]
+euler_h = .1             # Euler step size = h; (0 - 1]
 simulation_time = 500       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images/test'
-cell_plot_frequency = 1000
+cell_plot_frequency = 100
 create_video = False
 create_gif = False
 
 # Heatmap ranges
-auxin_range = (0, 3)       # This is only to map variable values to heatmap values
+auxin_range = (0, 100)       # This is only to map variable values to heatmap values
 pin1_range = (0, 10)
-cuc_range = (0, 9)
-middle_domain = (0, 9)
-adab_domain = (0, 9)
+cuc_range = (0, 10)
+middle_domain = (0, 10)
+adab_domain = (0, 10)
 
 # Auxin diffusion
-k_auxin_diffusion = 0.15 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.3 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
@@ -26,27 +26,27 @@ k_auxin_degr = 0 #0.02 #0.01 #0.06 # Relative amount of molecules degraded per u
 k_cuc_auxin_synth = 0 #1 #0.5 #0.6 #0.3
 k_md_auxin_synth = 0 #0.5 #0
 
-# Auxin noise
+# Auxin noise ( interval is [) )
 auxin_noise = {
-  'limit': 0, #0.025,
-  'sim_time_interval': range(0,1)
+  'limit': 0.025,
+  'time_interval': (0,1)
 }
 
-# Auxin custom local synthesis (treated as absolute rate)
+# Auxin custom local synthesis (treated as absolute rate; interval is [) )
 auxin_custom_synth = {
   "cells": ((0,0),(100,100)),
-  "time_interval": range(0,10000000000),
-  "value": 0.05
+  "time_interval": (0,1000),
+  "value": 0
 }
-# Auxin custom local degradation (treated as relative rate)
+# Auxin custom local degradation (treated as relative rate; interval is [) )
 auxin_custom_degr = {
   "cells": ((1,0),(100,100)),
-  "time_interval": range(0,10000000000),
-  "value": 0.1
+  "time_interval": (0,1000),
+  "value": 0
 }
 
 # PIN1 localization
-pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+pin1_polarity = 'wtf_abley2016'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
 k_UTG = 1.1 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #1 in Abley 2016 ('linear WTF')
 k_WTF_b = 0.005
@@ -57,7 +57,7 @@ cuc_threshold_pin1 = 5
 k_auxin_pin1 = 0 #0.003 #0.0001
 k_cuc_pin1 = 0 #0.01
 k_pin1_decay = 0 #0.1 # 0.004
-k_pin1_transp = 0 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
+k_pin1_transp = 0 #0.015 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
 
 # CUC expression
 k_cuc = 0 #0.09

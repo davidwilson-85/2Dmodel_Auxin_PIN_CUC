@@ -43,6 +43,8 @@ plt.plot(t, sol_grid[: , 0], label='0,0')
 plt.plot(t, sol_grid[: , 1], label='0,1')
 plt.plot(t, sol_grid[: , 2], label='1,0')
 plt.plot(t, sol_grid[: , 3], label='1,1')
+plt.xlabel('simulation time (AU)')
+plt.ylabel('[auxin] (AU)')
 plt.legend()
 plt.savefig('tests/test.png', bbox_inches='tight')
 
