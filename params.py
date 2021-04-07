@@ -3,10 +3,10 @@
 import func_auxin
 
 # General
-euler_h = .1             # Euler step size = h; (0 - 1]
-simulation_time = 500       # Arbitrary Units (AU) (let's assume it is hours of development)
+euler_h = 1             # Euler step size = h; (0 - 1]
+simulation_time = 50       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images/test'
-cell_plot_frequency = 100
+cell_plot_frequency = 10
 create_video = False
 create_gif = False
 
@@ -18,7 +18,7 @@ middle_domain = (0, 10)
 adab_domain = (0, 10)
 
 # Auxin diffusion
-k_auxin_diffusion = 0.3 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.1 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
@@ -26,19 +26,19 @@ k_auxin_degr = 0 #0.02 #0.01 #0.06 # Relative amount of molecules degraded per u
 k_cuc_auxin_synth = 0 #1 #0.5 #0.6 #0.3
 k_md_auxin_synth = 0 #0.5 #0
 
-# Auxin noise ( interval is [) )
+# Auxin noise ( interval is [) and refers to iterations)
 auxin_noise = {
-  'limit': 0.025,
-  'time_interval': (0,1)
+  'limit': 0, #0.025,
+  'iteration_interval': (0,1)
 }
 
-# Auxin custom local synthesis (treated as absolute rate; interval is [) )
+# Auxin custom local synthesis (treated as absolute rate; interval is [) and refers to simulation time)
 auxin_custom_synth = {
-  "cells": ((0,0),(100,100)),
+  "cells": ((1,6),(100,100)),
   "time_interval": (0,1000),
-  "value": 0
+  "value": 5
 }
-# Auxin custom local degradation (treated as relative rate; interval is [) )
+# Auxin custom local degradation (treated as relative rate; interval is [) and refers to simulation time)
 auxin_custom_degr = {
   "cells": ((1,0),(100,100)),
   "time_interval": (0,1000),
@@ -57,7 +57,7 @@ cuc_threshold_pin1 = 5
 k_auxin_pin1 = 0 #0.003 #0.0001
 k_cuc_pin1 = 0 #0.01
 k_pin1_decay = 0 #0.1 # 0.004
-k_pin1_transp = 0 #0.015 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
+k_pin1_transp = .01 #0.015 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
 
 # CUC expression
 k_cuc = 0 #0.09

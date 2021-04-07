@@ -156,8 +156,9 @@ def create_cell_plot(timestamp, iteration):
 		y = y_origin
 
 	# Draw text with timestamp and simulation time formatted appropriately
+	draw.polygon([(0,height-9),(200,height-9),(200,height),(0,height)], fill=(128,128,128))
 	sim_time_formatted = "{:.5f}".format(iteration * pr.euler_h)
-	ImageDraw.Draw(im).text((8,5), timestamp + '__' + str(sim_time_formatted).zfill(9), fill=(0, 0, 0))
+	ImageDraw.Draw(im).text((4, height-10), timestamp + '__' + str(sim_time_formatted).zfill(9), fill=(0, 0, 0))
 	#print(str(sim_time_formatted).zfill(9))
 	
 	# Save image

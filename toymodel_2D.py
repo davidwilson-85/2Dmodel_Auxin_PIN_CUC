@@ -37,9 +37,9 @@ for iteration in range(nbr_iterations + 1):
 	sim_time = iteration * pr.euler_h
 	# Print iteration to terminal
 	if iteration < nbr_iterations:
-		print(str(iteration + 1) + ' / ' + str(nbr_iterations + 1), end='\r')
+		print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
 	else:
-		print(str(iteration + 1) + ' / ' + str(nbr_iterations + 1), end='\n')
+		print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
 	#*************************************************************************************
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
@@ -54,18 +54,18 @@ for iteration in range(nbr_iterations + 1):
 		func_cuc.cuc_expression()
 	#*************************************************************************************
 	# AUXIN HOMEOSTASIS
-	func_auxin.auxin_homeostasis(sim_time)
+	func_auxin.auxin_homeostasis(iteration, sim_time)
 	#*************************************************************************************
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
 		func_auxin.auxin_diffusion()
 	#*************************************************************************************	
 	# PIN1 POLARIZATION
-	func_pin.pin_polarity(pr.pin1_polarity)
+	#func_pin.pin_polarity(pr.pin1_polarity)
 	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
-	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.k_pin1_transp)
+	#if pr.k_pin1_transp > 0:
+	#	func_auxin.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
 	# FOR TEMPORARY/TESTING FUNCTIONALY

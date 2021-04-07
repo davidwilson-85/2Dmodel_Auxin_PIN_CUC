@@ -8,7 +8,7 @@ import params as pr
 import inputs as ip
 
 
-def auxin_homeostasis(sim_time):
+def auxin_homeostasis(iteration, sim_time):
 	
 	'''
 	This function implements all changes in auxin concentration in which there
@@ -60,8 +60,8 @@ def auxin_homeostasis(sim_time):
 			
 			# Noise
 			if pr.auxin_noise['limit'] > 0 \
-			and sim_time >= pr.auxin_noise['time_interval'][0] \
-			and sim_time < pr.auxin_noise['time_interval'][1]:
+			and iteration >= pr.auxin_noise['iteration_interval'][0] \
+			and iteration < pr.auxin_noise['iteration_interval'][1]:
 				noise = auxin_cell * random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
 			
 			# Calculate change in auxin concentration
