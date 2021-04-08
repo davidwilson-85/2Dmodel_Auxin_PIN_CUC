@@ -41,7 +41,7 @@ def create_cell_plot(timestamp, iteration):
 	draw_pin1_flux_directions = True
 
 	# Vector magnification factor (only changes visualization)
-	vector_mag = 5
+	vector_mag = 50
 
 	x_origin = 0
 	y_origin = 0
@@ -141,7 +141,7 @@ def create_cell_plot(timestamp, iteration):
 			x = x_origin
 			for j in range(matrix_shape[1]):
 
-				array_afp[10,i,j] = vector_to_degrees(array_afp[6,i,j], array_afp[9,i,j])
+				array_afp[10,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
 
 				# Rotate arrow image and paste it 
 				if array_afp[10,i,j] != 361.0:
@@ -168,7 +168,7 @@ def create_cell_plot(timestamp, iteration):
 def vector_to_degrees(vector_x, vector_y):
 
     '''
-    Convert vector information (x and y pair) to degrees (0-360).
+    Convert vector information (x,y pair) to degrees (0-360).
     
     1. Calculate the quadrant in which the vector lies and then
     convert to radians.
@@ -177,8 +177,8 @@ def vector_to_degrees(vector_x, vector_y):
     radians.
     3. Convert from radians to degrees.
     
-    There are Python functions to covert from different units but I
-    still need to perform the stept above to get correct degree values.
+    There are Python functions to convert from different units but I
+    still need to perform the steps below to get correct degree values.
     
     Degrees are later used to rotate the arrow images that show the
     direction of auxin flux in images/videos.
