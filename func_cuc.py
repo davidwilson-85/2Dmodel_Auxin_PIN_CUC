@@ -17,8 +17,8 @@ def cuc_expression():
 	# Rename parameters
 	h = pr.euler_h
 	k_cuc = pr.k_cuc
-	#k_md_cuc = pr.k_md_cuc
-	k_adab_cuc = pr.k_adab_cuc
+	k_md_cuc = pr.k_md_cuc
+	#k_adab_cuc = pr.k_adab_cuc
 	k_auxin_cuc = pr.k_auxin_cuc
 	k_cuc_decay = pr.k_cuc_decay
 
@@ -27,11 +27,11 @@ def cuc_expression():
 		
 			cuc_cell = ip.cuc[y,x]
 			auxin_cell = ip.auxin[y,x]
-			adab_cell = ip.adab_domain[x]
-			#md_cell = ip.middle_domain[y,x]
+			#adab_cell = ip.adab_domain[x]
+			md_cell = ip.middle_domain[x]
 			#md_cell = ip.middle_domain[y,x] For 1-D middle domain
 			
-			cuc_cell_updated = cuc_cell + h * ( k_cuc - adab_cell * k_adab_cuc - auxin_cell * k_auxin_cuc - cuc_cell * k_cuc_decay )
+			cuc_cell_updated = cuc_cell + h * ( k_cuc + md_cell * k_md_cuc - auxin_cell * k_auxin_cuc - cuc_cell * k_cuc_decay )
 			
 			if cuc_cell_updated < 0:
 				cuc_cell_updated = 0

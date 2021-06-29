@@ -35,6 +35,8 @@ os.mkdir(pr.img_dest_folder)
 # Perform simulation cycles
 for iteration in range(nbr_iterations + 1):
 	sim_time = iteration * pr.euler_h
+	#print(sim_time)
+	
 	# Print iteration to terminal
 	if iteration < nbr_iterations:
 		print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
@@ -42,7 +44,7 @@ for iteration in range(nbr_iterations + 1):
 		print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
 	#*************************************************************************************
 	# DRAW CELL PLOT
-	if sim_time % pr.cell_plot_frequency == 0:
+	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(current_datetime, iteration)
 	#*************************************************************************************
 	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
@@ -72,11 +74,12 @@ for iteration in range(nbr_iterations + 1):
 
 	#func_graph.create_heatmap(ip.auxin, iteration)
 
-	#if iteration > 1000:
-	#	ip.cuc[5:8,5:8] = 8
-	#	#ip.auxin[8,6] += 5
+	#if iteration > 5:
+		#ip.cuc[5:8,5:8] = 8
+		#ip.auxin[8,6] += 5
 
-	#if iteration == -1:
+	#if iteration == 1900:
+		#print(ip.auxin)
 		#print(np.array2string(ip.auxin, separator=','))
 		#with open('templates/2D/template_auxin_1', 'w') as file:
 			#func_aux.save_ndarray()

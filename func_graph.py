@@ -35,7 +35,7 @@ def create_cell_plot(timestamp, iteration):
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = True
-	draw_values_text = True
+	draw_values_text = False
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
 	draw_pin1_flux_directions = True
@@ -275,10 +275,12 @@ def create_video(timestamp):
 
 	To call this function:
 	$ python3 func_graph.py
+
+	So far it works with .AVI and .MP4. The former format makes files 50 time bigger than the latter. 
 	'''
 
 	image_folder = 'images/test'
-	video_name = 'videos/vid_' + str(timestamp) + '.avi'
+	video_name = 'videos/vid_' + str(timestamp) + '.mp4'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 	images.sort()
@@ -287,7 +289,8 @@ def create_video(timestamp):
 	height, width, layers = frame.shape
 	print(height, width)
 
-	video = cv2.VideoWriter(video_name, 0, 10, (width,height))
+	#video = cv2.VideoWriter(video_name, 0, 10, (width,height)) # Use this one for .AVI
+	video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), 10, (width,height))
 
 	for image in images:
 		video.write(cv2.imread(os.path.join(image_folder, image)))

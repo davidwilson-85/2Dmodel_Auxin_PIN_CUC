@@ -62,7 +62,7 @@ def auxin_homeostasis(iteration, sim_time):
 			if pr.auxin_noise['limit'] > 0 \
 			and iteration >= pr.auxin_noise['iteration_interval'][0] \
 			and iteration < pr.auxin_noise['iteration_interval'][1]:
-				noise = auxin_cell * random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
+				noise = auxin_cell * ( 1 + random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit']) )
 			
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + \
@@ -166,9 +166,7 @@ def auxin_diffusion():
 def auxin_noise():
 
 	'''
-	INTEGRATING THIS IN AUXIN HOMEOSTASIS FUNCTION
-	Simply adds noise to axin concetration matrix.
-	It uses uniform distribution.
+	NOW INTEGRATED ALSO IN AUXIN HOMEOSTASIS FUNCTION
 	'''
 
 	for y in range(ip.tissue_rows):
