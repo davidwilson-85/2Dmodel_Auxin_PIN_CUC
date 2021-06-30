@@ -61,7 +61,7 @@ k_pin1_decay = 0 #0.1 # 0.004
 k_pin1_transp = 0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
 
 # CUC expression
-k_cuc = 0 #0.35
+k_cuc = 0.35
 k_md_cuc = 0.01
 k_adab_cuc = 0
 k_auxin_cuc = 0.01
