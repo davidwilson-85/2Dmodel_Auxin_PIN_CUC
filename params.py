@@ -3,9 +3,9 @@
 import func_auxin
 
 # General
-euler_h = .01             # Euler step size = h; (0 - 1]
-simulation_time = 20       # Arbitrary Units (AU) (let's assume it is hours of development)
-img_dest_folder = 'images/test'
+euler_h = .01              # Euler step size = h; (0 - 1]
+simulation_time = 2       # Arbitrary Units (AU) (let's assume it is hours of development)
+img_dest_folder = 'images'
 cell_plot_frequency = 10
 create_video = True
 create_gif = False

@@ -13,6 +13,10 @@ import func_cuc
 import func_pin
 
 import auxiliary as aux
+import tests.setup as setup
+
+# Setup
+setup.setup()
 
 # Calculate number of interations based on simulation time and step size
 nbr_iterations = int(pr.simulation_time / pr.euler_h)
