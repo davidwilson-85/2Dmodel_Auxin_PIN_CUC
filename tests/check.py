@@ -2,7 +2,7 @@
 
 import os
 
-def setup():
+def check_dirs():
 
     """
     Check and create folders for images, videos, sim_logs and templates

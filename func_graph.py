@@ -279,16 +279,17 @@ def create_video(timestamp):
 	So far it works with .AVI and .MP4. The former format makes files 50 time bigger than the latter. 
 	'''
 
+	print('Creating video...')
+
 	image_folder = 'images'
 	video_name = 'videos/vid_' + str(timestamp) + '.mp4'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
-	print(images)
 	images.sort()
 
 	frame = cv2.imread(os.path.join(image_folder, images[0]))
 	height, width, layers = frame.shape
-	print(height, width)
+	#print(height, width)
 
 	#video = cv2.VideoWriter(video_name, 0, 10, (width,height)) # Use this one for .AVI
 	video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), 10, (width,height))

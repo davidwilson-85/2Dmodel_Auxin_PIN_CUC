@@ -13,10 +13,10 @@ import func_cuc
 import func_pin
 
 import auxiliary as aux
-import tests.setup as setup
+import tests.check as check
 
-# Setup
-setup.setup()
+# Setup checks
+check.check_dirs()
 
 # Calculate number of interations based on simulation time and step size
 nbr_iterations = int(pr.simulation_time / pr.euler_h)
