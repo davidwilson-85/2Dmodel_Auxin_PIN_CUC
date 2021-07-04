@@ -25,7 +25,7 @@ k_auxin_diffusion = 0.3 #0.3 0.12  # Relative amount of molecules that cross bet
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
 k_auxin_degr = 0.02 #0.01 #0.06 # Relative amount of molecules degraded per unit of time
 k_cuc_auxin_synth = 1 #0.5 #0.6 #0.3
-k_md_auxin_synth = 0.5 #0
+k_md_auxin_synth = 0.25 #0
 
 # Auxin noise ( interval is [) and refers to iterations)
 auxin_noise = {

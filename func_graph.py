@@ -325,6 +325,33 @@ def create_gif(timestamp, mode=''):
 	# duration (time per frame in ms), loop = number of times to loop (0 = infinite)
 	img.save(fp=gif_name, format='GIF', append_images=imgs, save_all=True, duration=20, loop=0)
 
+'''
+# Formerly in animation.py
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+fig, ax = plt.subplots()
+xdata, ydata = [], []
+ln, = plt.plot([], [], 'ro')
+
+def init():
+    ax.set_xlim(0, 2*np.pi)
+    ax.set_ylim(-1, 1)
+    return ln,
+
+def update(frame):
+    xdata.append(frame)
+    ydata.append(np.sin(frame))
+    ln.set_data(xdata, ydata)
+    return ln,
+
+ani = FuncAnimation(fig, update, frames=np.linspace(0, 2*np.pi, 128), init_func=init, blit=True)
+
+ani.save("test.mp4", bitrate=512)
+
+plt.show()
+'''
 
 if __name__ == '__main__':
 	#create_gif(0, 'bidir')
