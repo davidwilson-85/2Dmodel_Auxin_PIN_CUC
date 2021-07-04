@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import inputs as ip
 import params as pr
-import func_aux as aux
+import auxiliary as aux
 
 
 def create_cell_plot(timestamp, iteration):
