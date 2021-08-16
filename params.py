@@ -3,16 +3,16 @@
 import func_auxin
 
 # General
-euler_h = .01              # Euler step size = h; (0 - 1]
-simulation_time = 2       # Arbitrary Units (AU) (let's assume it is hours of development)
+euler_h = .1              # Euler step size = h; (0 - 1]
+simulation_time = 10       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images'
-cell_plot_frequency = 10
+cell_plot_frequency = 1
 create_video = True
 create_gif = False
-simulation_description = 'CUC WTF + synthesis - can this form an adjacent auxin max?'
+simulation_description = 'Trying to include ODEint in my loop'
 
 # Heatmap ranges
-auxin_range = (0, 350)       # This is only to map variable values to heatmap values
+auxin_range = (0, 95)       # This is only to map variable values to heatmap values
 pin1_range = (0, 10)
 cuc_range = (0, 9)
 middle_domain = (0, 9)
@@ -23,9 +23,9 @@ k_auxin_diffusion = 0.3 #0.3 0.12  # Relative amount of molecules that cross bet
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
-k_auxin_degr = 0.02 #0.01 #0.06 # Relative amount of molecules degraded per unit of time
-k_cuc_auxin_synth = 1 #0.5 #0.6 #0.3
-k_md_auxin_synth = 0.25 #0
+k_auxin_degr = 0 #0.02 #0.01 #0.06 # Relative amount of molecules degraded per unit of time
+k_cuc_auxin_synth = 0 #1 #0.5 #0.6 #0.3
+k_md_auxin_synth = 0 #0.25 #0
 
 # Auxin noise ( interval is [) and refers to iterations)
 auxin_noise = {
@@ -35,9 +35,9 @@ auxin_noise = {
 
 # Auxin custom local synthesis (treated as absolute rate; interval is [) and refers to simulation time)
 auxin_custom_synth = {
-  "cells": ((1,6),(100,100)),
+  "cells": ((1,6),(0,100)),
   "time_interval": (0,1000),
-  "value": 20
+  "value": 0 #20
 }
 # Auxin custom local degradation (treated as relative rate; interval is [) and refers to simulation time)
 auxin_custom_degr = {
@@ -47,7 +47,7 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization
-pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+pin1_polarity = 'smith2006'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
 k_UTG = 1.1 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #1 in Abley 2016 ('linear WTF')
 k_WTF_b = 0.005
@@ -58,13 +58,13 @@ cuc_threshold_pin1 = 5
 k_auxin_pin1 = 0 #0.003 #0.0001
 k_cuc_pin1 = 0 #0.01
 k_pin1_decay = 0 #0.1 # 0.004
-k_pin1_transp = 0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
+k_pin1_transp = 0 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
 
 # CUC expression
-k_cuc = 0.35
-k_md_cuc = 0.01
+k_cuc = 0 #0.35
+k_md_cuc = 0 #0.01
 k_adab_cuc = 0
-k_auxin_cuc = 0.01
+k_auxin_cuc = 0 #0.01
 k_cuc_decay = 0
 
 '''

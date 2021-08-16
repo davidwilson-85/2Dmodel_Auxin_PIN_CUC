@@ -7,7 +7,7 @@ def check_dirs():
     """
     Check and create folders for images, videos, sim_logs and templates
     
-    This function is executed every time the program runs but will only tipically do stuff after cloning from Github or after accidentally deleting any of the folder listed above.
+    This function is executed every time the program runs but will only tipically do stuff after cloning from Github or after accidentally deleting any of the folders listed above.
     """
 
     if not os.path.exists('images'):
