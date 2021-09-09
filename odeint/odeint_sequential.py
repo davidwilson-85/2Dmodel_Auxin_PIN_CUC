@@ -5,22 +5,26 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 
 def model(a,t):
-    k_sy = 0.05
-    k_di = 0.15
-    k_de = 0.1
+    k_synth = 0.05
+    k_diff = 0.15
+    k_degr = 0.1
     a = a.reshape(2,2)
     da_dt = [0,0,0,0]
-    da_dt[0] = k_di * (a[0,1] + a[1,0] - 2 * a[0,0]) + k_sy
-    da_dt[1] = k_di * (a[0,0] + a[1,1] - 2 * a[0,1])
-    da_dt[2] = k_di * (a[0,0] + a[1,1] - 2 * a[1,0]) - k_de * a[1,0]
-    da_dt[3] = k_di * (a[0,1] + a[1,0] - 2 * a[1,1])
+    # Top left cell
+    da_dt[0] = k_diff * (a[0,1] + a[1,0] - 2 * a[0,0]) + k_synth
+    # Top right
+    da_dt[1] = k_diff * (a[0,0] + a[1,1] - 2 * a[0,1])
+    # Bottom left
+    da_dt[2] = k_diff * (a[0,0] + a[1,1] - 2 * a[1,0]) - k_degr * a[1,0]
+    # Bottom right
+    da_dt[3] = k_diff * (a[0,1] + a[1,0] - 2 * a[1,1])
     #a2 = np.array(da_dt).flatten()
     #return a2
     return da_dt
 
 ###########
-'''
-t = np.linspace(0, 500, 500)
+
+t = np.linspace(0, 1000, 2)
 a_t0 = np.zeros(4)
 sol = odeint(model, a_t0, t)
 
@@ -33,22 +37,31 @@ plt.ylabel('[auxin] (AU)')
 plt.legend()
 plt.savefig('odeint/test.png', bbox_inches='tight')
 
-print(sol[: , :])
-'''
+print(sol[: , :][-1])
+
 ###########
 
+'''
+Sequential approach. I run the solver for a subinterval (e.g. t0 to t5) and store the result. This result is used as initial values for a subsequent run of the solver (e.g. t5 to t10), and so on.
+'''
+
 #timepoints = [0,50,100,150,200,250,300,350,400,450]
-timepoints = np.linspace(0, 499, 500)
+
+t_ini = 0
+t_fin = 499
+nbr_points = 5000 
+
+timepoints = np.linspace(t_ini, t_fin, nbr_points) # From A to B including X points
+interval_length = (t_fin - t_ini) / (nbr_points - 1)
 a_seq = np.zeros(4)
 stacked_result = []
 
 for i in timepoints:
-    t = np.linspace(i, i+50, 5)
+    t = np.linspace(i, i+interval_length, 2)
     sol_seq = odeint(model, a_seq, t)
-    print(sol_seq)
-    a_seq = sol_seq[4 , :].flatten()
+    a_seq = sol_seq[1 , :].flatten()
     results = sol_seq[: , :]
     stacked_result.append(results)
 
-print(stacked_result)
+print(stacked_result[-1][-1])
 
