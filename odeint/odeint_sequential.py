@@ -24,7 +24,7 @@ def model(a,t):
 
 ###########
 
-t = np.linspace(0, 1000, 2)
+t = np.linspace(0, 1000, 100)
 a_t0 = np.zeros(4)
 sol = odeint(model, a_t0, t)
 
@@ -49,7 +49,7 @@ Sequential approach. I run the solver for a subinterval (e.g. t0 to t5) and stor
 
 t_ini = 0
 t_fin = 499
-nbr_points = 5000 
+nbr_points = 500000
 
 timepoints = np.linspace(t_ini, t_fin, nbr_points) # From A to B including X points
 interval_length = (t_fin - t_ini) / (nbr_points - 1)

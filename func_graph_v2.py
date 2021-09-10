@@ -5,8 +5,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 
-import inputs as ip
-import params as pr
+import inputs_v2 as ip
+import params_v2 as pr
 import auxiliary as aux
 
 

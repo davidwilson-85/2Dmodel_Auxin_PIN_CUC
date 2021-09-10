@@ -4,15 +4,37 @@ import numpy as np
 import math
 import random
 
-import params as pr
-import inputs as ip
+import params_v2 as pr
+import inputs_v2 as ip
 
-def integrate_auxin():
+def update_auxin_neighbours():
 
 	for y in range(ip.tissue_rows):
 		for x in range(ip.tissue_columns):
-			pass
 
+			# Top face
+			if y > 0:
+				ip.auxin_neighbours[0,y,x] = ip.auxin[y-1,x]
+			else:
+				ip.auxin_neighbours[0,y,x] = ip.auxin[y,x]
+
+			# Right face
+			if x < ip.tissue_columns-1:
+				ip.auxin_neighbours[1,y,x] = ip.auxin[y,x+1]
+			else:
+				ip.auxin_neighbours[1,y,x] = ip.auxin[y,x]
+
+			# Bottom face
+			if y < ip.tissue_rows-1:
+				ip.auxin_neighbours[2,y,x] = ip.auxin[y+1,x]
+			else:
+				ip.auxin_neighbours[2,y,x] = ip.auxin[y,x]
+
+			# Left face
+			if x > 0:
+				ip.auxin_neighbours[3,y,x] = ip.auxin[y,x-1]
+			else:
+				ip.auxin_neighbours[3,y,x] = ip.auxin[y,x]
 
 
 def auxin_homeostasis(iteration, sim_time):
