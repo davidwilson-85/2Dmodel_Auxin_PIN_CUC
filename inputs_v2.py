@@ -21,13 +21,15 @@ auxin_tmp = auxin * 0
 auxin_matrix_shape = auxin.shape
 tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
 pin1 = np.loadtxt(pin1_template, delimiter=',', unpack=False).reshape((4,tissue_rows,tissue_columns)) # Format is [z,y,x]
-pin1_matrix_shape = pin1.shape
+pin1_tmp = pin1 * 0
 cuc = np.loadtxt(cuc_template, delimiter=',', unpack=False)
+cuc_tmp = cuc * 0
 middle_domain = np.loadtxt(middle_domain_template, delimiter=',', unpack=False)
 adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
 
-# Auxin in direct neighbours
+# Auxin and PIN1 in direct neighbours
 auxin_neighbours = np.zeros(shape=(4,tissue_rows,tissue_columns)) # Z order: T, R, B, L
+pin1_neighbours = np.zeros(shape=(4,tissue_rows,tissue_columns)) # Z order: T_toB, R_toL, B_toT, L_toB
 
 # Auxin fluxes: number of auxin molecules that cross between 2 cells in a given simultation step
 # auxin_fluxes_difusion: fluxes via diffusion

@@ -10,7 +10,7 @@ import inputs_v2 as ip
 import func_graph_v2
 import func_auxin_v2
 import func_cuc
-import func_pin
+import func_pin_v2
 
 import auxiliary as aux
 import tests.check as check
@@ -60,6 +60,7 @@ for iteration in range(nbr_iterations + 1):
 
 	# Update ip.auxin_neighbours
 	func_auxin_v2.update_auxin_neighbours()
+	func_pin_v2.update_pin1_neighbours()
 
 	# Compute cell by cell
 	for y in range(ip.tissue_rows):
@@ -71,19 +72,32 @@ for iteration in range(nbr_iterations + 1):
 				ip.auxin_neighbours[1,y,x],
 				ip.auxin_neighbours[2,y,x],
 				ip.auxin_neighbours[3,y,x],
-				ip.cuc[x,y]
+				ip.cuc[y,x],
+				ip.pin1[0,y,x],
+				ip.pin1[1,y,x],
+				ip.pin1[2,y,x],
+				ip.pin1[3,y,x],
+				ip.pin1_neighbours[0,y,x],
+				ip.pin1_neighbours[1,y,x],
+				ip.pin1_neighbours[2,y,x],
+				ip.pin1_neighbours[3,y,x]
 			]
 			cell_solution = odeint(itg.model, model_init_values, time_points)
-			#print('cell_solution: ')
-			#print(cell_solution[-1,0])
 			ip.auxin_tmp[y,x] = cell_solution[-1,0]
+			ip.cuc_tmp[y,x] = cell_solution[-1,5]
+			ip.pin1_tmp[0,y,x] = cell_solution[-1,6]
+			ip.pin1_tmp[1,y,x] = cell_solution[-1,7]
+			ip.pin1_tmp[2,y,x] = cell_solution[-1,8]
+			ip.pin1_tmp[3,y,x] = cell_solution[-1,9]
 	
-	# Consolidate auxin changes
+	# Consolidate changes
 	ip.auxin = np.copy(ip.auxin_tmp)
+	ip.cuc = np.copy(ip.cuc_tmp)
+	ip.pin1 = np.copy(ip.pin1_tmp)
 
-	print('--')
-	print(ip.auxin)
-	print('--')
+	#print('--')
+	#print(ip.auxin)
+	#print('--')
 
 print("%s seconds" % (time.time() - start_time))
 # =====================================================================================
