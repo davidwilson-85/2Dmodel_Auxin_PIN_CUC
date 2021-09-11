@@ -34,7 +34,7 @@ aux.write_to_log(current_datetime)
 # Time execution of simulation
 start_time = time.time()
 
-time_points = np.linspace(0, 1, 2)
+time_points = np.linspace(0, 0.1, 2)
 
 # =====================================================================================
 
@@ -82,7 +82,9 @@ for iteration in range(nbr_iterations + 1):
 				ip.pin1_neighbours[2,y,x],
 				ip.pin1_neighbours[3,y,x]
 			]
+
 			cell_solution = odeint(itg.model, model_init_values, time_points)
+			
 			ip.auxin_tmp[y,x] = cell_solution[-1,0]
 			ip.cuc_tmp[y,x] = cell_solution[-1,5]
 			ip.pin1_tmp[0,y,x] = cell_solution[-1,6]
