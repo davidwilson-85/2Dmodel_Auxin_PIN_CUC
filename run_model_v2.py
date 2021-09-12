@@ -34,7 +34,7 @@ aux.write_to_log(current_datetime)
 # Time execution of simulation
 start_time = time.time()
 
-time_points = np.linspace(0, 0.1, 2)
+time_points = np.linspace(0, 1, 2)
 
 # =====================================================================================
 
@@ -100,6 +100,8 @@ for iteration in range(nbr_iterations + 1):
 	#print('--')
 	#print(ip.auxin)
 	#print('--')
+
+print(ip.auxin)
 
 print("%s seconds" % (time.time() - start_time))
 # =====================================================================================

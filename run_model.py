@@ -47,19 +47,20 @@ for iteration in range(nbr_iterations + 1):
 		print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
 	else:
 		print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
-	#*************************************************************************************
+	
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph.create_cell_plot(current_datetime, iteration)
-	#*************************************************************************************
+	
+	#************************************************************************************* TO ODEINT
 	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
 	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
 		func_pin.pin_expression()
-	#*************************************************************************************
+	#************************************************************************************* TO ODEINT
 	# CUC EXPRESSION
 	if pr.k_cuc > 0:
 		func_cuc.cuc_expression()
-	#*************************************************************************************
+	#************************************************************************************* TO ODEINT
 	# AUXIN HOMEOSTASIS
 	func_auxin.auxin_homeostasis(iteration, sim_time)
 	#*************************************************************************************
