@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 import time, os, random, shutil, datetime
-
 import numpy as np
+from scipy.integrate import odeint
 
-import params as pr
-import inputs as ip
-
-import func_graph
-import func_auxin
-import func_cuc
-import func_pin
+import params_v3 as pr
+import inputs_v3 as ip
+import integrator as itg
+import func_graph_v3
+import func_auxin_v3
+import func_pin_v3
 
 import auxiliary as aux
 import tests.check as check
@@ -50,30 +49,66 @@ for iteration in range(nbr_iterations + 1):
 	
 	# DRAW CELL PLOT
 	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(current_datetime, iteration)
+		func_graph_v3.create_cell_plot(current_datetime, iteration)
 	
-	#*************************************************************************************
+	'''
+	#************************************************************************************* TO ODEINT
 	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
 	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		func_pin.pin_expression()
-	#*************************************************************************************
+		func_pin_v3.pin_expression()
+	#************************************************************************************* TO ODEINT
 	# CUC EXPRESSION
 	if pr.k_cuc > 0:
 		func_cuc.cuc_expression()
-	#*************************************************************************************
+	#************************************************************************************* TO ODEINT
 	# AUXIN HOMEOSTASIS
-	func_auxin.auxin_homeostasis(iteration, sim_time)
+	func_auxin_v3.auxin_homeostasis(iteration, sim_time)
+	#*************************************************************************************
+	'''
+	
+	# Compute cell by cell
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+			
+			# Gather initial values for ODEint
+			model_init_values = [
+				ip.auxin[y,x],
+				ip.cuc[y,x],
+				ip.pin1[0,y,x],
+				ip.pin1[1,y,x],
+				ip.pin1[2,y,x],
+				ip.pin1[3,y,x],
+				ip.middle_domain[x]
+			]
+
+			# Solve
+			cell_solution = odeint(itg.model_regulatory_network, model_init_values, pr.odeint_timepoints)
+			
+			# Update current cell in data arrays with solution output
+			ip.auxin[y,x] = cell_solution[-1,0]
+			ip.cuc[y,x] = cell_solution[-1,1]
+			ip.pin1[0,y,x] = cell_solution[-1,2]
+			ip.pin1[1,y,x] = cell_solution[-1,3]
+			ip.pin1[2,y,x] = cell_solution[-1,4]
+			ip.pin1[3,y,x] = cell_solution[-1,5]
+	
+	######
+	# Apply noise
+	######
+	# Correct values out of bound
+	######
+
 	#*************************************************************************************
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
-		func_auxin.auxin_diffusion()
+		func_auxin_v3.auxin_diffusion()
 	#*************************************************************************************	
 	# PIN1 POLARIZATION
-	func_pin.pin_polarity(pr.pin1_polarity)
+	func_pin_v3.pin_polarity(pr.pin1_polarity)
 	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.k_pin1_transp)
+		func_auxin_v3.pin_on_auxin(pr.k_pin1_transp)
 	#*************************************************************************************
 
 	# FOR TEMPORARY/TESTING FUNCTIONALY
@@ -97,10 +132,10 @@ print("%s seconds" % (time.time() - start_time))
 # Create video/gif files
 
 if pr.create_video == True:
-	func_graph.create_video(current_datetime)
+	func_graph_v3.create_video(current_datetime)
 
 if pr.create_gif == True:
-	func_graph.create_gif(current_datetime)
+	func_graph_v3.create_gif(current_datetime)
 
 print("%s seconds" % (time.time() - start_time))
 

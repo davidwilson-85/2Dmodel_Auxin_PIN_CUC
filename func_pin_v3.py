@@ -3,8 +3,8 @@
 import numpy as np
 import math
 
-import params as pr
-import inputs as ip
+import params_v3 as pr
+import inputs_v3 as ip
 
 
 def pin_expression():

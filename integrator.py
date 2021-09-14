@@ -2,8 +2,47 @@
 
 import numpy as np
 from scipy.integrate import odeint
+import params_v3 as pr
 
-def model(init_values, t):
+
+def model_regulatory_network(init_values, t):
+
+    '''
+    This model is solved by ODEint.
+    It only defines changes that can be described as differential equations and that occur within each individual cell.
+    Changes not included: those resulting from movement of auxin between cells, PIN1 polarization 
+    '''
+
+    A, C, Pt, Pr, Pb, Pl, MD = init_values
+    
+    k_AS = pr.k_auxin_synth
+    k_CA = pr.k_cuc_auxin_synth
+    k_MDA = pr.k_md_auxin_synth
+    k_AT = pr.k_auxin_degr
+    
+
+    k_CS = pr.k_cuc_synth
+    k_MDC = pr.k_md_cuc
+    k_AC = pr.k_auxin_cuc
+    k_CT = pr.k_cuc_decay
+    
+    k_PS = 0.01
+    k_AP = pr.k_auxin_pin1
+    k_CP = pr.k_cuc_pin1
+    k_PT = pr.k_pin1_decay
+
+    dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
+    dC_dt = k_CS + MD * k_MDC - A * k_AC - C * k_CT
+    dPt_dt = k_PS + A * k_AP * C * k_CP - Pt * k_PT
+    dPr_dt = k_PS + A * k_AP * C * k_CP - Pr * k_PT
+    dPb_dt = k_PS + A * k_AP * C * k_CP - Pb * k_PT
+    dPl_dt = k_PS + A * k_AP * C * k_CP - Pl * k_PT
+    dMD_dt = 0
+
+    return [dA_dt, dC_dt, dPt_dt, dPr_dt, dPb_dt, dPl_dt, dMD_dt]
+
+
+def model_v2(init_values, t):
 
     k_AD = 0.05
     k_AS = 0
