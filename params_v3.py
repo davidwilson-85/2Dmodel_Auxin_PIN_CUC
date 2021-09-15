@@ -3,11 +3,11 @@
 import numpy as np
 
 # General
-euler_h = .01              # Euler step size = h; (0 - 1]
-odeint_timepoints = np.linspace(0, euler_h, 2)
-simulation_time = 10       # Arbitrary Units (AU) (let's assume it is hours of development)
+euler_h = .001              # Euler step size = h; (0 - 1]
+#odeint_timepoints = np.linspace(0, euler_h, 2)
+simulation_time = 5       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images'
-cell_plot_frequency = 10
+cell_plot_frequency = 100
 create_video = True
 create_gif = False
 simulation_description = 'Trying to include ODEint in my loop'
@@ -20,7 +20,7 @@ middle_domain = (0, 9)
 adab_domain = (0, 9)
 
 # Auxin diffusion
-k_auxin_diffusion = 0.05 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
+k_auxin_diffusion = 0.5 #0.3 0.12  # Relative amount of molecules that cross between two adjacent cells per cycle
 
 # Auxin homeostasis
 k_auxin_synth = 0 # Basal absolute amount of molecules synthesized per unit of time
@@ -48,7 +48,7 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization
-pin1_polarity = 'wtf_abley2016'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+pin1_polarity = 'smith2006'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
 k_UTG = 1.1 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #1 in Abley 2016 ('linear WTF')
 k_WTF_b = 0.005
@@ -56,10 +56,11 @@ k_WTF_pin1_max = 100000000000 #9
 cuc_threshold_pin1 = 5
 
 # PIN1 expression and activity
-k_auxin_pin1 = 0 #0.003 #0.0001
+k_auxin_pin1 = 0.003 #0.003 #0.0001
 k_cuc_pin1 = 0 #0.01
+k_pin1_synth = 0
 k_pin1_decay = 0 #0.1 # 0.004
-k_pin1_transp = 0.0005 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
+k_pin1_transp = 0.02 #0.02 #0.01   # = auxin molecules transported / ( PIN1 molecule * cycle )
 
 # CUC expression
 k_cuc_synth = 0.01 #0.35

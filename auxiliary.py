@@ -17,7 +17,7 @@ def write_to_log(timestamp):
 
     #timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
     name_log_file = 'sim_logs/' + timestamp + '_params'
-    shutil.copy('params.py', name_log_file)
+    shutil.copy('params_v3.py', name_log_file)
 
     with open('templates/2D/template_auxin', mode='r') as template_auxin:
         template_auxin_contents = template_auxin.read()

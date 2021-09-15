@@ -185,7 +185,7 @@ def auxin_noise():
 				ip.auxin[y,x] = float(0.0000001)
 
 
-def pin_on_auxin(k_pin1_transp):
+def pin_on_auxin():
 
 	#
 	# PIN1-MEDIATED AUXIN TRANSPORT
@@ -198,10 +198,10 @@ def pin_on_auxin(k_pin1_transp):
 
 	# Simplify var names
 	h = pr.euler_h
-	K = k_pin1_transp
+	#K = k_pin1_transp
 	auxin = ip.auxin
 	pin1 = ip.pin1
-	#k_pin1_transp = pr.k_pin1_transp
+	k_pin1_transp = pr.k_pin1_transp
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1

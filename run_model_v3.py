@@ -6,7 +6,7 @@ from scipy.integrate import odeint
 
 import params_v3 as pr
 import inputs_v3 as ip
-import integrator as itg
+import regulatory_network as rn
 import func_graph_v3
 import func_auxin_v3
 import func_pin_v3
@@ -51,51 +51,13 @@ for iteration in range(nbr_iterations + 1):
 	if iteration % pr.cell_plot_frequency == 0:
 		func_graph_v3.create_cell_plot(current_datetime, iteration)
 	
-	'''
-	#************************************************************************************* TO ODEINT
-	# PIN1 EXPRESSION (AUXIN AND CUC EFFECT)
-	if pr.k_auxin_pin1 > 0 or pr.k_cuc_pin1 > 0 or pr.k_pin1_decay > 0:
-		func_pin_v3.pin_expression()
-	#************************************************************************************* TO ODEINT
-	# CUC EXPRESSION
-	if pr.k_cuc > 0:
-		func_cuc.cuc_expression()
-	#************************************************************************************* TO ODEINT
-	# AUXIN HOMEOSTASIS
-	func_auxin_v3.auxin_homeostasis(iteration, sim_time)
-	#*************************************************************************************
-	'''
-	
-	# Compute cell by cell
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-			
-			# Gather initial values for ODEint
-			model_init_values = [
-				ip.auxin[y,x],
-				ip.cuc[y,x],
-				ip.pin1[0,y,x],
-				ip.pin1[1,y,x],
-				ip.pin1[2,y,x],
-				ip.pin1[3,y,x],
-				ip.middle_domain[x]
-			]
-
-			# Solve
-			cell_solution = odeint(itg.model_regulatory_network, model_init_values, pr.odeint_timepoints)
-			
-			# Update current cell in data arrays with solution output
-			ip.auxin[y,x] = cell_solution[-1,0]
-			ip.cuc[y,x] = cell_solution[-1,1]
-			ip.pin1[0,y,x] = cell_solution[-1,2]
-			ip.pin1[1,y,x] = cell_solution[-1,3]
-			ip.pin1[2,y,x] = cell_solution[-1,4]
-			ip.pin1[3,y,x] = cell_solution[-1,5]
+	# SOLVE MODEL REGULATORY NETWORK
+	rn.solve_model()
 	
 	######
 	# Apply noise
 	######
-	# Correct values out of bound
+	# Correct values out of bound (e.g. auxin < 0)
 	######
 
 	#*************************************************************************************
@@ -104,11 +66,11 @@ for iteration in range(nbr_iterations + 1):
 		func_auxin_v3.auxin_diffusion()
 	#*************************************************************************************	
 	# PIN1 POLARIZATION
-	func_pin_v3.pin_polarity(pr.pin1_polarity)
+	func_pin_v3.pin_polarity()
 	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
-		func_auxin_v3.pin_on_auxin(pr.k_pin1_transp)
+		func_auxin_v3.pin_on_auxin()
 	#*************************************************************************************
 
 	# FOR TEMPORARY/TESTING FUNCTIONALY

@@ -51,7 +51,7 @@ def pin_expression():
 			pin1[3,y,x] = pin1[3,y,x] * pin1_ratio
 
 
-def pin_polarity(polarity):
+def pin_polarity():
 	
 	"""
 	This function determines, for each cell in the tissue, the PIN1 polarity mode. Then calls
@@ -67,17 +67,17 @@ def pin_polarity(polarity):
 	for y in range(ip.auxin.shape[0]):
 		for x in range(ip.auxin.shape[1]):
 
-			if polarity == 'multi':
+			if pr.pin1_polarity == 'multi':
 				
 				if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
 					pin_wtf_abley2016(y, x)
 				else:
 					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
-			if polarity == 'smith2006':
+			if pr.pin1_polarity == 'smith2006':
 				pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
 
-			if polarity == 'wtf_abley2016':
+			if pr.pin1_polarity == 'wtf_abley2016':
 				pin_wtf_abley2016(y, x)
 
 
