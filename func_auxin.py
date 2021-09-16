@@ -201,7 +201,7 @@ def pin_on_auxin():
 	#K = k_pin1_transp
 	auxin = ip.auxin
 	pin1 = ip.pin1
-	k_pin1_transp = pr.k_pin1_transp
+	K = pr.k_pin1_transp
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1

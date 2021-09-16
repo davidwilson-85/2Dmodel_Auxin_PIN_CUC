@@ -3,11 +3,11 @@
 import numpy as np
 
 # General
-euler_h = .001              # Euler step size = h; (0 - 1]
+euler_h = .01              # Euler step size = h; (0 - 1]
 #odeint_timepoints = np.linspace(0, euler_h, 2)
-simulation_time = 5       # Arbitrary Units (AU) (let's assume it is hours of development)
+simulation_time = 7       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images'
-cell_plot_frequency = 100
+cell_plot_frequency = 10      # To do: change this to images / hour
 create_video = True
 create_gif = False
 simulation_description = 'Trying to include ODEint in my loop'
@@ -30,15 +30,15 @@ k_md_auxin_synth = 0 #0.25 #0
 
 # Auxin noise ( interval is [) and refers to iterations)
 auxin_noise = {
-  'limit': 0, #0.025,
+  'limit': 0, #0.0025,
   'iteration_interval': (0,1)
 }
 
 # Auxin custom local synthesis (treated as absolute rate; interval is [) and refers to simulation time)
 auxin_custom_synth = {
-  "cells": ((1,6),(0,100)),
+  "cells": ((5,5),(0,100)),
   "time_interval": (0,1000),
-  "value": 0 #20
+  "value": 2 #20
 }
 # Auxin custom local degradation (treated as relative rate; interval is [) and refers to simulation time)
 auxin_custom_degr = {
@@ -48,15 +48,15 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization
-pin1_polarity = 'smith2006'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+pin1_polarity = 'wtf_abley2016'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
 k_UTG = 1.1 # 6 (6 in Bilsborough 2011, Smith 2006)
-k_WTF_a = 1 #1 in Abley 2016 ('linear WTF')
-k_WTF_b = 0.005
-k_WTF_pin1_max = 100000000000 #9
+k_WTF_a = 1500 #1 in Abley 2016 ('linear WTF')
+k_WTF_b = 0.2
+k_WTF_pin1_max = 9 #100000000000 #9
 cuc_threshold_pin1 = 5
 
 # PIN1 expression and activity
-k_auxin_pin1 = 0.003 #0.003 #0.0001
+k_auxin_pin1 = 0.005 #0.003 #0.0001
 k_cuc_pin1 = 0 #0.01
 k_pin1_synth = 0
 k_pin1_decay = 0 #0.1 # 0.004

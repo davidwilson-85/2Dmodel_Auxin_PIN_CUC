@@ -186,10 +186,10 @@ def pin_wtf_abley2016(y, x):
 	if net_flux_l < 0: net_flux_l = 0
 
 	# Linear effect of flux on PIN1
-	pin1[0,y,x] = pin1[0,y,x] + (a * net_flux_t) - (b * pin1[0,y,x])
-	pin1[1,y,x] = pin1[1,y,x] + (a * net_flux_r) - (b * pin1[1,y,x])
-	pin1[2,y,x] = pin1[2,y,x] + (a * net_flux_b) - (b * pin1[2,y,x])
-	pin1[3,y,x] = pin1[3,y,x] + (a * net_flux_l) - (b * pin1[3,y,x])
+	pin1[0,y,x] = pin1[0,y,x] + h * ( (a * net_flux_t) - (b * pin1[0,y,x]) )
+	pin1[1,y,x] = pin1[1,y,x] + h * ( (a * net_flux_r) - (b * pin1[1,y,x]) )
+	pin1[2,y,x] = pin1[2,y,x] + h * ( (a * net_flux_b) - (b * pin1[2,y,x]) )
+	pin1[3,y,x] = pin1[3,y,x] + h * ( (a * net_flux_l) - (b * pin1[3,y,x]) )
 
 	# Quadratic effect of flux on PIN1
 	#pin1[0,y,x] = pin1[0,y,x] + (net_flux_t**a) - (b * pin1[0,y,x])

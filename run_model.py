@@ -73,7 +73,7 @@ for iteration in range(nbr_iterations + 1):
 	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
-		func_auxin.pin_on_auxin(pr.k_pin1_transp)
+		func_auxin.pin_on_auxin()
 	#*************************************************************************************
 
 	# FOR TEMPORARY/TESTING FUNCTIONALY

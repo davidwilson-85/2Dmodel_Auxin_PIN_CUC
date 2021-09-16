@@ -54,9 +54,9 @@ for iteration in range(nbr_iterations + 1):
 	# SOLVE MODEL REGULATORY NETWORK
 	rn.solve_model()
 	
-	######
-	# Apply noise
-	######
+	# AUXIN CUSTOM MANIPULATION
+	func_auxin_v3.auxin_custom_manipulation(iteration, sim_time)
+
 	# Correct values out of bound (e.g. auxin < 0)
 	######
 

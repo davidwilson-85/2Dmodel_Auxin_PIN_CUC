@@ -14,8 +14,67 @@ def integrate_auxin():
 			pass
 
 
+def auxin_custom_manipulation(iteration, sim_time):
+	
+	'''
+	This function implements some changes in auxin:
+	- Local exogenous application, etc
+	- Noise: random variation in concentration 
+	
+	Params:
+	* sim_time: Iteration of the simulation. This is used for local auxin synth/degr
+	
+	'''
 
-def auxin_homeostasis(iteration, sim_time):
+	# Define simpler aliases
+	h = pr.euler_h
+	k_auxin_synth = pr.k_auxin_synth
+	k_auxin_degr = pr.k_auxin_degr
+	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
+	k_md_auxin_synth = pr.k_md_auxin_synth
+		
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+			
+			# Simplify var names
+			auxin_cell = ip.auxin[y,x]
+			cuc_cell = ip.cuc[y,x]
+			md_cell = ip.middle_domain[x]
+			
+			# Local/custom auxin synth/degr and noise...
+			current_cell = (y,x)
+			custom_synth, custom_degr, noise = 0, 0, 0
+
+			if pr.auxin_custom_synth['value'] > 0:
+				if current_cell in pr.auxin_custom_synth['cells'] \
+				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
+				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
+					custom_synth = pr.auxin_custom_synth['value']
+			
+			if pr.auxin_custom_degr['value'] > 0:
+				if current_cell in pr.auxin_custom_degr['cells'] \
+				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
+				and sim_time < pr.auxin_custom_degr['time_interval'][1]:
+					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
+			
+			# Noise
+			if pr.auxin_noise['limit'] > 0 \
+			and iteration >= pr.auxin_noise['iteration_interval'][0] \
+			and iteration < pr.auxin_noise['iteration_interval'][1]:
+				noise = auxin_cell * ( 1 + random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit']) )
+			
+			# Calculate change in auxin concentration
+			auxin_cell_updated = auxin_cell + h * ( custom_synth - custom_degr ) + noise
+			
+			if auxin_cell_updated < 0:
+				auxin_cell_updated = float(1E-6)
+				
+			ip.auxin[y,x] = auxin_cell_updated
+			
+			#ip.auxin[y,x] = auxin_cell + h * 0.25 * auxin_cell
+
+
+def auxin_homeostasis_old(iteration, sim_time):
 	
 	'''
 	This function implements all changes in auxin concentration in which there
