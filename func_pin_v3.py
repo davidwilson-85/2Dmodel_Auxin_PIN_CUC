@@ -160,7 +160,7 @@ def pin_wtf_abley2016(y, x):
 
 	'''
 
-	# Alias var names
+	# Aliases var names
 	h = pr.euler_h
 	a = pr.k_WTF_a
 	b = pr.k_WTF_b
@@ -170,14 +170,13 @@ def pin_wtf_abley2016(y, x):
 	flux_pin1 = ip.auxin_fluxes_pin1
 	
 	# Calculate net flux at each cell face (out = positive; in = negative)
-	net_flux_t = flux_diff[0,y,x] - flux_diff[1,y,x] + flux_pin1[0,y,x] - flux_pin1[1,y,x]
-	net_flux_r = flux_diff[2,y,x] - flux_diff[3,y,x] + flux_pin1[2,y,x] - flux_pin1[3,y,x]
-	net_flux_b = flux_diff[4,y,x] - flux_diff[5,y,x] + flux_pin1[4,y,x] - flux_pin1[5,y,x]
-	net_flux_l = flux_diff[6,y,x] - flux_diff[7,y,x] + flux_pin1[6,y,x] - flux_pin1[7,y,x]
+	# To express it as molecules / hour, I diveide by the step size (Euler h)
+	net_flux_t = ( flux_diff[0,y,x] - flux_diff[1,y,x] + flux_pin1[0,y,x] - flux_pin1[1,y,x] ) / h
+	net_flux_r = ( flux_diff[2,y,x] - flux_diff[3,y,x] + flux_pin1[2,y,x] - flux_pin1[3,y,x] ) / h
+	net_flux_b = ( flux_diff[4,y,x] - flux_diff[5,y,x] + flux_pin1[4,y,x] - flux_pin1[5,y,x] ) / h
+	net_flux_l = ( flux_diff[6,y,x] - flux_diff[7,y,x] + flux_pin1[6,y,x] - flux_pin1[7,y,x] ) / h
 
 	# Calculate new PIN amount at each cell face
-	# Fluxes already scaled by euler_h? (CHECK THIS CAREFULY)
-	# But then what about the second b part of the formula???
 	
 	# If net outflux is negative, there is no effect on PIN1 allocation to membrane
 	if net_flux_t < 0: net_flux_t = 0

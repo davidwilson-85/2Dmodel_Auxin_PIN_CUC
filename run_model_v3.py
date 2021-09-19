@@ -61,17 +61,19 @@ for iteration in range(nbr_iterations + 1):
 	######
 
 	#*************************************************************************************
+	# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
 		func_auxin_v3.auxin_diffusion()
-	#*************************************************************************************	
 	# PIN1 POLARIZATION
 	func_pin_v3.pin_polarity()
-	#*************************************************************************************
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
 		func_auxin_v3.pin_on_auxin()
 	#*************************************************************************************
+
+	# Track simulation
+	aux.track_simulation(iteration, nbr_iterations)
 
 	# FOR TEMPORARY/TESTING FUNCTIONALY
 

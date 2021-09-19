@@ -5,8 +5,31 @@ Auxiliary functions go here
 '''
 
 import shutil, datetime
-import inputs as ip
+import inputs_v3 as ip
 import numpy as np
+import matplotlib.pyplot as plt
+
+
+def track_simulation(iteration, nbr_iterations):
+    """
+    Creates a graph x=simtime y=total level of auxin. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
+    
+    Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stoped then.
+    """
+
+    if iteration == 0 :
+        ip.auxin_auxiliary = ip.auxin.copy()
+    
+    if iteration > 0:
+        auxin_diff_abs = np.absolute(ip.auxin - ip.auxin_auxiliary)
+        auxin_diff_abs_sum = auxin_diff_abs.sum()
+        print(auxin_diff_abs_sum)
+        ip.auxin_sum_per_step.append(auxin_diff_abs_sum)
+        ip.auxin_auxiliary = ip.auxin.copy()
+    
+    if iteration == nbr_iterations:
+        plt.plot(ip.auxin_sum_per_step)
+        plt.savefig('test.png')
 
 
 def write_to_log(timestamp):
@@ -56,7 +79,6 @@ def write_to_log(timestamp):
         log_file.write(template_adab_domain_contents)
         log_file.write('\n\n')
 
-        
 
 def save_ndarray():
 

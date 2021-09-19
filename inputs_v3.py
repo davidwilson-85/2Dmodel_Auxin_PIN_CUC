@@ -32,6 +32,10 @@ auxin_fluxes_difusion = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_o
 auxin_fluxes_pin1 = np.zeros(shape=(11,tissue_rows,tissue_columns), dtype=(float)) # 3D array = (attribute, column, row)
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
+# Arrays for tracking purposes
+auxin_auxiliary = auxin * 0
+auxin_sum_per_step = []
+
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
