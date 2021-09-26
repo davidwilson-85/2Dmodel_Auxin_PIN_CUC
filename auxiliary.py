@@ -8,28 +8,70 @@ import shutil, datetime
 import inputs_v3 as ip
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 
 
 def track_simulation(iteration, nbr_iterations):
     """
     Creates a graph x=simtime y=total level of auxin. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
     
-    Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stoped then.
+    Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. Values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stoped then.
     """
+
+    # Total auxin in system
+    auxin_allcells = ip.auxin.sum()
+    ip.auxin_allcells_historic.append(auxin_allcells)
+    # Total PIN1 in system
+    pin1_allcells = ip.pin1.sum()
+    ip.pin1_allcells_historic.append(pin1_allcells)
+    # Total CUC in system
+    cuc_allcells = ip.cuc.sum()
+    ip.cuc_allcells_historic.append(cuc_allcells)
 
     if iteration == 0 :
         ip.auxin_auxiliary = ip.auxin.copy()
+        ip.pin1_auxiliary = ip.pin1.copy()
+        ip.cuc_auxiliary = ip.cuc.copy()
     
     if iteration > 0:
-        auxin_diff_abs = np.absolute(ip.auxin - ip.auxin_auxiliary)
-        auxin_diff_abs_sum = auxin_diff_abs.sum()
-        print(auxin_diff_abs_sum)
-        ip.auxin_sum_per_step.append(auxin_diff_abs_sum)
+        auxin_increment = np.absolute(ip.auxin - ip.auxin_auxiliary)
+        auxin_increment_allcells = auxin_increment.sum()
+        ip.auxin_incr_allcells_historic.append(auxin_increment_allcells)
         ip.auxin_auxiliary = ip.auxin.copy()
+
+        pin1_increment = np.absolute(ip.pin1 - ip.pin1_auxiliary)
+        pin1_increment_allcells = pin1_increment.sum()
+        ip.pin1_incr_allcells_historic.append(pin1_increment_allcells)
+        ip.pin1_auxiliary = ip.pin1.copy()
+
+        cuc_increment = np.absolute(ip.cuc - ip.cuc_auxiliary)
+        cuc_increment_allcells = cuc_increment.sum()
+        ip.cuc_incr_allcells_historic.append(cuc_increment_allcells)
+        ip.cuc_auxiliary = ip.cuc.copy()
     
     if iteration == nbr_iterations:
-        plt.plot(ip.auxin_sum_per_step)
-        plt.savefig('test.png')
+        fig1 = plt.figure()
+        fig1, axes = plt.subplots(6, figsize=(5,10), sharex=True)
+        axes[0].plot(ip.auxin_allcells_historic)
+        axes[1].plot(ip.auxin_incr_allcells_historic)
+        axes[2].plot(ip.pin1_allcells_historic)
+        axes[3].plot(ip.pin1_incr_allcells_historic)
+        axes[4].plot(ip.cuc_allcells_historic)
+        axes[5].plot(ip.cuc_incr_allcells_historic)
+
+        axes[0].set(ylabel='Total auxin')
+        axes[1].set(ylabel='Auxin abs. change')
+        axes[2].set(ylabel='Total PIN1')
+        axes[3].set(ylabel='PIN1 abs. change')
+        axes[4].set(ylabel='Total CUC')
+        axes[5].set(ylabel='CUC abs. change')
+
+        for ax in axes:
+            ax.ticklabel_format(useOffset=False, style='plain')
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+
+        plt.xlabel('Simulation iteration')
+        fig1.savefig('graphs/levels.png', bbox_inches='tight')
 
 
 def write_to_log(timestamp):

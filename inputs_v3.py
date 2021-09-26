@@ -34,7 +34,16 @@ auxin_fluxes_pin1 = np.zeros(shape=(11,tissue_rows,tissue_columns), dtype=(float
 
 # Arrays for tracking purposes
 auxin_auxiliary = auxin * 0
-auxin_sum_per_step = []
+auxin_allcells_historic = []
+auxin_incr_allcells_historic = []
+
+pin1_auxiliary = pin1 * 0
+pin1_allcells_historic = []
+pin1_incr_allcells_historic = []
+
+cuc_auxiliary = cuc * 0
+cuc_allcells_historic = []
+cuc_incr_allcells_historic = []
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red_sat.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)

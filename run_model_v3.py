@@ -27,14 +27,14 @@ current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' 
 # Write initial state and simulation parameters to log
 aux.write_to_log(current_datetime)
 
-# Time execution of simulation
-start_time = time.time()
-
-# =====================================================================================
-
 # Cleanup destination folder (remove and create)
 shutil.rmtree(pr.img_dest_folder) 
 os.mkdir(pr.img_dest_folder)
+
+# Time execution of simulation
+start_time = time.time()
+
+# ============================================================================
 
 # Perform simulation cycles
 for iteration in range(nbr_iterations + 1):
@@ -60,7 +60,7 @@ for iteration in range(nbr_iterations + 1):
 	# Correct values out of bound (e.g. auxin < 0)
 	######
 
-	#*************************************************************************************
+	#**************************************************************************
 	# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
 	# AUXIN DIFFUSION
 	if pr.k_auxin_diffusion > 0:
@@ -70,7 +70,7 @@ for iteration in range(nbr_iterations + 1):
 	# PIN1-MEDIATED AUXIN EFFLUX
 	if pr.k_pin1_transp > 0:
 		func_auxin_v3.pin_on_auxin()
-	#*************************************************************************************
+	#**************************************************************************
 
 	# Track simulation
 	aux.track_simulation(iteration, nbr_iterations)
@@ -91,7 +91,7 @@ for iteration in range(nbr_iterations + 1):
 			#pass
 	
 print("%s seconds" % (time.time() - start_time))
-# =====================================================================================
+# ============================================================================
 
 # Create video/gif files
 
