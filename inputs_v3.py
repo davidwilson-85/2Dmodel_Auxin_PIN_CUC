@@ -26,9 +26,9 @@ middle_domain = np.loadtxt(middle_domain_template, delimiter=',', unpack=False)
 adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
 
 # Auxin fluxes: number of auxin molecules that cross between 2 cells in a given simultation step
-# auxin_fluxes_difusion: fluxes via diffusion
+# auxin_fluxes_diffusion: fluxes via diffusion
 # auxin_fluxes_pin1: fluxes through PIN1 transporters
-auxin_fluxes_difusion = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in ... netXvector, netYvector 
+auxin_fluxes_diffusion = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in ... netXvector, netYvector 
 auxin_fluxes_pin1 = np.zeros(shape=(11,tissue_rows,tissue_columns), dtype=(float)) # 3D array = (attribute, column, row)
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 

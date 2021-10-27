@@ -61,8 +61,9 @@ def auxin_custom_manipulation(iteration, sim_time):
 			if pr.auxin_noise['limit'] > 0 \
 			and iteration >= pr.auxin_noise['iteration_interval'][0] \
 			and iteration < pr.auxin_noise['iteration_interval'][1]:
-				noise = auxin_cell * ( 1 + random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit']) )
-			
+				noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
+				#print(noise)
+
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + h * ( custom_synth - custom_degr ) + noise
 			
@@ -166,7 +167,7 @@ def auxin_diffusion():
 	h = pr.euler_h
 	D = pr.k_auxin_diffusion
 	auxin = ip.auxin
-	fluxes = ip.auxin_fluxes_difusion
+	fluxes = ip.auxin_fluxes_diffusion
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 

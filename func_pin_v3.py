@@ -166,7 +166,7 @@ def pin_wtf_abley2016(y, x):
 	b = pr.k_WTF_b
 	wtf_pin1_max = pr.k_WTF_pin1_max
 	pin1 = ip.pin1
-	flux_diff = ip.auxin_fluxes_difusion
+	flux_diff = ip.auxin_fluxes_diffusion
 	flux_pin1 = ip.auxin_fluxes_pin1
 	
 	# Calculate net flux at each cell face (out = positive; in = negative)

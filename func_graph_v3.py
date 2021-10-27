@@ -27,7 +27,7 @@ def create_cell_plot(timestamp, iteration):
 	cuc = ip.cuc
 	cuc_range = pr.cuc_range
 	lut_cuc = ip.lut_cuc
-	array_afd = ip.auxin_fluxes_difusion
+	array_afd = ip.auxin_fluxes_diffusion
 	array_afp = ip.auxin_fluxes_pin1
 	img_dest_folder = pr.img_dest_folder
 	
