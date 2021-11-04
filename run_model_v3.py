@@ -78,10 +78,11 @@ for iteration in range(nbr_iterations + 1):
 	# FOR TEMPORARY/TESTING FUNCTIONALY
 
 	#func_graph.create_heatmap(ip.auxin, iteration)
-
-	#if iteration > 5:
-		#ip.cuc[5:8,5:8] = 8
-		#ip.auxin[8,6] += 5
+	
+	if sim_time == 40:
+  		ip.cuc[4:7,4:7] = 8
+	#if sim_time >= 80:
+	#	ip.auxin[:,5] += 0.35
 
 	#if iteration == 1900:
 		#print(ip.auxin)
