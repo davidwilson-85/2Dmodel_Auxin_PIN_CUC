@@ -21,7 +21,6 @@ def model_regulatory_network(init_values, t):
     k_CA = pr.k_cuc_auxin_synth
     k_MDA = pr.k_md_auxin_synth
     k_AT = pr.k_auxin_degr
-    
 
     k_CS = pr.k_cuc_synth
     k_MDC = pr.k_md_cuc
@@ -35,10 +34,10 @@ def model_regulatory_network(init_values, t):
 
     dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - C * k_CT
-    dPt_dt = k_PS + A * k_AP * C * k_CP - Pt * k_PT
-    dPr_dt = k_PS + A * k_AP * C * k_CP - Pr * k_PT
-    dPb_dt = k_PS + A * k_AP * C * k_CP - Pb * k_PT
-    dPl_dt = k_PS + A * k_AP * C * k_CP - Pl * k_PT
+    dPt_dt = k_PS + A * k_AP + C * k_CP - Pt * k_PT
+    dPr_dt = k_PS + A * k_AP + C * k_CP - Pr * k_PT
+    dPb_dt = k_PS + A * k_AP + C * k_CP - Pb * k_PT
+    dPl_dt = k_PS + A * k_AP + C * k_CP - Pl * k_PT
     dMD_dt = 0
 
     return [dA_dt, dC_dt, dPt_dt, dPr_dt, dPb_dt, dPl_dt, dMD_dt]

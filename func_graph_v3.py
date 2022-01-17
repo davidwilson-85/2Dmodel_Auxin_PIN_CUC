@@ -132,16 +132,28 @@ def create_cell_plot(timestamp, iteration):
 	
 	if draw_pin1_flux_directions == True:
 
-		# These arrows only indicate the net direction of PIN1-mediated auxin flux
+		# These arrows indicate the net direction and thje magnitude of PIN1-mediated auxin flux
 
-		im_arrow = Image.open('art/arrow_white_17x17.png')
+		#im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
+		#im_arrow_50 = Image.open('art/arrow_white_17x17_50.png')
+		#im_arrow_75 = Image.open('art/arrow_white_17x17_75.png')
+		#im_arrow_100 = Image.open('art/arrow_white_17x17_100.png')
 
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
 			for j in range(matrix_shape[1]):
 
-				array_afp[10,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
+				array_afp[10,i,j], array_afp[11,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
+
+				if array_afp[11,i,j] < 0.5:
+					im_arrow = ip.im_arrow_25
+				if array_afp[11,i,j] >= 0.5 and array_afp[11,i,j] < 1:
+					im_arrow = ip.im_arrow_50
+				if array_afp[11,i,j] >= 1 and array_afp[11,i,j] < 1.5:
+					im_arrow = ip.im_arrow_75
+				if array_afp[11,i,j] >= 1.5:
+					im_arrow = ip.im_arrow_100
 
 				# Rotate arrow image and paste it 
 				if array_afp[10,i,j] != 361.0:
@@ -163,6 +175,15 @@ def create_cell_plot(timestamp, iteration):
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration).zfill(6) +'.png')
+
+
+def vector_to_magnitude(vector_x, vector_y):
+
+	'''
+	Convert vector to absolute distance between points (length)
+	'''
+
+	pass
 
 
 def vector_to_degrees(vector_x, vector_y):
@@ -189,7 +210,7 @@ def vector_to_degrees(vector_x, vector_y):
     # If there is no flux (no vector) return float '366.0'
     if x == 0 and y == 0:
         deg = '361.0'
-        return deg
+        return deg, 0
 
     # Hypotenuse
     h = math.sqrt(x**2 + y**2)
@@ -222,7 +243,7 @@ def vector_to_degrees(vector_x, vector_y):
     #print("rdn_quad: " + str(radians_quadrant))
     #print("degrees: " + str(degrees))
 
-    return degrees
+    return degrees, h
 
 
 # Maps an integer representing the amount of a magnitude (e.g. [auxin]) and translates it to the corresponding RGB triplet of the selected LUT

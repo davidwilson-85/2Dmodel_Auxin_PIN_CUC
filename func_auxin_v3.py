@@ -258,10 +258,11 @@ def pin_on_auxin():
 
 	# Simplify var names
 	h = pr.euler_h
-	K = pr.k_pin1_transp
 	auxin = ip.auxin
 	pin1 = ip.pin1
-	#k_pin1_transp = pr.k_pin1_transp
+	CUC = ip.cuc
+	Kp = pr.k_pin1_effi_basal
+	Kcp = pr.k_pin1_effi_cuc
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1
@@ -269,12 +270,18 @@ def pin_on_auxin():
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
 
+			# Calculate K as K basal + effect of CUC
+			# Kp = basal efficiency
+			# Kcp = CUC (phosphorilation) strength to increase efficiency
+			K = Kp + CUC[y,x] * Kcp
+
 			# Certain combinations of [PIN1] and K could result in that the sum of auxin molecules effluxed (through all the cell faces) exceeds the num of auxin molecules in the cell. To detect that, first calculate the efflux in the whole cell and check if it is higher than the num of auxin molecules available.
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
 			transported_molecules_total = h * auxin[y,x] * total_pin1 * K 
 
 			# Manually limit transport if it exceeds the amount of auxin molecules
 			# Later on: calculate excess ratio and then use to reduce the value of the vector below
+			# 2022.01.17: This situation probably means that paramenters are very unrealistic (it is not likely that in a very small fraction of time all auxin molecules in the cell are transported by PIN1 molecules...). Therefore, increase the auxin / PIN1 ratio ot or reduce k_pin1_transp
 			if transported_molecules_total > auxin[y,x]:
 				print('warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x))
 

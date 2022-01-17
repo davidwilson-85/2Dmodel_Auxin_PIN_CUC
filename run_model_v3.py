@@ -68,8 +68,7 @@ for iteration in range(nbr_iterations + 1):
 	# PIN1 POLARIZATION
 	func_pin_v3.pin_polarity()
 	# PIN1-MEDIATED AUXIN EFFLUX
-	if pr.k_pin1_transp > 0:
-		func_auxin_v3.pin_on_auxin()
+	func_auxin_v3.pin_on_auxin()
 	#**************************************************************************
 
 	# Track simulation
@@ -79,10 +78,10 @@ for iteration in range(nbr_iterations + 1):
 
 	#func_graph.create_heatmap(ip.auxin, iteration)
 	
-	if sim_time == 40:
-  		ip.cuc[4:7,4:7] = 8
-	#if sim_time >= 80:
-	#	ip.auxin[:,5] += 0.35
+	if sim_time == 20:
+  		ip.cuc[6:9,4:7] = 8
+	#if sim_time >= 50:
+	#	ip.auxin[:,5] += .5
 
 	#if iteration == 1900:
 		#print(ip.auxin)
