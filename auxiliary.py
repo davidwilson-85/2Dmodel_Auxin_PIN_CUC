@@ -69,6 +69,7 @@ def track_simulation(iteration, nbr_iterations):
         for ax in axes:
             ax.ticklabel_format(useOffset=False, style='plain')
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            #ax.set_ylim(bottom=0)
 
         plt.xlabel('Simulation iteration')
         fig1.savefig('graphs/levels.png', bbox_inches='tight')

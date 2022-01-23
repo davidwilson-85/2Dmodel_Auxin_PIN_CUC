@@ -14,7 +14,7 @@ simulation_description = 'Testing UTG and WTF in combination to reproduce leaf m
 
 # Heatmap ranges
 auxin_range = (0, 235)       # This is only to map variable values to heatmap values
-pin1_range = (0, 8)
+pin1_range = (0, 16)
 cuc_range = (0, 9)
 middle_domain = (0, 9)
 adab_domain = (0, 9)
@@ -23,7 +23,7 @@ adab_domain = (0, 9)
 k_auxin_diffusion = .8 #.3 .12  # Rel. amount of molecules that cross between two adjacent cells per cycle
 k_auxin_synth = 0 # Basal abs. amount of molecules synthesized per unit of time
 k_auxin_degr = .02 #0.2 #0.02 #0.01 #0.06 # Rel. amount of molecules degraded per unit of time
-k_cuc_auxin_synth = .5 #1 #.5 #.6 #.3
+k_cuc_auxin_synth = 0 #.75 #1 #.5 #.6 #.3
 k_md_auxin_synth = 0 #.05 #.25 #0
 
 # Auxin noise ( interval is [) and refers to iterations)
@@ -46,7 +46,7 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization
-pin1_polarity = 'smith2006'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
+pin1_polarity = 'multi'   # 'multi' OR 'smith2006' OR 'wtf_abley2016'
 k_UTG = 2 #1.1 #1.3 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #10 #1500 #1 in Abley 2016 ('linear WTF')
 k_WTF_b = .005 #.18 #.2 #.005 in Abley 2016 ('linear WTF')
@@ -59,7 +59,7 @@ k_cuc_pin1 = 0 #.1 #.01
 k_pin1_synth = 0 #1
 k_pin1_decay = 0 #.02 #.1 # .004
 k_pin1_effi_basal = .02 #.02 #.01   # = auxin mol. transp. / ( PIN1 molecule * cycle )
-k_pin1_effi_cuc = .5 #.1 # CUC effect on PIN1 efficiency
+k_pin1_effi_cuc = .02 #.1 # CUC effect on PIN1 efficiency [0 = no effect]
 
 # CUC expression
 k_cuc_synth = 0 #.01 #.35

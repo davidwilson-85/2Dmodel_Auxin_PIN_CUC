@@ -4,8 +4,8 @@ import numpy as np
 import math
 import random
 
-import params_v3 as pr
-import inputs_v3 as ip
+import params as pr
+import inputs as ip
 
 def integrate_auxin():
 
@@ -14,68 +14,8 @@ def integrate_auxin():
 			pass
 
 
-def auxin_custom_manipulation(iteration, sim_time):
-	
-	'''
-	This function implements some changes in auxin:
-	- Local exogenous application, etc
-	- Noise: random variation in concentration 
-	
-	Params:
-	* sim_time: Iteration of the simulation. This is used for local auxin synth/degr
-	
-	'''
 
-	# Define simpler aliases
-	h = pr.euler_h
-	k_auxin_synth = pr.k_auxin_synth
-	k_auxin_degr = pr.k_auxin_degr
-	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
-	k_md_auxin_synth = pr.k_md_auxin_synth
-		
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-			
-			# Simplify var names
-			auxin_cell = ip.auxin[y,x]
-			cuc_cell = ip.cuc[y,x]
-			md_cell = ip.middle_domain[x]
-			
-			# Local/custom auxin synth/degr and noise...
-			current_cell = (y,x)
-			custom_synth, custom_degr, noise = 0, 0, 0
-
-			if pr.auxin_custom_synth['value'] > 0:
-				if current_cell in pr.auxin_custom_synth['cells'] \
-				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
-				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
-					custom_synth = pr.auxin_custom_synth['value']
-			
-			if pr.auxin_custom_degr['value'] > 0:
-				if current_cell in pr.auxin_custom_degr['cells'] \
-				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
-				and sim_time < pr.auxin_custom_degr['time_interval'][1]:
-					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
-			
-			# Noise
-			if pr.auxin_noise['limit'] > 0 \
-			and iteration >= pr.auxin_noise['iteration_interval'][0] \
-			and iteration < pr.auxin_noise['iteration_interval'][1]:
-				noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
-				#print(noise)
-
-			# Calculate change in auxin concentration
-			auxin_cell_updated = auxin_cell + h * ( custom_synth - custom_degr ) + noise
-			
-			if auxin_cell_updated < 0:
-				auxin_cell_updated = float(1E-6)
-				
-			ip.auxin[y,x] = auxin_cell_updated
-			
-			#ip.auxin[y,x] = auxin_cell + h * 0.25 * auxin_cell
-
-
-def auxin_homeostasis_old(iteration, sim_time):
+def auxin_homeostasis(iteration, sim_time):
 	
 	'''
 	This function implements all changes in auxin concentration in which there
@@ -167,7 +107,7 @@ def auxin_diffusion():
 	h = pr.euler_h
 	D = pr.k_auxin_diffusion
 	auxin = ip.auxin
-	fluxes = ip.auxin_fluxes_diffusion
+	fluxes = ip.auxin_fluxes_difusion
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 
@@ -258,11 +198,10 @@ def pin_on_auxin():
 
 	# Simplify var names
 	h = pr.euler_h
+	#K = k_pin1_transp
 	auxin = ip.auxin
 	pin1 = ip.pin1
-	CUC = ip.cuc
-	Kp = pr.k_pin1_effi_basal
-	Kcp = pr.k_pin1_effi_cuc
+	K = pr.k_pin1_transp
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1
@@ -270,26 +209,12 @@ def pin_on_auxin():
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
 
-			# Calculate K as K basal + effect of CUC
-			# Kp = basal efficiency
-			# Kcp = CUC (phosphorilation) strength to increase efficiency
-			K_out = Kp + CUC[y,x] * Kcp
-			if y > 0:
-				K_fromT = Kp + CUC[y-1,x] * Kcp
-			if x < tissue_columns - 1:
-				K_fromR = Kp + CUC[y,x+1] * Kcp
-			if y < tissue_rows - 1:
-				K_fromB = Kp + CUC[y+1,x] * Kcp
-			if x > 0:
-				K_fromL = Kp + CUC[y,x-1] * Kcp
-
 			# Certain combinations of [PIN1] and K could result in that the sum of auxin molecules effluxed (through all the cell faces) exceeds the num of auxin molecules in the cell. To detect that, first calculate the efflux in the whole cell and check if it is higher than the num of auxin molecules available.
 			total_pin1 = pin1[0,y,x] + pin1[1,y,x] + pin1[2,y,x] + pin1[3,y,x]
-			transported_molecules_total = h * auxin[y,x] * total_pin1 * K_out 
+			transported_molecules_total = h * auxin[y,x] * total_pin1 * K 
 
 			# Manually limit transport if it exceeds the amount of auxin molecules
 			# Later on: calculate excess ratio and then use to reduce the value of the vector below
-			# 2022.01.17: This situation probably means that paramenters are very unrealistic (it is not likely that in a very small fraction of time all auxin molecules in the cell are transported by PIN1 molecules...). Therefore, increase the auxin / PIN1 ratio ot or reduce k_pin1_transp
 			if transported_molecules_total > auxin[y,x]:
 				print('warning: transported molecules had to be manually adjusted in cell ' + str(y), str(x))
 
@@ -298,29 +223,29 @@ def pin_on_auxin():
 
 			# Top face: out (fluxes_pin1[0,y,x]); in (fluxes_pin1[1,y,x])
 			if y > 0:
-				fluxes_pin1[0,y,x] = h * ( auxin[y,x] * pin1[0,y,x] * K_out )
-				fluxes_pin1[1,y,x]  = h * ( auxin[y-1,x] * pin1[2,y-1,x] * K_fromT )
+				fluxes_pin1[0,y,x] = h * ( auxin[y,x] * pin1[0,y,x] * K )
+				fluxes_pin1[1,y,x]  = h * ( auxin[y-1,x] * pin1[2,y-1,x] * K )
 			else:
 				fluxes_pin1[0,y,x], fluxes_pin1[1,y,x] = 0, 0
 			
 			# Right face: out (fluxes_pin1[2,y,x]); in (fluxes_pin1[3,y,x])
 			if x < tissue_columns - 1:
-				fluxes_pin1[2,y,x] = h * ( auxin[y,x] * pin1[1,y,x] * K_out )
-				fluxes_pin1[3,y,x]  = h * ( auxin[y,x+1] * pin1[3,y,x+1] * K_fromR )
+				fluxes_pin1[2,y,x] = h * ( auxin[y,x] * pin1[1,y,x] * K )
+				fluxes_pin1[3,y,x]  = h * ( auxin[y,x+1] * pin1[3,y,x+1] * K )
 			else:
 				fluxes_pin1[2,y,x], fluxes_pin1[3,y,x] = 0, 0
 			
 			# Bottom face: out (fluxes_pin1[4,y,x]); in (fluxes_pin1[5,y,x])
 			if y < tissue_rows - 1:
-				fluxes_pin1[4,y,x] = h * ( auxin[y,x] * pin1[2,y,x] * K_out )
-				fluxes_pin1[5,y,x]  = h * ( auxin[y+1,x] * pin1[0,y+1,x] * K_fromB )
+				fluxes_pin1[4,y,x] = h * ( auxin[y,x] * pin1[2,y,x] * K )
+				fluxes_pin1[5,y,x]  = h * ( auxin[y+1,x] * pin1[0,y+1,x] * K )
 			else:
 				fluxes_pin1[4,y,x], fluxes_pin1[5,y,x] = 0, 0
 			
 			# Left face: out (fluxes_pin1[6,y,x]); in (fluxes_pin1[7,y,x])
 			if x > 0:
-				fluxes_pin1[6,y,x] = h * ( auxin[y,x] * pin1[3,y,x] * K_out )
-				fluxes_pin1[7,y,x]  = h * ( auxin[y,x-1] * pin1[1,y,x-1] * K_fromL )
+				fluxes_pin1[6,y,x] = h * ( auxin[y,x] * pin1[3,y,x] * K )
+				fluxes_pin1[7,y,x]  = h * ( auxin[y,x-1] * pin1[1,y,x-1] * K )
 			else:
 				fluxes_pin1[6,y,x], fluxes_pin1[7,y,x] = 0, 0
 			

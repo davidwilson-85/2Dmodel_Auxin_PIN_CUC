@@ -5,8 +5,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 
-import inputs_v3 as ip
-import params_v3 as pr
+import inputs as ip
+import params as pr
 import auxiliary as aux
 
 
@@ -27,7 +27,7 @@ def create_cell_plot(timestamp, iteration):
 	cuc = ip.cuc
 	cuc_range = pr.cuc_range
 	lut_cuc = ip.lut_cuc
-	array_afd = ip.auxin_fluxes_diffusion
+	array_afd = ip.auxin_fluxes_difusion
 	array_afp = ip.auxin_fluxes_pin1
 	img_dest_folder = pr.img_dest_folder
 	
@@ -35,7 +35,7 @@ def create_cell_plot(timestamp, iteration):
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = True
-	draw_values_text = False
+	draw_values_text = True
 	draw_vectors_diff = False
 	draw_vectors_pin1 = False
 	draw_pin1_flux_directions = True
@@ -67,18 +67,10 @@ def create_cell_plot(timestamp, iteration):
 
 			# Draw PIN1
 			if draw_pin == True:
-				# Offset and thikness of stroke
-				thickness = 4
-				oft = 2
-				thi = oft + thickness
-				# Top
-				draw.polygon([(x+oft,y+oft),(x+cellSide-oft,y+oft),(x+cellSide-thi,y+thi),(x+thi,y+thi)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range))
-				# Right
-				draw.polygon([(x+cellSide-oft,y+oft),(x+cellSide-oft,y+cellSide-oft),(x+cellSide-thi,y+cellSide-thi),(x+cellSide-thi,y+thi)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range))
-				# Bottom
-				draw.polygon([(x+oft,y+cellSide-oft),(x+cellSide-oft,y+cellSide-oft),(x+cellSide-thi,y+cellSide-thi),(x+thi,y+cellSide-thi)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range))
-				# Left
-				draw.polygon([(x+oft,y+oft),(x+oft,y+cellSide-oft),(x+thi,y+cellSide-thi),(x+thi,y+thi)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range))
+				draw.line([(x+4,y+3),(x+cellSide-4,y+3)], fill=index_to_rgb(lut_pin1, pin1[0,i,j], pin1_range), width=3)
+				draw.line([(x+cellSide-3,y+4),(x+cellSide-3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[1,i,j], pin1_range), width=3)
+				draw.line([(x+4,y+cellSide-3),(x+cellSide-4,y+cellSide-3)], fill=index_to_rgb(lut_pin1, pin1[2,i,j], pin1_range), width=3)
+				draw.line([(x+3,y+4),(x+3,y+cellSide-4)], fill=index_to_rgb(lut_pin1, pin1[3,i,j], pin1_range), width=3)
 			
 			if draw_cuc == True:
 				# Draw CUC
@@ -89,9 +81,9 @@ def create_cell_plot(timestamp, iteration):
 				# Write auxin concentration (magenta)
 				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
-				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
-				ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
+				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
 			x = x + cellSide
 		
@@ -140,28 +132,16 @@ def create_cell_plot(timestamp, iteration):
 	
 	if draw_pin1_flux_directions == True:
 
-		# These arrows indicate the net direction and thje magnitude of PIN1-mediated auxin flux
+		# These arrows only indicate the net direction of PIN1-mediated auxin flux
 
-		#im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
-		#im_arrow_50 = Image.open('art/arrow_white_17x17_50.png')
-		#im_arrow_75 = Image.open('art/arrow_white_17x17_75.png')
-		#im_arrow_100 = Image.open('art/arrow_white_17x17_100.png')
+		im_arrow = Image.open('art/arrow_white_17x17.png')
 
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
 			for j in range(matrix_shape[1]):
 
-				array_afp[10,i,j], array_afp[11,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
-
-				if array_afp[11,i,j] < 0.5:
-					im_arrow = ip.im_arrow_25
-				if array_afp[11,i,j] >= 0.5 and array_afp[11,i,j] < 1:
-					im_arrow = ip.im_arrow_50
-				if array_afp[11,i,j] >= 1 and array_afp[11,i,j] < 1.5:
-					im_arrow = ip.im_arrow_75
-				if array_afp[11,i,j] >= 1.5:
-					im_arrow = ip.im_arrow_100
+				array_afp[10,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
 
 				# Rotate arrow image and paste it 
 				if array_afp[10,i,j] != 361.0:
@@ -183,15 +163,6 @@ def create_cell_plot(timestamp, iteration):
 	
 	# Save image
 	im.save(img_dest_folder + '/image' + str(iteration).zfill(6) +'.png')
-
-
-def vector_to_magnitude(vector_x, vector_y):
-
-	'''
-	Convert vector to absolute distance between points (length)
-	'''
-
-	pass
 
 
 def vector_to_degrees(vector_x, vector_y):
@@ -218,7 +189,7 @@ def vector_to_degrees(vector_x, vector_y):
     # If there is no flux (no vector) return float '366.0'
     if x == 0 and y == 0:
         deg = '361.0'
-        return deg, 0
+        return deg
 
     # Hypotenuse
     h = math.sqrt(x**2 + y**2)
@@ -251,7 +222,7 @@ def vector_to_degrees(vector_x, vector_y):
     #print("rdn_quad: " + str(radians_quadrant))
     #print("degrees: " + str(degrees))
 
-    return degrees, h
+    return degrees
 
 
 # Maps an integer representing the amount of a magnitude (e.g. [auxin]) and translates it to the corresponding RGB triplet of the selected LUT
