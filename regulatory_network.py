@@ -3,8 +3,8 @@
 import numpy as np
 from scipy.integrate import odeint
 
-import params_v3 as pr
-import inputs_v3 as ip
+import params as pr
+import inputs as ip
 
 
 def model_regulatory_network(init_values, t):

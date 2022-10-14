@@ -5,7 +5,7 @@ Auxiliary functions go here
 '''
 
 import shutil, datetime
-import inputs_v3 as ip
+import inputs as ip
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
@@ -13,7 +13,7 @@ from matplotlib.ticker import FormatStrFormatter
 
 def track_simulation(iteration, nbr_iterations):
     """
-    Creates a graph x=simtime y=total level of auxin. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
+    Creates a graph x=simtime y=total level of auxin etc. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
     
     Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. Values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stoped then.
     """
@@ -83,7 +83,7 @@ def write_to_log(timestamp):
 
     #timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
     name_log_file = 'sim_logs/' + timestamp + '_params'
-    shutil.copy('params_v3.py', name_log_file)
+    shutil.copy('params.py', name_log_file)
 
     with open('templates/2D/template_auxin', mode='r') as template_auxin:
         template_auxin_contents = template_auxin.read()
