@@ -33,7 +33,7 @@ auxin_fluxes_diffusion = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_
 auxin_fluxes_pin1 = np.zeros(shape=(12,tissue_rows,tissue_columns), dtype=(float)) # 3D array = (attribute, column, row)
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
-# Arrays for tracking purposes
+# Arrays to store values and track simulation
 auxin_auxiliary = auxin * 0
 auxin_allcells_historic = []
 auxin_incr_allcells_historic = []
@@ -45,6 +45,9 @@ pin1_incr_allcells_historic = []
 cuc_auxiliary = cuc * 0
 cuc_allcells_historic = []
 cuc_incr_allcells_historic = []
+
+# Arrays to store some auxin values when running wrapper_automater.py
+auxin_central_column = auxin[0] * 0
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)

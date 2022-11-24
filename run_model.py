@@ -14,94 +14,101 @@ import func_pin
 import auxiliary as aux
 import tests.check as check
 
-# Setup checks
-check.check_dirs()
+def run():
 
-# Calculate number of interations based on simulation time and step size
-nbr_iterations = int(pr.simulation_time / pr.euler_h)
+	# Setup checks
+	check.check_dirs()
 
-#print('shape', ip.auxin.shape)
+	# Calculate number of iterations based on simulation time and step size
+	nbr_iterations = int(pr.simulation_time / pr.euler_h)
 
-current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+	#print('shape', ip.auxin.shape)
 
-# Write initial state and simulation parameters to log
-aux.write_to_log(current_datetime)
+	current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
-# Cleanup destination folder (remove and create)
-shutil.rmtree(pr.img_dest_folder) 
-os.mkdir(pr.img_dest_folder)
+	# Write initial state and simulation parameters to log
+	aux.write_to_log(current_datetime)
 
-# Time execution of simulation
-start_time = time.time()
+	# Cleanup destination folder (remove and create)
+	shutil.rmtree(pr.img_dest_folder) 
+	os.mkdir(pr.img_dest_folder)
 
-# ============================================================================
+	# Time execution of simulation
+	start_time = time.time()
 
-# Perform simulation cycles
-for iteration in range(nbr_iterations + 1):
-	sim_time = iteration * pr.euler_h
-	#print(sim_time)
-	
-	# Print iteration to terminal
-	if iteration < nbr_iterations:
-		print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
-	else:
-		print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
-	
-	# DRAW CELL PLOT
-	if iteration % pr.cell_plot_frequency == 0:
-		func_graph.create_cell_plot(current_datetime, iteration)
-	
-	# SOLVE MODEL REGULATORY NETWORK
-	rn.solve_model()
-	
-	# AUXIN CUSTOM MANIPULATION
-	func_auxin.auxin_custom_manipulation(iteration, sim_time)
+	print(pr.k_cuc_auxin_synth)
 
-	# Correct values out of bound (e.g. auxin < 0)
-	######
+	# ============================================================================
 
-	#**************************************************************************
-	# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
-	# AUXIN DIFFUSION
-	if pr.k_auxin_diffusion > 0:
-		func_auxin.auxin_diffusion()
-	# PIN1 POLARIZATION
-	func_pin.pin_polarity()
-	# PIN1-MEDIATED AUXIN EFFLUX
-	func_auxin.pin_on_auxin()
-	#**************************************************************************
+	# Perform simulation cycles
+	for iteration in range(nbr_iterations + 1):
+		sim_time = iteration * pr.euler_h
+		#print(sim_time)
+		
+		# Print iteration to terminal
+		if iteration < nbr_iterations:
+			print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
+		else:
+			print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
+		
+		# DRAW CELL PLOT
+		if pr.cell_plot_frequency == True:
+			if iteration % pr.cell_plot_frequency == 0:
+				func_graph.create_cell_plot(current_datetime, iteration)
+		
+		# SOLVE MODEL REGULATORY NETWORK
+		rn.solve_model()
+		
+		# AUXIN CUSTOM MANIPULATION
+		func_auxin.auxin_custom_manipulation(iteration, sim_time)
 
-	# Track simulation
-	aux.track_simulation(iteration, nbr_iterations)
+		# Correct values out of bound (e.g. auxin < 0)
+		######
 
-	# FOR TEMPORARY/TESTING FUNCTIONALY
+		#**************************************************************************
+		# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
+		# AUXIN DIFFUSION
+		if pr.k_auxin_diffusion > 0:
+			func_auxin.auxin_diffusion()
+		# PIN1 POLARIZATION
+		func_pin.pin_polarity()
+		# PIN1-MEDIATED AUXIN EFFLUX
+		func_auxin.pin_on_auxin()
+		#**************************************************************************
 
-	#func_graph.create_heatmap(ip.auxin, iteration)
-	
-	#if sim_time == 1:
-  	#	ip.cuc[6:9,4:7] = 8
-	#if sim_time >= 60:
-	#	ip.auxin[:,5] += .5
+		# Track simulation
+		aux.track_simulation(iteration, nbr_iterations)
 
-	#if iteration == 1900:
-		#print(ip.auxin)
-		#print(np.array2string(ip.auxin, separator=','))
-		#with open('templates/2D/template_auxin_1', 'w') as file:
-			#aux.save_ndarray()
-			#pass
-	
-print("%s seconds" % (time.time() - start_time))
-# ============================================================================
+		# FOR TEMPORARY/TESTING FUNCTIONALY
 
-# Create video/gif files
+		#func_graph.create_heatmap(ip.auxin, iteration)
+		
+		#if sim_time == 1:
+		#	ip.cuc[6:9,4:7] = 8
+		#if sim_time >= 60:
+		#	ip.auxin[:,5] += .5
 
-if pr.create_video == True:
-	func_graph.create_video(current_datetime)
+		#if iteration == 1900:
+			#print(ip.auxin)
+			#print(np.array2string(ip.auxin, separator=','))
+			#with open('templates/2D/template_auxin_1', 'w') as file:
+				#aux.save_ndarray()
+				#pass
+		
+	print("%s seconds" % (time.time() - start_time))
+	# ============================================================================
 
-if pr.create_gif == True:
-	func_graph.create_gif(current_datetime)
+	# Create video/gif files
 
-print("%s seconds" % (time.time() - start_time))
+	if pr.create_video == True:
+		func_graph.create_video(current_datetime)
+
+	if pr.create_gif == True:
+		func_graph.create_gif(current_datetime)
+
+
+if __name__ == '__main__':
+	run()
 
 '''
 TO DO:

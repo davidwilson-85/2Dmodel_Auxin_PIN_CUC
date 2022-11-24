@@ -73,6 +73,7 @@ def track_simulation(iteration, nbr_iterations):
 
         plt.xlabel('Simulation iteration')
         fig1.savefig('graphs/levels.png', bbox_inches='tight')
+        plt.close()
 
 
 def write_to_log(timestamp):

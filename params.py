@@ -5,7 +5,7 @@ import numpy as np
 # General
 euler_h = .1              # Euler step size = h; (0 - 1]
 #odeint_timepoints = np.linspace(0, euler_h, 2)
-simulation_time = 90       # Arbitrary Units (AU) (let's assume it is hours of development)
+simulation_time = 2       # Arbitrary Units (AU) (let's assume it is hours of development)
 img_dest_folder = 'images'
 cell_plot_frequency = 1     # To do: change this to images / hour
 create_video = True
