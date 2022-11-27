@@ -9,13 +9,14 @@ import inputs as ip
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+import seaborn as sns
 
 
 def track_simulation(iteration, nbr_iterations):
     """
     Creates a graph x=simtime y=total level of auxin etc. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
     
-    Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. Values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stoped then.
+    Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. Values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stopped then.
     """
 
     # Total auxin in system
@@ -73,6 +74,29 @@ def track_simulation(iteration, nbr_iterations):
 
         plt.xlabel('Simulation iteration')
         fig1.savefig('graphs/levels.png', bbox_inches='tight')
+        plt.close()
+
+
+def track_series(series_num, series_num_total):
+
+    """
+    Creates a line plot with representing the auxin profile in a chosen column (or row) of cells
+
+    Params:
+        series_num: 0-based number of the current simulation in the series
+        series_num_total: total number of simulations in the series
+    """
+    
+    values = ip.auxin[:,5].copy()
+    ip.auxin_series_historic.append(values)
+
+    if series_num == series_num_total - 1:
+        fig2 = plt.figure()
+        fig2, ax = plt.subplots(1, figsize=(5,5))
+        ax.set_prop_cycle('color', plt.cm.Spectral(np.linspace(0,1,6)))
+        for i in ip.auxin_series_historic:
+            ax.plot(i)
+        fig2.savefig('graphs/series.png', bbox_inches='tight')
         plt.close()
 
 

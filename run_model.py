@@ -14,7 +14,12 @@ import func_pin
 import auxiliary as aux
 import tests.check as check
 
-def run():
+def run(series_num = False):
+
+	"""
+	params:
+		series_num: When model is run through run_model_series.py wrapper, this indicates the simulation number in the series.
+	"""
 
 	# Setup checks
 	check.check_dirs()
@@ -22,21 +27,18 @@ def run():
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time / pr.euler_h)
 
-	#print('shape', ip.auxin.shape)
-
 	current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
 	# Write initial state and simulation parameters to log
 	aux.write_to_log(current_datetime)
 
-	# Cleanup destination folder (remove and create)
-	shutil.rmtree(pr.img_dest_folder) 
-	os.mkdir(pr.img_dest_folder)
+	if pr.is_series == False:
+		# Cleanup destination folder (remove and create)
+		shutil.rmtree(pr.img_dest_folder) 
+		os.mkdir(pr.img_dest_folder)
 
 	# Time execution of simulation
 	start_time = time.time()
-
-	print(pr.k_cuc_auxin_synth)
 
 	# ============================================================================
 
@@ -51,10 +53,13 @@ def run():
 		else:
 			print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
 		
-		# DRAW CELL PLOT
-		if pr.cell_plot_frequency == True:
+		# OPTIONAL: DRAW CELL PLOT
+		if pr.is_series == False:
 			if iteration % pr.cell_plot_frequency == 0:
 				func_graph.create_cell_plot(current_datetime, iteration)
+		if pr.is_series == True:
+			if iteration  == nbr_iterations:
+				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_model()
@@ -96,15 +101,20 @@ def run():
 				#pass
 		
 	print("%s seconds" % (time.time() - start_time))
+	
 	# ============================================================================
+	
+	# Track series
+	if pr.is_series == True:
+		aux.track_series(series_num, pr.series_num_total)
 
 	# Create video/gif files
 
-	if pr.create_video == True:
-		func_graph.create_video(current_datetime)
-
-	if pr.create_gif == True:
-		func_graph.create_gif(current_datetime)
+	if pr.is_series == False:
+		if pr.create_video == True:
+			func_graph.create_video(current_datetime)
+		if pr.create_gif == True:
+			func_graph.create_gif(current_datetime)
 
 
 if __name__ == '__main__':

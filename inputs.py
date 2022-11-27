@@ -46,8 +46,8 @@ cuc_auxiliary = cuc * 0
 cuc_allcells_historic = []
 cuc_incr_allcells_historic = []
 
-# Arrays to store some auxin values when running wrapper_automater.py
-auxin_central_column = auxin[0] * 0
+# Arrays to store some auxin values when running a simulation series
+auxin_series_historic = []
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)

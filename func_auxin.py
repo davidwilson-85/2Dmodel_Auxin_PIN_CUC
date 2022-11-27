@@ -22,7 +22,7 @@ def auxin_custom_manipulation(iteration, sim_time):
 	- Noise: random variation in concentration 
 	
 	Params:
-	* sim_time: Iteration of the simulation. This is used for local auxin synth/degr
+	* sim_time: Iteration of the simulation. This is used for custom (local) auxin synth/degr
 	
 	'''
 
@@ -233,7 +233,7 @@ def auxin_diffusion():
 def auxin_noise():
 
 	'''
-	NOW INTEGRATED ALSO IN AUXIN HOMEOSTASIS FUNCTION
+	NOW INTEGRATED IN AUXIN HOMEOSTASIS FUNCTION
 	'''
 
 	for y in range(ip.tissue_rows):

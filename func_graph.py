@@ -10,7 +10,7 @@ import params as pr
 import auxiliary as aux
 
 
-def create_cell_plot(timestamp, iteration):
+def create_cell_plot(timestamp, iteration, series_num = 0):
 
 	'''
 	Create cell grid using PIL
@@ -87,9 +87,9 @@ def create_cell_plot(timestamp, iteration):
 			
 			if draw_values_text == True:
 				# Write auxin concentration (magenta)
-				#ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
+				ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
-				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
 				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
@@ -182,7 +182,7 @@ def create_cell_plot(timestamp, iteration):
 	#print(str(sim_time_formatted).zfill(9))
 	
 	# Save image
-	im.save(img_dest_folder + '/image' + str(iteration).zfill(6) +'.png')
+	im.save(img_dest_folder + '/image_' + str(series_num).zfill(3) + '_' + str(iteration).zfill(6) +'.png')
 
 
 def vector_to_magnitude(vector_x, vector_y):
