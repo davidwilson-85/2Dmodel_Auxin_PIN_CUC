@@ -46,7 +46,7 @@ cuc_auxiliary = cuc * 0
 cuc_allcells_historic = []
 cuc_incr_allcells_historic = []
 
-# Arrays to store some auxin values when running a simulation series
+# Arrays to store values when running a simulation series
 auxin_series_historic = []
 
 # LUTs

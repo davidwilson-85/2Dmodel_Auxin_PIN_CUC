@@ -40,6 +40,11 @@ def run(series_num = False):
 	# Time execution of simulation
 	start_time = time.time()
 
+	print(np.amin(ip.middle_domain))
+	print(np.amax(ip.middle_domain))
+	slope = (pr.k_UTG - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
+	print(slope)
+
 	# ============================================================================
 
 	# Perform simulation cycles
@@ -88,10 +93,11 @@ def run(series_num = False):
 
 		#func_graph.create_heatmap(ip.auxin, iteration)
 		
-		#if sim_time == 1:
-		#	ip.cuc[6:9,4:7] = 8
-		#if sim_time >= 60:
-		#	ip.auxin[:,5] += .5
+		if sim_time >= 40:
+			ip.cuc[4:7,4:7] = 8
+			ip.auxin[4:7,4:7] += .1
+		if sim_time >= 60:
+			ip.auxin[:,5] += .4
 
 		#if iteration == 1900:
 			#print(ip.auxin)

@@ -82,7 +82,7 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
 	'''
 	Auxin affects PIN1 subcellular localization (up-the-gradient model = UTG)
-	UTG: PIN1 accumulates at membrane abutting cells with higher auxin concentration
+	UTG: PIN1 tends to accumulates at membrane abutting neighbour cell with highest auxin concentration
 	 
 	I use formula from Smith 2006 (also used in Bilsborough 2011):
 	
@@ -96,8 +96,15 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
 	'''
 	
-	# Base of exponential function to tweak with UTG responsiveness
+	# Base of exponential function to regulate UTG responsiveness
 	b = k_UTG
+
+	# Regulation of k_UTG by m-l axis (suppression of polarity convergences by abaxial or adaxial identity, like KAN1 an KAN2)
+	# Map range of MD values to (1 - k_UTG)
+	# slope = (output_end - output_start) / (input_end - input_start)
+	# output = output_start + slope * (input - input_start)
+	slope = (b - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
+	b = 1 + slope * (ip.middle_domain[x] - np.amin(ip.middle_domain))
 	
 	# Current PIN1 total amount in the cell
 	total_pin1 = pin1[0] + pin1[1] + pin1[2] + pin1[3]

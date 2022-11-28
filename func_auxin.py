@@ -7,12 +7,6 @@ import random
 import params as pr
 import inputs as ip
 
-def integrate_auxin():
-
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-			pass
-
 
 def auxin_custom_manipulation(iteration, sim_time):
 	
@@ -176,6 +170,9 @@ def auxin_diffusion():
 			
 			# Calculate in an out fluxes for each cell face (molecules / face and cycle)
 			# (calculating fluxes is necessary for WTF polarization)
+
+			# Test
+			#D = D * math.fabs(9 - (ip.middle_domain[x]) / 10)
 
 			# Top face: out (fluxes[0,y,x]); in (fluxes[1,y,x])
 			if y > 0:
