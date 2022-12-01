@@ -140,7 +140,7 @@ def create_cell_plot(timestamp, iteration, series_num = 0):
 	
 	if draw_pin1_flux_directions == True:
 
-		# These arrows indicate the net direction and thje magnitude of PIN1-mediated auxin flux
+		# These arrows indicate the net direction and the magnitude of PIN1-mediated auxin flux
 
 		#im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
 		#im_arrow_50 = Image.open('art/arrow_white_17x17_50.png')
@@ -154,16 +154,20 @@ def create_cell_plot(timestamp, iteration, series_num = 0):
 
 				array_afp[10,i,j], array_afp[11,i,j] = vector_to_degrees(array_afp[8,i,j], array_afp[9,i,j])
 
-				if array_afp[11,i,j] < 0.5:
+				# Correct flux magnitude (vector length = array_afp[11,i,j]) by pr.euler_h
+				array_afp[11,i,j] = array_afp[11,i,j] / pr.euler_h
+
+				# Select appropriate image from available ones
+				if array_afp[11,i,j] < 5:
 					im_arrow = ip.im_arrow_25
-				if array_afp[11,i,j] >= 0.5 and array_afp[11,i,j] < 1:
+				if array_afp[11,i,j] >= 5 and array_afp[11,i,j] < 10:
 					im_arrow = ip.im_arrow_50
-				if array_afp[11,i,j] >= 1 and array_afp[11,i,j] < 1.5:
+				if array_afp[11,i,j] >= 10 and array_afp[11,i,j] < 15:
 					im_arrow = ip.im_arrow_75
-				if array_afp[11,i,j] >= 1.5:
+				if array_afp[11,i,j] >= 15:
 					im_arrow = ip.im_arrow_100
 
-				# Rotate arrow image and paste it 
+				# Rotate arrow image and paste it in image
 				if array_afp[10,i,j] != 361.0:
 					im_arrow_rotated = im_arrow.rotate(array_afp[10,i,j] + 270)
 					im.paste(im_arrow_rotated, (x+16,y+16), im_arrow_rotated) # 3rd parameter is a mask (for transparency)

@@ -152,7 +152,7 @@ def auxin_diffusion():
 	#
 	# Rate of diffusion from cell i to j: dD(i->j)/dt = h * ( [auxin(i)] * k )
 	#
-	# k = diffusion factor constant
+	# k = diffusion constant
 	#
 
 	#fluxes = np.zeros(shape=(8,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in...

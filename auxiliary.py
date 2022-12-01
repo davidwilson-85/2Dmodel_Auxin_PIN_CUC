@@ -93,10 +93,11 @@ def track_series(series_num, series_num_total):
     if series_num == series_num_total - 1:
         fig2 = plt.figure()
         fig2, ax = plt.subplots(1, figsize=(5,5))
-        ax.set_prop_cycle('color', plt.cm.Spectral(np.linspace(0,1,6)))
+        ax.set_prop_cycle('color', plt.cm.Spectral(np.linspace(0,1,series_num_total)))
         for i in ip.auxin_series_historic:
             ax.plot(i)
         fig2.savefig('graphs/series.png', bbox_inches='tight')
+        #plt.colorbar(label="param value", orientation="vertical")
         plt.close()
 
 

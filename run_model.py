@@ -14,6 +14,7 @@ import func_pin
 import auxiliary as aux
 import tests.check as check
 
+
 def run(series_num = False):
 
 	"""
@@ -32,25 +33,15 @@ def run(series_num = False):
 	# Write initial state and simulation parameters to log
 	aux.write_to_log(current_datetime)
 
-	if pr.is_series == False:
-		# Cleanup destination folder (remove and create)
-		shutil.rmtree(pr.img_dest_folder) 
-		os.mkdir(pr.img_dest_folder)
-
 	# Time execution of simulation
 	start_time = time.time()
-
-	print(np.amin(ip.middle_domain))
-	print(np.amax(ip.middle_domain))
-	slope = (pr.k_UTG - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
-	print(slope)
 
 	# ============================================================================
 
 	# Perform simulation cycles
 	for iteration in range(nbr_iterations + 1):
+		
 		sim_time = iteration * pr.euler_h
-		#print(sim_time)
 		
 		# Print iteration to terminal
 		if iteration < nbr_iterations:
@@ -65,57 +56,38 @@ def run(series_num = False):
 		if pr.is_series == True:
 			if iteration  == nbr_iterations:
 				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
+		#func_graph.create_heatmap(ip.auxin, iteration)
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_model()
-		
-		# AUXIN CUSTOM MANIPULATION
-		func_auxin.auxin_custom_manipulation(iteration, sim_time)
 
-		# Correct values out of bound (e.g. auxin < 0)
-		######
-
-		#**************************************************************************
 		# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
-		# AUXIN DIFFUSION
+		func_auxin.auxin_custom_manipulation(iteration, sim_time)
 		if pr.k_auxin_diffusion > 0:
 			func_auxin.auxin_diffusion()
-		# PIN1 POLARIZATION
 		func_pin.pin_polarity()
-		# PIN1-MEDIATED AUXIN EFFLUX
 		func_auxin.pin_on_auxin()
-		#**************************************************************************
+		
+		# Correct values out of bound (e.g. auxin < 0)?
+		######
 
 		# Track simulation
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-
-		#func_graph.create_heatmap(ip.auxin, iteration)
-		
 		if sim_time >= 40:
 			ip.cuc[4:7,4:7] = 8
 			ip.auxin[4:7,4:7] += .1
 		if sim_time >= 60:
 			ip.auxin[:,5] += .4
-
-		#if iteration == 1900:
-			#print(ip.auxin)
-			#print(np.array2string(ip.auxin, separator=','))
-			#with open('templates/2D/template_auxin_1', 'w') as file:
-				#aux.save_ndarray()
-				#pass
 		
 	print("%s seconds" % (time.time() - start_time))
-	
-	# ============================================================================
-	
+		
 	# Track series
 	if pr.is_series == True:
-		aux.track_series(series_num, pr.series_num_total)
+		aux.track_series(series_num, series_num_total)
 
 	# Create video/gif files
-
 	if pr.is_series == False:
 		if pr.create_video == True:
 			func_graph.create_video(current_datetime)
@@ -124,15 +96,42 @@ def run(series_num = False):
 
 
 if __name__ == '__main__':
-	run()
+
+	# Import params.py or log/params_XXXX_XX_XX
+
+	# Cleanup destination folder (remove and create)
+	shutil.rmtree(pr.img_dest_folder) 
+	os.mkdir(pr.img_dest_folder)
+	
+	if pr.is_series == False:
+
+		# Run simulation
+		run()
+
+	if pr.is_series == True:
+
+		# Retrieve parameter that varies and range of values that it takes
+		param_a_space = np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points'])
+		# Calculate total number of simulations in the series and set parameter
+		series_num_total = len(param_a_space)
+
+		for i in param_a_space: print(i)
+
+		# Run series
+		for key, val in enumerate(param_a_space):
+			exec('pr.' + pr.series_param_a['name'] + '=' + str(val)) # exec() converts str to code
+			print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(val))
+			run(series_num = key)
+		
 
 '''
 TO DO:
-* Try to implement ODEint solving for each iteration. At least for the equations that describe expression of each component. 
+* Check how integration step affects sources and sinks (and consider perfect sinks and sources)
+* Integrate templates as arrays in params.py
+# * Try to integrate custom synth and degradation in ODEint model
+* A switch to define parameter file source (params.py versus log)
 * Check if the order in which the functions are called has an effect on output of simulations
-* Create quick way of switching ON/OFF features like UTG, WTF, CUC2
 * Set diffusion to 0 at faces that are outer boundaries
-* Add pin1_UTGresponsiveness to function! It is not used at all at the moment!
 
 '''
 

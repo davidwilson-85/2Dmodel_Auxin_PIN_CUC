@@ -12,7 +12,7 @@ def model_regulatory_network(init_values, t):
     '''
     This model is solved by ODEint.
     It only defines changes that can be described as differential equations and that occur within each individual cell.
-    Changes not included: those resulting from movement of auxin between cells, PIN1 polarization 
+    Changes not included: those that involve movement of auxin between cells, PIN1 polarization 
     '''
 
     A, C, Pt, Pr, Pb, Pl, MD = init_values

@@ -100,11 +100,12 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 	b = k_UTG
 
 	# Regulation of k_UTG by m-l axis (suppression of polarity convergences by abaxial or adaxial identity, like KAN1 an KAN2)
-	# Map range of MD values to (1 - k_UTG)
+	# Map range of MD values to (1 - k_UTG) and overwrite b accorging to the position of the cell in the m-l axis
 	# slope = (output_end - output_start) / (input_end - input_start)
 	# output = output_start + slope * (input - input_start)
-	slope = (b - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
-	b = 1 + slope * (ip.middle_domain[x] - np.amin(ip.middle_domain))
+	if pr.md_on_pin1_UTG == True:
+		slope = (b - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
+		b = 1 + slope * (ip.middle_domain[x] - np.amin(ip.middle_domain))
 	
 	# Current PIN1 total amount in the cell
 	total_pin1 = pin1[0] + pin1[1] + pin1[2] + pin1[3]
@@ -137,7 +138,7 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 	# Calculate normalization factor (eq. denominator)
 	norm_factor = b**auxin_top + b**auxin_right + b**auxin_bottom + b**auxin_left
 
-	# Calculate PIN1 alocation at each cell face
+	# Calculate PIN1 allocation at each cell face
 	pin1[0] = total_pin1 * ( b**auxin_top / norm_factor )
 	pin1[1] = total_pin1 * ( b**auxin_right / norm_factor )
 	pin1[2] = total_pin1 * ( b**auxin_bottom / norm_factor )
@@ -145,7 +146,6 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 
 	#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]	
 	#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
-
 
 
 def pin_utg_smith2006_mod(y, x, auxin, pin1, k_UTG):
