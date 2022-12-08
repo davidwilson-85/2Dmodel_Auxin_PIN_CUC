@@ -4,7 +4,7 @@ import numpy as np
 
 # General
 euler_h = .1              # Euler step size = h; (0 - 1]
-simulation_time = 200     # Arbitrary Units (AU) (let's assume it is hours)
+simulation_time = 20     # Arbitrary Units (AU) (let's assume it is hours)
 img_dest_folder = 'images'
 create_cell_plots = 'multiple' # False / 'multiple' / 'only_last'
 cell_plot_frequency = 10     # To do: change this to images / hour
@@ -69,7 +69,7 @@ k_auxin_cuc = 0 #.0005 #.01
 k_cuc_decay = 0
 
 # Series simulations for parameter value exploration
-is_series = True # Specifies whether simulation is a single run or a series
+is_series = False # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
   'name': 'k_auxin_degr',
 	'min': 0.02,

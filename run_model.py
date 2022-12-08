@@ -5,7 +5,7 @@ import numpy as np
 from scipy.integrate import odeint
 
 import params as pr
-#from sim_logs import params_2022_12_01_21_23_19 as pr
+#from sim_logs import params_2022_12_01_21_23_19 as pr # To re-run logged simulation
 import inputs as ip
 import regulatory_network as rn
 import func_graph
@@ -15,6 +15,8 @@ import func_pin
 import auxiliary as aux
 import tests.check as check
 
+# Do checks
+check.check_dirs()
 
 def run(series_num = False):
 
@@ -22,9 +24,6 @@ def run(series_num = False):
 	params:
 		series_num: When model is run through run_model_series.py wrapper, this indicates the simulation number in the series.
 	"""
-
-	# Setup checks
-	check.check_dirs()
 
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time / pr.euler_h)
@@ -36,9 +35,6 @@ def run(series_num = False):
 
 	# Time execution of simulation
 	start_time = time.time()
-
-	# Warnings
-	print('WARNING: dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT')
 
 	# ============================================================================
 
@@ -81,6 +77,7 @@ def run(series_num = False):
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
+		
 		ip.auxin[1,5] = 250
 		if sim_time >= 40:
 			ip.cuc[4:7,4:7] = 8
@@ -103,10 +100,6 @@ def run(series_num = False):
 
 
 if __name__ == '__main__':
-
-	print('Number of CPUs in the system: {}'.format(os.cpu_count()))
-
-	# Import params.py or log/params_XXXX_XX_XX
 
 	# Cleanup destination folder (remove and create)
 	shutil.rmtree(pr.img_dest_folder) 
