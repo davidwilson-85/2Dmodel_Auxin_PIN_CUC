@@ -35,7 +35,7 @@ auxin_noise = {
 auxin_custom_synth = {
   "cells": ((-1,-1), (1,5)),
   "time_interval": (0,100000000),
-  "value": 50 #50 #2.5 #20
+  "value": 0 #50 #2.5 #20
 }
 # Auxin custom local degradation (treated as relative rate; interval is [) and refers to simulation time)
 auxin_custom_degr = {
@@ -69,17 +69,17 @@ k_auxin_cuc = 0 #.0005 #.01
 k_cuc_decay = 0
 
 # Series simulations for parameter value exploration
-is_series = False # Specifies whether simulation is a single run or a series
+is_series = True # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
-  'name': 'euler_h',
-	'min': .05,
-	'max': .1,
-	'num_points': 3
+  'name': 'k_auxin_degr',
+	'min': 0.02,
+	'max': 0.1,
+	'num_points': 6
 }
 
 ## Templates with initial values
 
-template_middle_domain = np.array([0,0,0,5,9,9,9,5,0,0,0], dtype=float)
+template_middle_domain = np.array([0,0,4,6,9,9,9,6,4,0,0], dtype=float)
 
 template_auxin = np.array(
     [

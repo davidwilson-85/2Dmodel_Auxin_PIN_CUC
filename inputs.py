@@ -75,3 +75,14 @@ im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
 im_arrow_50 = Image.open('art/arrow_white_17x17_50.png')
 im_arrow_75 = Image.open('art/arrow_white_17x17_75.png')
 im_arrow_100 = Image.open('art/arrow_white_17x17_100.png')
+
+'''
+FOR REFERENCE:
+
+matrix_shape[0] -> number of rows = y
+matrix_shape[1] -> number of columns = x
+
+auxin[6,11] = 5 refers to 7th row, 12th column
+pin1[0,0,5] = 5 refers to top wall of cell in 1st row, 6th column
+
+'''

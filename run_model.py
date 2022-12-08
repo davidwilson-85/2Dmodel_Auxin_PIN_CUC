@@ -5,6 +5,7 @@ import numpy as np
 from scipy.integrate import odeint
 
 import params as pr
+#from sim_logs import params_2022_12_01_21_23_19 as pr
 import inputs as ip
 import regulatory_network as rn
 import func_graph
@@ -35,6 +36,9 @@ def run(series_num = False):
 
 	# Time execution of simulation
 	start_time = time.time()
+
+	# Warnings
+	print('WARNING: dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT')
 
 	# ============================================================================
 
@@ -68,18 +72,21 @@ def run(series_num = False):
 		func_pin.pin_polarity()
 		func_auxin.pin_on_auxin()
 		
-		# Correct values out of bound (e.g. auxin < 0)?
-		######
+		# Limit / correct values out of bound (e.g. auxin < 0)?
+		for y in range(ip.tissue_rows):
+			for x in range(ip.tissue_columns):
+				if ip.auxin[y,x] > 250: ip.auxin[y,x] = 250
 
 		# Track simulation
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
+		ip.auxin[1,5] = 250
 		if sim_time >= 40:
 			ip.cuc[4:7,4:7] = 8
-			ip.auxin[4:7,4:7] += .1
+			ip.auxin[4:7,4:7] += (1 * pr.euler_h)
 		if sim_time >= 60:
-			ip.auxin[:,5] += .4
+			ip.auxin[:,5] += (4 * pr.euler_h)
 		
 	print("%s seconds" % (time.time() - start_time))
 		
@@ -96,6 +103,8 @@ def run(series_num = False):
 
 
 if __name__ == '__main__':
+
+	print('Number of CPUs in the system: {}'.format(os.cpu_count()))
 
 	# Import params.py or log/params_XXXX_XX_XX
 
@@ -126,24 +135,9 @@ if __name__ == '__main__':
 
 '''
 TO DO:
-* Check how integration step affects sources and sinks (and consider perfect sinks and sources)
-* Integrate templates as arrays in params.py
-# * Try to integrate custom synth and degradation in ODEint model
-* A switch to define parameter file source (params.py versus log)
+* Try staggered cells
+* Try PD growth?
+* Try to integrate custom synth and degradation in ODEint model
 * Check if the order in which the functions are called has an effect on output of simulations
-* Set diffusion to 0 at faces that are outer boundaries
-
-'''
-
-
-
-'''
-FOR REFERENCE:
-
-matrix_shape[0] -> number of rows = y
-matrix_shape[1] -> number of columns = x
-
-auxin[6,11] = 5 refers to 7th row, 12th column
-pin1[0,0,5] = 5 refers to top wall of cell in 1st row, 6th column
 
 '''

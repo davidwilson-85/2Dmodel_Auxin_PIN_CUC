@@ -107,6 +107,17 @@ def write_to_log(timestamp):
     Write contents of inputs and templates files to log file
     '''
 
+    timestamp = str(timestamp).replace('-','_')
+    name_log_file = 'sim_logs/params_' + timestamp + '.py'
+    shutil.copy('params.py', name_log_file)
+
+
+def write_to_log_old(timestamp):
+    
+    ''''
+    Write contents of inputs and templates files to log file
+    '''
+
     #timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
     name_log_file = 'sim_logs/' + timestamp + '_params'
     shutil.copy('params.py', name_log_file)
@@ -179,4 +190,4 @@ def save_ndarray():
     
 
 if __name__ == '__main__':
-    write_to_log()
+    write_to_log('test_timestamp')
