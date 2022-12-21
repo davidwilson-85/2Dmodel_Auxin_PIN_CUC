@@ -36,8 +36,6 @@ def run(series_num = False):
 	# Time execution of simulation
 	start_time = time.time()
 
-	# ============================================================================
-
 	# Perform simulation cycles
 	for iteration in range(nbr_iterations + 1):
 		
@@ -51,12 +49,11 @@ def run(series_num = False):
 		
 		# OPTIONAL: DRAW CELL PLOT
 		if pr.is_series == False:
-			if iteration % pr.cell_plot_frequency == 0:
+			if (iteration * pr.euler_h) % pr.cell_plot_frequency == 0:
 				func_graph.create_cell_plot(current_datetime, iteration)
 		if pr.is_series == True:
 			if iteration  == nbr_iterations:
 				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
-		#func_graph.create_heatmap(ip.auxin, iteration)
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_model()
@@ -79,11 +76,13 @@ def run(series_num = False):
 		# FOR TEMPORARY/TESTING FUNCTIONALY
 		
 		ip.auxin[1,5] = 250
+		'''
 		if sim_time >= 40:
 			ip.cuc[4:7,4:7] = 8
 			ip.auxin[4:7,4:7] += (1 * pr.euler_h)
 		if sim_time >= 60:
 			ip.auxin[:,5] += (4 * pr.euler_h)
+		'''
 		
 	print("%s seconds" % (time.time() - start_time))
 		

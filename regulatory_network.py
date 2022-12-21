@@ -15,7 +15,7 @@ def model_regulatory_network(init_values, t):
     Changes not included: those that involve movement of auxin between cells, PIN1 polarization 
     '''
 
-    A, C, Pt, Pr, Pb, Pl, MD = init_values
+    A, C, Pt, Pr, Pb, Pl, MD, PD = init_values
     
     k_AS = pr.k_auxin_synth
     k_CA = pr.k_cuc_auxin_synth
@@ -24,6 +24,7 @@ def model_regulatory_network(init_values, t):
 
     k_CS = pr.k_cuc_synth
     k_MDC = pr.k_md_cuc
+    k_PDC = pr.k_pd_cuc
     k_AC = pr.k_auxin_cuc
     k_CT = pr.k_cuc_decay
     
@@ -34,14 +35,15 @@ def model_regulatory_network(init_values, t):
 
     dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
     #dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
-    dC_dt = k_CS + MD * k_MDC - A * C * k_AC - C * k_CT
+    dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
     dPt_dt = k_PS + A * k_AP + C * k_CP - Pt * k_PT
     dPr_dt = k_PS + A * k_AP + C * k_CP - Pr * k_PT
     dPb_dt = k_PS + A * k_AP + C * k_CP - Pb * k_PT
     dPl_dt = k_PS + A * k_AP + C * k_CP - Pl * k_PT
     dMD_dt = 0
+    dPD_dt = 0
 
-    return [dA_dt, dC_dt, dPt_dt, dPr_dt, dPb_dt, dPl_dt, dMD_dt]
+    return [dA_dt, dC_dt, dPt_dt, dPr_dt, dPb_dt, dPl_dt, dMD_dt, dPD_dt]
 
 
 def solve_model():
@@ -57,7 +59,8 @@ def solve_model():
 				ip.pin1[1,y,x],
 				ip.pin1[2,y,x],
 				ip.pin1[3,y,x],
-				ip.middle_domain[x]
+				ip.middle_domain[x],
+                pr.template_proximodistal_axis[y]
 			]
 
 			# Solve

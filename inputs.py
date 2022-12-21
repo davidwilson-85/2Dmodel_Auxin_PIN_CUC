@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import params as pr
 
+'''
 # === LOAD TEMPLATE DATA
 
 # Templates
@@ -16,7 +17,6 @@ cuc_template = 'templates/' + template + '/template_cuc'
 middle_domain_template = 'templates/' + template + '/template_middle_domain'
 adab_domain_template = 'templates/' + template + '/template_adab_domain'
 
-'''
 #auxin = np.loadtxt(auxin_template, delimiter=',', unpack=False)
 auxin = pr.template_auxin
 auxin = auxin * 10
@@ -39,7 +39,7 @@ pin1 = pr.template_pin1 # Format is [z,y,x] = [cell face (T, R, B, L), cell row,
 pin1_matrix_shape = pin1.shape
 cuc = pr.template_cuc
 middle_domain = pr.template_middle_domain
-adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
+#adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
 
 
 # Auxin fluxes: number of auxin molecules that cross between 2 cells in a given simultation step
