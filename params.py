@@ -28,20 +28,34 @@ k_md_auxin_synth = .05 #.25 #0
 
 # Auxin noise ( interval is [) and refers to iterations)
 auxin_noise = {
-  'limit': 4,
+  'limit': 3,
   'iteration_interval': (0,1000000)
+}
+# Auxin perfect sources (interval is [) and refers to simulation time)
+auxin_perfect_sources = {
+    "active": True,
+    "cells": ((-1,-1), (1,5)),
+    "time_interval": (0,100000000),
+    "value": 250
+}
+# Auxin perfect sinks (interval is [) and refers to simulation time)
+auxin_perfect_sinks = {
+    "active": False,
+    "cells": ((10,5), (9,5)),
+    "time_interval": (0,100000000),
+    "value": 0
 }
 # Auxin custom local synthesis (treated as absolute rate; interval is [) and refers to simulation time)
 auxin_custom_synth = {
-  "cells": ((-1,-1), (1,5)),
-  "time_interval": (0,100000000),
-  "value": 0 #50 #2.5 #20
+    "cells": ((-1,-1), (1,5)),
+    "time_interval": (0,100000000),
+    "value": 0 #50 #2.5 #20
 }
 # Auxin custom local degradation (treated as relative rate; interval is [) and refers to simulation time)
 auxin_custom_degr = {
-  "cells": ((11,7), (1000,5)),
-  "time_interval": (0,10000),
-  "value": 0 #0.5 #.2 #.05
+    "cells": ((11,7), (1000,5)),
+    "time_interval": (0,10000),
+    "value": 0 #0.5 #.2 #.05
 }
 
 # PIN1 localization
@@ -70,9 +84,9 @@ k_auxin_cuc = .002 #.0005 #.01
 k_cuc_decay = .1
 
 # Series simulations for parameter value exploration
-is_series = True # Specifies whether simulation is a single run or a series
+is_series = False # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
-  'name': 'k_adab_cuc',
+    'name': 'k_adab_cuc',
 	'min': 0,
 	'max': 0,
 	'num_points': 8

@@ -34,17 +34,16 @@ def auxin_custom_manipulation(iteration, sim_time):
 			auxin_cell = ip.auxin[y,x]
 			cuc_cell = ip.cuc[y,x]
 			md_cell = ip.middle_domain[x]
-			
-			# Local/custom auxin synth/degr and noise...
+
 			current_cell = (y,x)
 			custom_synth, custom_degr, noise = 0, 0, 0
-
+			
+			# Local/custom auxin synth/degr and noise...
 			if pr.auxin_custom_synth['value'] > 0:
 				if current_cell in pr.auxin_custom_synth['cells'] \
 				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
 				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
 					custom_synth = pr.auxin_custom_synth['value']
-			
 			if pr.auxin_custom_degr['value'] > 0:
 				if current_cell in pr.auxin_custom_degr['cells'] \
 				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
@@ -60,13 +59,23 @@ def auxin_custom_manipulation(iteration, sim_time):
 
 			# Calculate change in auxin concentration
 			auxin_cell_updated = auxin_cell + h * ( custom_synth - custom_degr ) + noise
+
+			# Perfect sources and sinks (overwrites noise and synthesis/degradation)
+			if pr.auxin_perfect_sources['active'] == True:
+				if current_cell in pr.auxin_perfect_sources['cells'] \
+				and sim_time >= pr.auxin_perfect_sources['time_interval'][0] \
+				and sim_time < pr.auxin_perfect_sources['time_interval'][1]:
+					auxin_cell_updated = pr.auxin_perfect_sources['value']
+			if pr.auxin_perfect_sinks['active'] == True:
+				if current_cell in pr.auxin_perfect_sinks['cells'] \
+				and sim_time >= pr.auxin_perfect_sinks['time_interval'][0] \
+				and sim_time < pr.auxin_perfect_sinks['time_interval'][1]:
+					auxin_cell_updated = pr.auxin_perfect_sinks['value']
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = float(1E-6)
 				
 			ip.auxin[y,x] = auxin_cell_updated
-			
-			#ip.auxin[y,x] = auxin_cell + h * 0.25 * auxin_cell
 
 
 def auxin_homeostasis_old(iteration, sim_time):
@@ -141,8 +150,6 @@ def auxin_homeostasis_old(iteration, sim_time):
 				auxin_cell_updated = float(1E-6)
 				
 			ip.auxin[y,x] = auxin_cell_updated
-			
-			#ip.auxin[y,x] = auxin_cell + h * 0.25 * auxin_cell
 
 
 def auxin_diffusion():

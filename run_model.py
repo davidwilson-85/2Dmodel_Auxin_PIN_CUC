@@ -74,9 +74,9 @@ def run(series_num = False):
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		
-		ip.auxin[1,5] = 250
 		'''
+		ip.auxin[1,5] = 250
+		
 		if sim_time >= 40:
 			ip.cuc[4:7,4:7] = 8
 			ip.auxin[4:7,4:7] += (1 * pr.euler_h)
