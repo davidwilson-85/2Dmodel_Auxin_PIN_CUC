@@ -13,10 +13,14 @@ def auxin_custom_manipulation(iteration, sim_time):
 	'''
 	This function implements some changes in auxin:
 	- Local exogenous application, etc
-	- Noise: random variation in concentration 
+	- Noise: random variation in concentration
+
+	Inputs and outputs:
+	- Function does not have parameter inputs. It reads pr.template_auxin
+	- Function does not return any objects. It writes to pr.template_auxin
 	
 	Params:
-	* sim_time: Iteration of the simulation. This is used for custom (local) auxin synth/degr
+	- sim_time: Iteration of the simulation. This is used for custom (local) auxin synth/degr
 	
 	'''
 

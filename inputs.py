@@ -32,6 +32,7 @@ adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
 
 '''
 
+# Copy arrays to new variables to not update the params namespace (critical when running series of simulations)
 auxin = pr.template_auxin * 10
 auxin_matrix_shape = auxin.shape
 tissue_rows, tissue_columns = auxin.shape[0], auxin.shape[1]
@@ -39,8 +40,8 @@ pin1 = pr.template_pin1 # Format is [z,y,x] = [cell face (T, R, B, L), cell row,
 pin1_matrix_shape = pin1.shape
 cuc = pr.template_cuc
 middle_domain = pr.template_middle_domain
+proximodistal_axis = pr.template_proximodistal_axis
 #adab_domain = np.loadtxt(adab_domain_template, delimiter=',', unpack=False)
-
 
 # Auxin fluxes: number of auxin molecules that cross between 2 cells in a given simultation step
 # auxin_fluxes_diffusion: fluxes via diffusion
@@ -61,9 +62,6 @@ pin1_incr_allcells_historic = []
 cuc_auxiliary = cuc * 0
 cuc_allcells_historic = []
 cuc_incr_allcells_historic = []
-
-# Arrays to store values when running a simulation series
-auxin_series_historic = []
 
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)

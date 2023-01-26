@@ -4,7 +4,7 @@ import time, os, random, shutil, datetime
 import numpy as np
 from scipy.integrate import odeint
 
-import importlib
+from sys import argv
 
 import params as pr
 #from sim_logs import params_2022_12_20_22_53_59 as pr # To re-run logged simulation
@@ -20,18 +20,12 @@ import tests.check as check
 # Do checks
 check.check_dirs()
 
-def run(series_num = False):
+def run(series_num = False, series_num_total = False):
 
 	"""
 	params:
 		series_num: When model is run as part of a series, this indicates the simulation number in the series.
 	"""
-
-	# When running as series, force reload the module inputs to reset all values to those in the parameters file. Then reassign the parameter being tested in the series.
-	'''if pr.is_series == True:
-		importlib.reload(pr)
-		importlib.reload(ip)
-		exec('pr.' + pr.series_param_a['name'] + '=' + str(param_val)) # exec() converts str to code'''
 
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time / pr.euler_h)
@@ -62,6 +56,9 @@ def run(series_num = False):
 		if pr.is_series == True:
 			if iteration  == nbr_iterations:
 				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
+
+		'''if iteration  == nbr_iterations:
+			func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)'''
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_model()
@@ -100,41 +97,4 @@ def run(series_num = False):
 			func_graph.create_gif(current_datetime)
 
 
-if __name__ == '__main__':
-
-	# Cleanup destination folder (remove and create)
-	shutil.rmtree(pr.img_dest_folder) 
-	os.mkdir(pr.img_dest_folder)
-	
-	if pr.is_series == False:
-
-		# Run single simulation
-		run()
-
-	if pr.is_series == True:
-
-		# Retrieve parameter that varies and range of values that it takes
-		param_a_space = np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points'])
-		series_num_total = len(param_a_space)
-
-		# Run simulation series
-		for key, val in enumerate(param_a_space):
-			#val = float(val)
-
-			# Force reload the module inputs to reset all values to those in the parameters file. Then reassign the parameter being tested in the series.
-			importlib.reload(pr)
-			importlib.reload(ip)
-			exec('pr.' + pr.series_param_a['name'] + '=' + str(val)) # exec() converts str to code
-			
-			# Run
-			print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(val))
-			run(series_num = key)
-
-'''
-TO DO:
-* Try staggered cells
-* Try PD growth?
-* Try to integrate custom synth and degradation in ODEint model
-* Check if the order in which the functions are called has an effect on output of simulations
-
-'''
+run()

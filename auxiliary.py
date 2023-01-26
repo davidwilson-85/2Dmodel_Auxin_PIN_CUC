@@ -6,7 +6,9 @@ Auxiliary functions go here
 
 import shutil, datetime
 import inputs as ip
+import params as pr
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 import seaborn as sns
@@ -76,8 +78,49 @@ def track_simulation(iteration, nbr_iterations):
         fig1.savefig('graphs/levels.png', bbox_inches='tight')
         plt.close()
 
+        print('Created plot: levels')
 
-def track_series(series_num, series_num_total):
+
+def create_line_plot(series_num, series_num_total):
+
+    """
+    Creates a line plot representing the auxin profile in a chosen column (or row) of cells
+
+    Params:
+        series_num: 0-based number of the current simulation in the series
+        series_num_total: total number of simulations in the series
+    """
+
+    if series_num == 0:
+        global auxin_series_historic
+        auxin_series_historic = []
+
+    # Create y axis points of graph
+    tissue_rows = ip.auxin.shape[0]
+    x = np.linspace(1, tissue_rows, tissue_rows)
+    
+    values = ip.auxin[:,5].copy()
+    auxin_series_historic.append(values)
+
+    if series_num == series_num_total - 1:
+        fig2 = plt.figure()
+        fig2, ax = plt.subplots(1, figsize=(3.5,5))
+        # Choices that worked: 'Spectral', 'coolwarm', 'plasma', 'viridis', 'jet', 'brg'
+        ax.set_prop_cycle('color', plt.cm.viridis(np.linspace(0,1,series_num_total)))
+        for i in auxin_series_historic:
+            ax.plot(i,x, c='gray') # For chromatic lines following defined colormap
+            #ax.plot(i,x, c='gray') # For gray lines
+        ax.invert_yaxis()
+        plt.xlabel('[Auxin] A.U.')
+        plt.ylabel('Cell row')
+        fig2.savefig('graphs/auxin_profile.png', bbox_inches='tight')
+        #plt.colorbar(label="param value", orientation="vertical")
+        plt.close()
+
+        print('Created plot: auxin profile')
+
+
+def create_line_plot_2(series_num, series_num_total):
 
     """
     Creates a line plot with representing the auxin profile in a chosen column (or row) of cells
@@ -86,19 +129,43 @@ def track_series(series_num, series_num_total):
         series_num: 0-based number of the current simulation in the series
         series_num_total: total number of simulations in the series
     """
-    
+
+    if series_num == 0:
+        global auxin_series_historic
+        auxin_series_historic = []
+
+    # Create the x values of graph
     values = ip.auxin[:,5].copy()
-    ip.auxin_series_historic.append(values)
+    auxin_series_historic.append(values)
 
     if series_num == series_num_total - 1:
-        fig2 = plt.figure()
-        fig2, ax = plt.subplots(1, figsize=(5,5))
-        ax.set_prop_cycle('color', plt.cm.Spectral(np.linspace(0,1,series_num_total)))
-        for i in ip.auxin_series_historic:
-            ax.plot(i)
-        fig2.savefig('graphs/series.png', bbox_inches='tight')
-        #plt.colorbar(label="param value", orientation="vertical")
-        plt.close()
+
+        # Create the y values of graph
+        tissue_rows = ip.auxin.shape[0]
+        x = np.linspace(1, tissue_rows, tissue_rows)
+        
+        # Define colormap
+        cmap = plt.get_cmap('viridis', series_num_total)
+        
+        fig2, ax1 = plt.subplots(1, 1, figsize=(5, 5))
+        
+        for n, y in enumerate(auxin_series_historic):
+            ax1.plot(y, x, c=cmap(n))
+        ax1.invert_yaxis()
+        plt.xlabel('[Auxin] A.U.')
+        plt.ylabel('Cell row')
+        
+        # Colorbar
+        # Normalizer
+        norm = mpl.colors.Normalize(vmin=pr.series_param_a['min'], vmax=pr.series_param_a['max'])
+        # creating ScalarMappable
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        plt.colorbar(sm, ticks=np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points']), label=pr.series_param_a['name'])
+
+        fig2.savefig('graphs/auxin_profile.png', bbox_inches='tight')
+
+        print('Created plot: auxin profile')
 
 
 def write_to_log(timestamp):
@@ -190,4 +257,5 @@ def save_ndarray():
     
 
 if __name__ == '__main__':
-    write_to_log('test_timestamp')
+    #write_to_log('test_timestamp')
+    create_line_plot_2(0, 1)

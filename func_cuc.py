@@ -8,6 +8,8 @@ import inputs as ip
 def cuc_expression():
 
 	'''
+	DEPRECATED. THIS FUNCTIONALITY IS NOW INTEGRATED IN regulatory_network.py.
+
 	CUC expression is produced at a constant rate, (promoted in the middle domain), repressed by side (adaxial and abaxial) domain, repressed by auxin, and decays at a constant rate.
 
 	C' = h * [ k(C) - S*k(SC) - A*k(AC) - C*k(Cdecay) ]

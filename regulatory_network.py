@@ -19,6 +19,7 @@ def model_regulatory_network(init_values, t):
     
     k_AS = pr.k_auxin_synth
     k_CA = pr.k_cuc_auxin_synth
+    k_AA = pr.k_auxin_auxin_synth
     k_MDA = pr.k_md_auxin_synth
     k_AT = pr.k_auxin_degr
 
@@ -33,13 +34,19 @@ def model_regulatory_network(init_values, t):
     k_CP = pr.k_cuc_pin1
     k_PT = pr.k_pin1_decay
 
-    dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
+    if A < pr.k_auxin_auxin_synth_thr:
+        dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
+    else:
+        dA_dt = k_AS + A * k_AA + C * k_CA + MD * k_MDA - A * k_AT
     #dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
+    
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
+    
     dPt_dt = k_PS + A * k_AP + C * k_CP - Pt * k_PT
     dPr_dt = k_PS + A * k_AP + C * k_CP - Pr * k_PT
     dPb_dt = k_PS + A * k_AP + C * k_CP - Pb * k_PT
     dPl_dt = k_PS + A * k_AP + C * k_CP - Pl * k_PT
+    
     dMD_dt = 0
     dPD_dt = 0
 
@@ -60,7 +67,7 @@ def solve_model():
 				ip.pin1[2,y,x],
 				ip.pin1[3,y,x],
 				ip.middle_domain[x],
-                pr.template_proximodistal_axis[y]
+                ip.proximodistal_axis[y]
 			]
 
 			# Solve

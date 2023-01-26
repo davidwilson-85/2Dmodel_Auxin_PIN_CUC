@@ -4,7 +4,7 @@ import numpy as np
 
 # General
 euler_h = .1             # Euler step size = h; (0 - 1]
-simulation_time = 500     # Arbitrary Units (AU) (let's assume it is hours)
+simulation_time = 200     # Arbitrary Units (AU) (let's assume it is hours)
 img_dest_folder = 'images'
 create_cell_plots = 'multiple' # False / 'multiple' / 'only_last'
 cell_plot_frequency = 1     # Simulation time units between plots
@@ -20,15 +20,17 @@ middle_domain = (0, 9)
 adab_domain = (0, 9)
 
 # Auxin homeostasis
-k_auxin_diffusion = .4 #.3 .12  # Rel. amount of molecules that cross between two adjacent cells per cycle
-k_auxin_synth = 0 # Basal abs. amount of molecules synthesized per cell per unit of time
+k_auxin_diffusion = .4 #.3 .12 # Rel. amount of molecules that cross between two adjacent cells per cycle
+k_auxin_synth = 0.8 # Basal abs. amount of molecules synthesized per cell per unit of time
 k_auxin_degr = 0.02 #.02 #0.2 #0.02 #0.01 #0.06 # Rel. amount of molecules degraded per unit of time
-k_cuc_auxin_synth = .5 #.75 #.75 #1 #.5 #.6 #.3
-k_md_auxin_synth = .05 #.25 #0
+k_cuc_auxin_synth = 0 #0.25 #0.5 #.75 #.75 #1 #.5 #.6 #.3
+k_md_auxin_synth =  0 #.05 #.25 #0
+k_auxin_auxin_synth = 0 #0.1
+k_auxin_auxin_synth_thr = 100000
 
-# Auxin noise ( interval is [) and refers to iterations)
+# Auxin noise (interval is [) and refers to iterations)
 auxin_noise = {
-  'limit': 3,
+  'limit': 4,
   'iteration_interval': (0,1000000)
 }
 # Auxin perfect sources (interval is [) and refers to simulation time)
@@ -77,19 +79,19 @@ k_pin1_effi_cuc = 0 #.04 #.1 # CUC effect on PIN1 efficiency [0 = no effect]
 
 # CUC expression
 k_cuc_synth = 0 #.01 #.35
-k_md_cuc = .1
-k_pd_cuc = .1
+k_md_cuc = 0.1
+k_pd_cuc = 0.1
 k_adab_cuc = 0
 k_auxin_cuc = .002 #.0005 #.01
-k_cuc_decay = .1
+k_cuc_decay = 0.1
 
 # Series simulations for parameter value exploration
-is_series = False # Specifies whether simulation is a single run or a series
+is_series = True # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
     'name': 'k_adab_cuc',
 	'min': 0,
 	'max': 0,
-	'num_points': 8
+	'num_points': 11
 }
 
 ## Templates with initial values
