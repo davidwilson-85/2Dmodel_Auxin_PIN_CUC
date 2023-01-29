@@ -82,7 +82,7 @@ def run(series_num = False):
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		#ip.auxin[1,5] = 250
+		ip.cuc[4:7,4:7] = 9
 		
 	print("%s seconds" % (time.time() - start_time))
 		
@@ -121,7 +121,7 @@ if __name__ == '__main__':
 		for key, val in enumerate(param_a_space):
 			#val = float(val)
 
-			# Force reload the module inputs to reset all values to those in the parameters file. Then reassign the parameter being tested in the series.
+			# Force reload the module inputs to reset all values to those in the parameters file (this is critical). Then reassign the parameter being tested in the series.
 			importlib.reload(pr)
 			importlib.reload(ip)
 			exec('pr.' + pr.series_param_a['name'] + '=' + str(val)) # exec() converts str to code
