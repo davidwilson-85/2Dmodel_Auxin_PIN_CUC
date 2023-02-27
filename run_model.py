@@ -27,12 +27,6 @@ def run(series_num = False):
 		series_num: When model is run as part of a series, this indicates the simulation number in the series.
 	"""
 
-	# When running as series, force reload the module inputs to reset all values to those in the parameters file. Then reassign the parameter being tested in the series.
-	'''if pr.is_series == True:
-		importlib.reload(pr)
-		importlib.reload(ip)
-		exec('pr.' + pr.series_param_a['name'] + '=' + str(param_val)) # exec() converts str to code'''
-
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time / pr.euler_h)
 
@@ -82,7 +76,9 @@ def run(series_num = False):
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		ip.cuc[4:7,4:7] = 9
+		ip.cuc[3:10,4:9] = 3
+		ip.cuc[4:9,5:8] = 5
+		ip.cuc[5:8,4:7] = 8
 		
 	print("%s seconds" % (time.time() - start_time))
 		

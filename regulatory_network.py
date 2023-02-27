@@ -34,11 +34,13 @@ def model_regulatory_network(init_values, t):
     k_CP = pr.k_cuc_pin1
     k_PT = pr.k_pin1_decay
 
+    '''
     if A < pr.k_auxin_auxin_synth_thr:
         dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
     else:
         dA_dt = k_AS + A * k_AA + C * k_CA + MD * k_MDA - A * k_AT
-    #dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
+    '''
+    dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
     
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
     

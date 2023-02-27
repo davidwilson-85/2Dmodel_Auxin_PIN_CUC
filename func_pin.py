@@ -6,6 +6,8 @@ import math
 import params as pr
 import inputs as ip
 
+import odeint
+
 
 def pin_expression():
 
@@ -54,7 +56,8 @@ def pin_expression():
 def pin_polarity():
 	
 	"""
-	This function determines, for each cell in the tissue, the PIN1 polarity mode. Then it calls the corresponding function [e.g. pin_utg_smith2006() ]
+	This function determines, for each cell in the tissue, the PIN1 polarity mode.
+	Then it calls the corresponding function [e.g. pin_utg_smith2006()] that will update the PIN polarity of a single cell
 	
 	CUC genes affect PIN1 subcellular localization. It is not clear how. Test different
 	hypotheses (WTF, reversal, non-polar, DTCG, UTG dampening, etc...)
@@ -69,6 +72,9 @@ def pin_polarity():
 
 			if pr.pin1_polarity == 'wtf_abley2016':
 				pin_wtf_abley2016(y, x)
+
+			if pr.pin1_polarity == 'wtf_odeint':
+				solve_wtf_model(y, x)
 			
 			if pr.pin1_polarity == 'multi':
 				
@@ -242,7 +248,7 @@ def pin_wtf_abley2016(y, x):
 	flux_pin1 = ip.auxin_fluxes_pin1
 	
 	# Calculate net flux at each cell face (out = positive; in = negative)
-	# To express it as molecules / hour, I diveide by the step size (Euler h)
+	# To express it as molecules / time step, I divide by the step size (Euler h)
 	net_flux_t = ( flux_diff[0,y,x] - flux_diff[1,y,x] + flux_pin1[0,y,x] - flux_pin1[1,y,x] ) / h
 	net_flux_r = ( flux_diff[2,y,x] - flux_diff[3,y,x] + flux_pin1[2,y,x] - flux_pin1[3,y,x] ) / h
 	net_flux_b = ( flux_diff[4,y,x] - flux_diff[5,y,x] + flux_pin1[4,y,x] - flux_pin1[5,y,x] ) / h
@@ -273,6 +279,80 @@ def pin_wtf_abley2016(y, x):
 	if pin1[1,y,x] >= wtf_pin1_max: pin1[1,y,x] = wtf_pin1_max
 	if pin1[2,y,x] >= wtf_pin1_max: pin1[2,y,x] = wtf_pin1_max
 	if pin1[3,y,x] >= wtf_pin1_max: pin1[3,y,x] = wtf_pin1_max
+
+
+def model_pin_wtf(init_values, t):
+
+	a = pr.k_WTF_a
+	b = pr.k_WTF_b
+
+	Pt, Pr, Pb, Pl, Ft, Fr, Fb, Fl = init_values
+
+	# Linear effect of flux on PIN1
+	dPt_dt = a * Ft - b * Pt
+	dPr_dt = a * Fr - b * Pr
+	dPb_dt = a * Fb - b * Pb
+	dPl_dt = a * Fl - b * Pl
+	dFt_dt, dFr_dt, dFb_dt, dFl_dt = 0, 0, 0, 0
+
+	return [dPt_dt, dPr_dt, dPb_dt, dPl_dt, dFt_dt, dFr_dt, dFb_dt, dFl_dt]
+
+
+def solve_wtf_model(y, x):
+
+	# Calculate net flux at each cell face (out = positive; in = negative)
+	# To express it as molecules / time step, I divide by the step size (Euler h)
+	h = pr.euler_h
+	fd = ip.auxin_fluxes_diffusion
+	fp = ip.auxin_fluxes_pin1
+	net_flux_t = ( fd[0,y,x] - fd[1,y,x] + fp[0,y,x] - fp[1,y,x] ) / h
+	net_flux_r = ( fd[2,y,x] - fd[3,y,x] + fp[2,y,x] - fp[3,y,x] ) / h
+	net_flux_b = ( fd[4,y,x] - fd[5,y,x] + fp[4,y,x] - fp[5,y,x] ) / h
+	net_flux_l = ( fd[6,y,x] - fd[7,y,x] + fp[6,y,x] - fp[7,y,x] ) / h
+	# If net outflux is negative, there is no effect on PIN1 allocation to membrane, so flux is considered as if it was 0
+	if net_flux_t < 0: net_flux_t = 0
+	if net_flux_r < 0: net_flux_r = 0
+	if net_flux_b < 0: net_flux_b = 0
+	if net_flux_l < 0: net_flux_l = 0
+
+	# Gather initial values for ODEint
+	model_init_values = [
+		ip.pin1[0,y,x],
+		ip.pin1[1,y,x],
+		ip.pin1[2,y,x],
+		ip.pin1[3,y,x],
+		net_flux_t,
+		net_flux_r,
+		net_flux_b,
+		net_flux_l
+	]
+
+	# Solve
+	cell_solution = odeint(model_pin_wtf, model_init_values, np.linspace(0, pr.euler_h, 2))
+
+	# Update current cell in data arrays with solution output
+	# Abley2016: If [PIN1](ij) reaches a threshold [], no more PIN1 can be allocated to membrane ij
+	pm = pr.k_WTF_pin1_max
+	
+	if cell_solution[-1,0] <= pm:
+		ip.pin1[0,y,x] = cell_solution[-1,0]
+	else:
+		ip.pin1[0,y,x] = pm
+	
+	if cell_solution[-1,1] <= pm:
+		ip.pin1[1,y,x] = cell_solution[-1,1]
+	else:
+		ip.pin1[1,y,x] = pm
+	
+	if cell_solution[-1,2] <= pm:
+		ip.pin1[2,y,x] = cell_solution[-1,2]
+	else:
+		ip.pin1[2,y,x] = pm
+	
+	if cell_solution[-1,3] <= pm:
+		ip.pin1[3,y,x] = cell_solution[-1,3]
+	else:
+		ip.pin1[3,y,x] = pm
 
 
 def pin_wtf_p(y, x, auxin_fluxes, pin1, k_WTF):

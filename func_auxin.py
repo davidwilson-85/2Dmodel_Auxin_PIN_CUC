@@ -225,7 +225,7 @@ def auxin_diffusion():
 			# Vector Y component
 			fluxes[9,y,x] = B_net_flux - T_net_flux
 
-			# Angle of net flux is calculated in func_graph module, in functions create_cell_plot() and vector_to_degrees()
+			# Angle of net flux is calculated in functions func_graph.create_cell_plot() and func_graph.vector_to_degrees()
 
 	# Update the auxin concentrations after calculating all the fluxes to avoid polarity effect of looping through numpy array
 	# This could go inside auxin_homeostasis()
