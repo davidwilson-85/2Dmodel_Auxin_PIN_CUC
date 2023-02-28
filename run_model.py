@@ -7,7 +7,7 @@ from scipy.integrate import odeint
 import importlib
 
 import params as pr
-#from sim_logs import params_2022_12_20_22_53_59 as pr # To re-run logged simulation
+#from sim_logs import params_2023_01_26_22_52_09 as pr # To re-run logged simulation
 import inputs as ip
 import regulatory_network as rn
 import func_graph
@@ -58,7 +58,7 @@ def run(series_num = False):
 				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
 		
 		# SOLVE MODEL REGULATORY NETWORK
-		rn.solve_model()
+		rn.solve_rn_model()
 
 		# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
 		func_auxin.auxin_custom_manipulation(iteration, sim_time)
@@ -76,9 +76,9 @@ def run(series_num = False):
 		aux.track_simulation(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		ip.cuc[3:10,4:9] = 3
-		ip.cuc[4:9,5:8] = 5
-		ip.cuc[5:8,4:7] = 8
+		#ip.cuc[3:10,4:9] = 3
+		#ip.cuc[4:9,5:8] = 5
+		#ip.cuc[5:8,4:7] = 8
 		
 	print("%s seconds" % (time.time() - start_time))
 		

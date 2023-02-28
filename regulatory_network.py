@@ -40,7 +40,8 @@ def model_regulatory_network(init_values, t):
     else:
         dA_dt = k_AS + A * k_AA + C * k_CA + MD * k_MDA - A * k_AT
     '''
-    dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
+    #dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
+    dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
     
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
     
@@ -55,7 +56,7 @@ def model_regulatory_network(init_values, t):
     return [dA_dt, dC_dt, dPt_dt, dPr_dt, dPb_dt, dPl_dt, dMD_dt, dPD_dt]
 
 
-def solve_model():
+def solve_rn_model():
     
     # Solve in a cell-by-cell basis
     for y in range(ip.tissue_rows):
