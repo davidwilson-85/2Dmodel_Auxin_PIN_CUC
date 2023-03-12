@@ -270,7 +270,7 @@ def pin_on_auxin():
 	pin1 = ip.pin1
 	CUC = ip.cuc
 	Kp = pr.k_pin1_effi_basal
-	Kcp = pr.k_cuc_pin1_effi
+	Kcp = pr.k_pin1_effi_cuc
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1

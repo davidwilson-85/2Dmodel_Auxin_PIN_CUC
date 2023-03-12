@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+import pandas as pd
 import seaborn as sns
 
 
@@ -81,14 +82,16 @@ def track_simulation(iteration, nbr_iterations):
         print('Created plot: levels')
 
 
-def create_line_plot(series_num, series_num_total):
+def create_line_plot_single(timestamp, series_num, series_num_total):
 
     """
     Creates a line plot representing the auxin profile in a chosen column (or row) of cells
 
     Params:
-        series_num: 0-based number of the current simulation in the series
-        series_num_total: total number of simulations in the series
+        * timestamp: unique identifier of the simulation based on the date and time at which the simulation is run, and to be printed on the image to be able to recover the parameters used
+        * series_num: 0-based number of the current simulation in the series
+        * series_num_total: total number of simulations in the series
+        * data arrays of the model
     """
 
     if series_num == 0:
@@ -100,19 +103,22 @@ def create_line_plot(series_num, series_num_total):
     x = np.linspace(1, tissue_rows, tissue_rows)
     
     values = ip.auxin[:,5].copy()
-    auxin_series_historic.append(values)
 
+    # Convert to Pandas dataframe and save as a csv file
+    df = pd.DataFrame(values)
+    df.to_csv("graphs/auxin_profile.csv", index=False)
+
+    # Make plot
     if series_num == series_num_total - 1:
         fig2 = plt.figure()
         fig2, ax = plt.subplots(1, figsize=(3.5,5))
         # Choices that worked: 'Spectral', 'coolwarm', 'plasma', 'viridis', 'jet', 'brg'
         ax.set_prop_cycle('color', plt.cm.viridis(np.linspace(0,1,series_num_total)))
-        for i in auxin_series_historic:
-            ax.plot(i,x, c='gray') # For chromatic lines following defined colormap
-            #ax.plot(i,x, c='gray') # For gray lines
+        ax.plot(values,x, c='gray')
         ax.invert_yaxis()
         plt.xlabel('[Auxin] A.U.')
         plt.ylabel('Cell row')
+        ax.annotate(timestamp, xy=(2, 1), xytext=(0.01, .99), textcoords='figure fraction', va='top', ha='left')
         fig2.savefig('graphs/auxin_profile.png', bbox_inches='tight')
         #plt.colorbar(label="param value", orientation="vertical")
         plt.close()
@@ -120,10 +126,11 @@ def create_line_plot(series_num, series_num_total):
         print('Created plot: auxin profile')
 
 
-def create_line_plot_2(series_num, series_num_total):
+def create_line_plot_multi(timestamp, series_num, series_num_total):
 
     """
-    Creates a line plot with representing the auxin profile in a chosen column (or row) of cells
+    Function is called in the last iteration of each simulation and gathers the auxin values in the desired cells
+    In the last series of the simulation, it creates a line plot with representing the auxin profile in a chosen column (or row) of cells
 
     Params:
         series_num: 0-based number of the current simulation in the series
@@ -140,6 +147,10 @@ def create_line_plot_2(series_num, series_num_total):
 
     if series_num == series_num_total - 1:
 
+        # Convert to Pandas dataframe, transpose, and save as a csv file
+        df = pd.DataFrame(auxin_series_historic).T
+        df.to_csv("graphs/auxin_profile_multiple.csv", index=False)
+
         # Create the y values of graph
         tissue_rows = ip.auxin.shape[0]
         x = np.linspace(1, tissue_rows, tissue_rows)
@@ -147,11 +158,12 @@ def create_line_plot_2(series_num, series_num_total):
         # Define colormap
         cmap = plt.get_cmap('viridis', series_num_total)
         
-        fig2, ax1 = plt.subplots(1, 1, figsize=(5, 5))
+        fig2, ax = plt.subplots(1, 1, figsize=(5, 5))
         
         for n, y in enumerate(auxin_series_historic):
-            ax1.plot(y, x, c=cmap(n))
-        ax1.invert_yaxis()
+            ax.plot(y, x, c=cmap(n))
+        ax.invert_yaxis()
+        ax.annotate(timestamp, xy=(2, 1), xytext=(0.01, .99), textcoords='figure fraction', va='top', ha='left')
         plt.xlabel('[Auxin] A.U.')
         plt.ylabel('Cell row')
         
@@ -163,7 +175,7 @@ def create_line_plot_2(series_num, series_num_total):
         sm.set_array([])
         plt.colorbar(sm, ticks=np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points']), label=pr.series_param_a['name'])
 
-        fig2.savefig('graphs/auxin_profile.png', bbox_inches='tight')
+        fig2.savefig('graphs/auxin_profile_multiple.png', bbox_inches='tight')
 
         print('Created plot: auxin profile')
 
@@ -258,4 +270,4 @@ def save_ndarray():
 
 if __name__ == '__main__':
     #write_to_log('test_timestamp')
-    create_line_plot_2(0, 1)
+    create_line_plot_multi(0, 1)

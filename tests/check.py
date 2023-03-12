@@ -27,3 +27,6 @@ def check_dirs():
     
     if not os.path.exists('templates/2D'):
         os.makedirs('templates/2D')
+    
+    if not os.path.exists('out_batch'):
+        os.makedirs('out_batch')

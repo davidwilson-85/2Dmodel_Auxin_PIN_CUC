@@ -66,7 +66,7 @@ cuc_incr_allcells_historic = []
 # LUTs
 lut_auxin = np.loadtxt('luts/lut_red.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 lut_pin1 = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
-lut_cuc = np.loadtxt('luts/lut_green.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
+lut_cuc = np.loadtxt('luts/lut_magenta.csv', delimiter=',', unpack=True, dtype=('int'), skiprows=1)
 
 # Images/art
 im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
