@@ -19,8 +19,17 @@ import auxiliary as aux
 def run(series_num_total = False, series_num = False):
 
 	"""
-	params:
+	Simulation loop function. Is called by run_model.py/run_model_new.py 
+	
+	Params:
+		series_num_total: When model is run as part of a series, this indicates the total number of simulations in the series.
 		series_num: When model is run as part of a series, this indicates the simulation number in the series.
+	
+	Input: 
+		All input is stored in file params.py, imported here
+	
+	Output:
+		A series of files (graphs, images, videos, text files)
 	"""
 
 	# Calculate number of iterations based on simulation time and step size

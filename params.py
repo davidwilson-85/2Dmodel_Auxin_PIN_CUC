@@ -91,7 +91,7 @@ series_param_a = { # If is_series = True, this overrides value of the chosen par
     'name': 'auxin_noise["limit"]',
 	'min': 4,
 	'max': 4,
-	'num_points': 3
+	'num_points': 30
 }
 
 # Batch of simulations for automation
@@ -99,11 +99,27 @@ is_batch = True # Specifies whether simulation is a batch of simulations
 batch_params = { # If is_series = True, this overrides value of the chosen parameter
     1: {
         'k_md_cuc': .1,
-        'k_cuc_auxin_synth': 0
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0,
+        'k_auxin_synth': .8
     },
 	2: {
         'k_md_cuc': .1,
-        'k_cuc_auxin_synth': 0.25
+        'k_cuc_auxin_synth': .25,
+        'k_md_auxin_synth': 0,
+        'k_auxin_synth': .8
+    },
+    3: {
+        'k_md_cuc': 0,
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0,
+        'k_auxin_synth': .8
+    },
+	4: {
+        'k_md_cuc': 0,
+        'k_cuc_auxin_synth': .25,
+        'k_md_auxin_synth': 0,
+        'k_auxin_synth': .8
     }
 }
 

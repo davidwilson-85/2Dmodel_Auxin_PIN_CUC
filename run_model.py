@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import time, os, random, shutil, datetime
+import time, os, shutil, datetime
 import numpy as np
 from scipy.integrate import odeint
 
 import importlib
 
 import params as pr
-#from sim_logs import params_2023_01_26_22_52_09 as pr # To re-run logged simulation
 import inputs as ip
 import regulatory_network as rn
 import func_graph
@@ -30,10 +29,10 @@ def run(series_num = False):
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time / pr.euler_h)
 
-	current_datetime = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+	timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
-	# Write initial state and simulation parameters to log
-	aux.write_to_log(current_datetime)
+	# Write params.py (initial state and simulation parameters) to log
+	aux.write_to_log(timestamp)
 
 	# Time execution of simulation
 	start_time = time.time()
@@ -52,15 +51,15 @@ def run(series_num = False):
 		# OPTIONAL: DRAW CELL PLOT
 		if pr.is_series == False:
 			if (iteration * pr.euler_h) % pr.cell_plot_frequency == 0:
-				func_graph.create_cell_plot(current_datetime, iteration)
+				func_graph.create_cell_plot(timestamp, iteration)
 		if pr.is_series == True:
-			if iteration  == nbr_iterations:
-				func_graph.create_cell_plot(current_datetime, iteration, series_num = series_num)
+			if iteration == nbr_iterations:
+				func_graph.create_cell_plot(timestamp, iteration, series_num = series_num)
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_rn_model()
 
-		# SOLVE REMAINING PROCESSES BY FORWARD EULER METHOD
+		# SOLVE REMAINING PROCESSES
 		func_auxin.auxin_custom_manipulation(iteration, sim_time)
 		if pr.k_auxin_diffusion > 0:
 			func_auxin.auxin_diffusion()
@@ -83,17 +82,17 @@ def run(series_num = False):
 	print("%s seconds" % (time.time() - start_time))
 		
 	# Graph auxin profile in central column of cells
-	if pr.is_series == True:
-		aux.create_line_plot_2(series_num, series_num_total)
 	if pr.is_series == False:
-		aux.create_line_plot(0, 1)
+		aux.create_line_plot_single(timestamp, 0, 1)
+	if pr.is_series == True:
+		aux.create_line_plot_multi(timestamp, series_num, series_num_total)
 
 	# Create video/gif files
 	if pr.is_series == False:
 		if pr.create_video == True:
-			func_graph.create_video(current_datetime)
+			func_graph.create_video(timestamp)
 		if pr.create_gif == True:
-			func_graph.create_gif(current_datetime)
+			func_graph.create_gif(timestamp)
 
 
 if __name__ == '__main__':
@@ -117,7 +116,7 @@ if __name__ == '__main__':
 		for key, val in enumerate(param_a_space):
 			#val = float(val)
 
-			# Force reload the module inputs to reset all values to those in the parameters file (this is critical). Then reassign the parameter being tested in the series.
+			# Force reload the module inputs to reset all values to those in the parameters file (this is critical). Then reassign the parameter being overwritten in each simulation of the series.
 			importlib.reload(pr)
 			importlib.reload(ip)
 			exec('pr.' + pr.series_param_a['name'] + '=' + str(val)) # exec() converts str to code
@@ -126,11 +125,15 @@ if __name__ == '__main__':
 			print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(val))
 			run(series_num = key)
 
+				
+
+
+
 '''
 TO DO:
 * Try staggered cells
 * Try PD growth?
-* Try to integrate custom synth and degradation in ODEint model
+* Try to move more things (like custom auxin synth and degradation) to ODEint model
 * Check if the order in which the functions are called has an effect on output of simulations
 
 '''
