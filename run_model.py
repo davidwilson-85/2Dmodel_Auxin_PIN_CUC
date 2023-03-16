@@ -2,131 +2,148 @@
 
 import time, os, shutil, datetime
 import numpy as np
-from scipy.integrate import odeint
 
 import importlib
 
+from main import run
 import params as pr
 import inputs as ip
-import regulatory_network as rn
-import func_graph
-import func_auxin
-import func_pin
 
-import auxiliary as aux
 import tests.check as check
 
 # Do checks
 check.check_dirs()
 
-def run(series_num = False):
 
-	"""
-	params:
-		series_num: When model is run as part of a series, this indicates the simulation number in the series.
-	"""
+def run_single(batch_sim_params = None):
+	'''
+	Runs a single simulation with the parameters specified in params.py
+	'''
+	
+	# Cleanup destination folder (remove and create)
+	shutil.rmtree(pr.img_dest_folder) 
+	os.mkdir(pr.img_dest_folder)
 
-	# Calculate number of iterations based on simulation time and step size
-	nbr_iterations = int(pr.simulation_time / pr.euler_h)
+	# Force reload the module inputs to reset all values to those in the parameters file (this is critical).
+	# Reassign parameters defined inside dict pr.batch_params and the parameter being overwritten in each simulation of the series.
+	if batch_sim_params is not None:
+		importlib.reload(pr)
+		importlib.reload(ip)
+		for param, val in batch_sim_params.items():
+			exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code
+	
+	# Run single simulation
+	run()
 
-	timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
-	# Write params.py (initial state and simulation parameters) to log
-	aux.write_to_log(timestamp)
+def run_series(batch_sim_params = None):
+	'''
+	Runs a series of simulations
+	Parameters are defined in params.py
+	Each simulation will share all parameters except for one
+	The changing parameter and its value in each simulation of the series is defined in params.series_param_a.
+	'''
+	
+	# Cleanup destination folder (remove and create)
+	shutil.rmtree(pr.img_dest_folder) 
+	os.mkdir(pr.img_dest_folder)
 
-	# Time execution of simulation
-	start_time = time.time()
+	# Retrieve parameter that varies and range of values that it takes
+	param_a_space = np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points'])
+	series_num_total = len(param_a_space)
 
-	# Perform simulation cycles
-	for iteration in range(nbr_iterations + 1):
+	# Run simulation series
+	for key, series_val in enumerate(param_a_space):
+		#val = float(val)
+
+		# Force reload the module inputs to reset all values to those in the parameters file (this is critical).
+		# Reassign parameters defined inside dict pr.batch_params and the parameter being overwritten in each simulation of the series.
+		importlib.reload(pr)
+		importlib.reload(ip)
+		if batch_sim_params is not None:
+			for param, val in batch_sim_params.items():
+				exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code
+		exec('pr.' + pr.series_param_a['name'] + '=' + str(series_val)) # exec() converts str to code
 		
-		sim_time = iteration * pr.euler_h
+		# Run
+		print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(series_val))
+		run(series_num_total, series_num = key)
+
+
+def run_batch():
+	'''
+	Runs a batch of simulations
+	A batch consists of a set of single or simulations or series of simulations
+	The parameters for each simulations in the batch are defined in params.batch_params
+	This function calls run_single() or run_series() and collects the output in folder out_batch for review at the end of the batch
+
+	Steps:
+	1. Define parameters to inject in the model, overriding those specified indide dict pr.batch_params for single simulations.
+	2. Run model.
+	3. Copy and rename desired output files to keep them for later.
+	'''
+
+	# Define batch unique id and create folder to contain all simulations
+	batch_id = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+	batch_dir = 'out_batch/batch_' + str(batch_id)
+	os.mkdir(batch_dir)
+
+	for sim_id, sim in pr.batch_params.items():
 		
-		# Print iteration to terminal
-		if iteration < nbr_iterations:
-			print(str(iteration) + ' / ' + str(nbr_iterations), end='\r')
-		else:
-			print(str(iteration) + ' / ' + str(nbr_iterations), end='\n')
+		importlib.reload(pr)
+		importlib.reload(ip)
+
+		# Make subdir for simulation
+		sim_dir = 'out_batch/batch_' + str(batch_id) + '/' + str(sim_id)
+		os.mkdir(sim_dir)
+
+		'''# Update parameters defined inside dict pr.batch_params
+		for param, val in sim.items():
+			exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code'''
+
+		print('\nbatch_num: ' + str(sim_id) + '; params: ' + str(sim))
+
+		# Run model and collect the output
 		
-		# OPTIONAL: DRAW CELL PLOT
 		if pr.is_series == False:
-			if (iteration * pr.euler_h) % pr.cell_plot_frequency == 0:
-				func_graph.create_cell_plot(timestamp, iteration)
+			
+			run_single(sim)
+
+			# Copy output to batch/simulation folder
+			shutil.copytree(pr.img_dest_folder, sim_dir, dirs_exist_ok=True)
+			shutil.copy('graphs/auxin_profile.png', batch_dir + '/auxin_profile_' + str(sim_id) + '.png')
+			shutil.copy('graphs/auxin_profile.csv', batch_dir + '/auxin_profile_' + str(sim_id) + '.csv')
+			shutil.copy('graphs/levels.png', batch_dir + '/levels_' + str(sim_id) + '.png')
+
 		if pr.is_series == True:
-			if iteration == nbr_iterations:
-				func_graph.create_cell_plot(timestamp, iteration, series_num = series_num)
-		
-		# SOLVE MODEL REGULATORY NETWORK
-		rn.solve_rn_model()
+			
+			run_series(sim)
 
-		# SOLVE REMAINING PROCESSES
-		func_auxin.auxin_custom_manipulation(iteration, sim_time)
-		if pr.k_auxin_diffusion > 0:
-			func_auxin.auxin_diffusion()
-		func_pin.pin_polarity()
-		func_auxin.pin_on_auxin()
-		
-		# Limit / correct values out of bound (e.g. auxin < 0)?
-		#for y in range(ip.tissue_rows):
-		#	for x in range(ip.tissue_columns):
-		#		if ip.auxin[y,x] < 0: ip.auxin[y,x] = 0
+			# Copy output to batch/simulation folder
+			shutil.copytree(pr.img_dest_folder, sim_dir, dirs_exist_ok=True)
+			shutil.copy('graphs/auxin_profile_multiple.png', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.png')
+			shutil.copy('graphs/auxin_profile_multiple.csv', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.csv')
 
-		# Track simulation
-		aux.track_simulation(iteration, nbr_iterations)
-
-		# FOR TEMPORARY/TESTING FUNCTIONALY
-		#ip.cuc[3:10,4:9] = 3
-		#ip.cuc[4:9,5:8] = 5
-		#ip.cuc[5:8,4:7] = 8
-		
-	print("%s seconds" % (time.time() - start_time))
-		
-	# Graph auxin profile in central column of cells
-	if pr.is_series == False:
-		aux.create_line_plot_single(timestamp, 0, 1)
-	if pr.is_series == True:
-		aux.create_line_plot_multi(timestamp, series_num, series_num_total)
-
-	# Create video/gif files
-	if pr.is_series == False:
-		if pr.create_video == True:
-			func_graph.create_video(timestamp)
-		if pr.create_gif == True:
-			func_graph.create_gif(timestamp)
 
 
 if __name__ == '__main__':
 
-	# Cleanup destination folder (remove and create)
-	shutil.rmtree(pr.img_dest_folder) 
-	os.mkdir(pr.img_dest_folder)
+	global_start_time = time.time()
+
+	if pr.is_batch == False:
+		
+		if pr.is_series == False:
+			run_single()
+
+		if pr.is_series == True:
+			run_series()
+
+	if pr.is_batch == True:
+
+		run_batch()
 	
-	if pr.is_series == False:
-
-		# Run single simulation
-		run()
-
-	if pr.is_series == True:
-
-		# Retrieve parameter that varies and range of values that it takes
-		param_a_space = np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points'])
-		series_num_total = len(param_a_space)
-
-		# Run simulation series
-		for key, val in enumerate(param_a_space):
-			#val = float(val)
-
-			# Force reload the module inputs to reset all values to those in the parameters file (this is critical). Then reassign the parameter being overwritten in each simulation of the series.
-			importlib.reload(pr)
-			importlib.reload(ip)
-			exec('pr.' + pr.series_param_a['name'] + '=' + str(val)) # exec() converts str to code
-			
-			# Run
-			print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(val))
-			run(series_num = key)
-
-				
-
+	print("\nTotal time: %s minutes" % ( (time.time() - global_start_time) / 60) )
+		
 
 
 '''

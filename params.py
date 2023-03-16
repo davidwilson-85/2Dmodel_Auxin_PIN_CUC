@@ -21,7 +21,7 @@ adab_domain = (0, 9)
 
 # Auxin homeostasis
 k_auxin_diffusion = .4 #.3 .12 # Rel. amount of molecules that cross between two adjacent cells per cycle
-k_auxin_synth = .8 # Basal abs. amount of molecules synthesized per cell per unit of time
+k_auxin_synth = .8 #1 # Basal abs. amount of molecules synthesized per cell per unit of time
 k_auxin_degr = 0.02 #.02 #0.2 #0.02 #0.01 #0.06 # Rel. amount of molecules degraded per unit of time
 k_cuc_auxin_synth = 0 #0.25 # 0.5 #.75 #.75 #1 #.5 #.6 #.3
 k_md_auxin_synth =  0 #.01 #.05 #.25 #0
@@ -86,12 +86,12 @@ k_auxin_cuc = .002 #.0005 #.01
 k_cuc_decay = .1
 
 # Series simulations for parameter value exploration
-is_series = True # Specifies whether simulation is a single run or a series
+is_series = False # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
     'name': 'auxin_noise["limit"]',
 	'min': 4,
 	'max': 4,
-	'num_points': 30
+	'num_points': 50
 }
 
 # Batch of simulations for automation
@@ -99,27 +99,51 @@ is_batch = True # Specifies whether simulation is a batch of simulations
 batch_params = { # If is_series = True, this overrides value of the chosen parameter
     1: {
         'k_md_cuc': .1,
+        'k_auxin_synth': .8,
         'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0,
-        'k_auxin_synth': .8
+        'k_md_auxin_synth': 0  
     },
-	2: {
+    2: {
         'k_md_cuc': .1,
-        'k_cuc_auxin_synth': .25,
-        'k_md_auxin_synth': 0,
-        'k_auxin_synth': .8
+        'k_auxin_synth': .8,
+        'k_cuc_auxin_synth': 0.25,
+        'k_md_auxin_synth': 0  
     },
     3: {
-        'k_md_cuc': 0,
+        'k_md_cuc': .1,
+        'k_auxin_synth': .8,
         'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0,
-        'k_auxin_synth': .8
+        'k_md_auxin_synth': 0.01
     },
-	4: {
+    4: {
+        'k_md_cuc': .1,
+        'k_auxin_synth': 1,
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0  
+    },
+    5: {
         'k_md_cuc': 0,
-        'k_cuc_auxin_synth': .25,
-        'k_md_auxin_synth': 0,
-        'k_auxin_synth': .8
+        'k_auxin_synth': .8,
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0  
+    },
+    6: {
+        'k_md_cuc': 0,
+        'k_auxin_synth': .8,
+        'k_cuc_auxin_synth': 0.25,
+        'k_md_auxin_synth': 0  
+    },
+    7: {
+        'k_md_cuc': 0,
+        'k_auxin_synth': .8,
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0.01
+    },
+    8: {
+        'k_md_cuc': 0,
+        'k_auxin_synth': 1,
+        'k_cuc_auxin_synth': 0,
+        'k_md_auxin_synth': 0  
     }
 }
 
