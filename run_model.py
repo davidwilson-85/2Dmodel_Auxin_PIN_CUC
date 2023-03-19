@@ -26,11 +26,12 @@ def run_single(batch_sim_params = None):
 
 	# Force reload the module inputs to reset all values to those in the parameters file (this is critical).
 	# Reassign parameters defined inside dict pr.batch_params and the parameter being overwritten in each simulation of the series.
+	# The inputs (ip) module has to be reloaded after params have been overwritte
 	if batch_sim_params is not None:
 		importlib.reload(pr)
-		importlib.reload(ip)
 		for param, val in batch_sim_params.items():
 			exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code
+		importlib.reload(ip)
 	
 	# Run single simulation
 	run()
@@ -54,16 +55,16 @@ def run_series(batch_sim_params = None):
 
 	# Run simulation series
 	for key, series_val in enumerate(param_a_space):
-		#val = float(val)
 
 		# Force reload the module inputs to reset all values to those in the parameters file (this is critical).
 		# Reassign parameters defined inside dict pr.batch_params and the parameter being overwritten in each simulation of the series.
+		# The inputs (ip) module has to be reloaded after params have been overwritte
 		importlib.reload(pr)
-		importlib.reload(ip)
 		if batch_sim_params is not None:
 			for param, val in batch_sim_params.items():
 				exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code
 		exec('pr.' + pr.series_param_a['name'] + '=' + str(series_val)) # exec() converts str to code
+		importlib.reload(ip)
 		
 		# Run
 		print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(series_val))
@@ -83,10 +84,11 @@ def run_batch():
 	3. Copy and rename desired output files to keep them for later.
 	'''
 
-	# Define batch unique id and create folder to contain all simulations
+	# Define batch unique id and create folder to contain all simulations, copy inside the params file
 	batch_id = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 	batch_dir = 'out_batch/batch_' + str(batch_id)
 	os.mkdir(batch_dir)
+	shutil.copy('params.py', batch_dir)
 
 	for sim_id, sim in pr.batch_params.items():
 		
@@ -97,11 +99,7 @@ def run_batch():
 		sim_dir = 'out_batch/batch_' + str(batch_id) + '/' + str(sim_id)
 		os.mkdir(sim_dir)
 
-		'''# Update parameters defined inside dict pr.batch_params
-		for param, val in sim.items():
-			exec('pr.' + str(param) + '=' + str(val)) # exec() converts str to code'''
-
-		print('\nbatch_num: ' + str(sim_id) + '; params: ' + str(sim))
+		print('\nbatch element: ' + str(sim_id) + '; params: ' + str(sim))
 
 		# Run model and collect the output
 		

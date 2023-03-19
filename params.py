@@ -4,13 +4,13 @@ import numpy as np
 
 # General
 euler_h = .1             # Euler step size = h; (0 - 1]
-simulation_time = 200    # Arbitrary Units (AU) (let's assume it is hours)
+simulation_time = 200     # Arbitrary Units (AU) (let's assume it is hours)
 img_dest_folder = 'images'
 create_cell_plots = 'multiple' # False / 'multiple' / 'only_last'
 cell_plot_frequency = 1     # Simulation time units between plots
-create_video = False
+create_video = True
 create_gif = False
-simulation_description = 'Dual model used in the paper'
+simulation_description = 'UTG model used in the paper'
 
 # Heatmap ranges
 auxin_range = (0, 235)       # This is only to map variable values to heatmap values
@@ -21,10 +21,10 @@ adab_domain = (0, 9)
 
 # Auxin homeostasis
 k_auxin_diffusion = .4 #.3 .12 # Rel. amount of molecules that cross between two adjacent cells per cycle
-k_auxin_synth = .8 #1 # Basal abs. amount of molecules synthesized per cell per unit of time
+k_auxin_synth = .8 #1 #0.8 # Basal abs. amount of molecules synthesized per cell per unit of time
 k_auxin_degr = 0.02 #.02 #0.2 #0.02 #0.01 #0.06 # Rel. amount of molecules degraded per unit of time
-k_cuc_auxin_synth = 0 #0.25 # 0.5 #.75 #.75 #1 #.5 #.6 #.3
-k_md_auxin_synth =  0 #.01 #.05 #.25 #0
+k_cuc_auxin_synth = 0 #0.25 #0.5 #.75 #.75 #1 #.5 #.6 #.3
+k_md_auxin_synth = 0 #.05 #.25 #0
 k_auxin_auxin_synth = 0 #0.1
 k_auxin_auxin_synth_thr = 100000
 
@@ -61,8 +61,8 @@ auxin_custom_degr = {
 }
 
 # PIN1 localization
-pin1_polarity = 'dual'   # 'dual' OR 'utg_smith2006' OR 'wtf_abley2016'
-k_UTG = 1.1 #1.1 #1.3 # 6 (6 in Bilsborough 2011, Smith 2006)
+pin1_polarity = 'utg_smith2006' # 'dual' OR 'smith2006' OR 'wtf_abley2016'
+k_UTG = 1.2 #1.1 #1.3 # 6 (6 in Bilsborough 2011, Smith 2006)
 k_WTF_a = 1 #10 #1500 #1 in Abley 2016 ('linear WTF')
 k_WTF_b = .005 #.18 #.2 #.005 in Abley 2016 ('linear WTF')
 k_WTF_pin1_max = 15 #29 #9
@@ -70,91 +70,65 @@ cuc_threshold_pin1 = 5 # For dual PIN1 polarization
 md_on_pin1_UTG = True # template_middle_domain modulates k_UTG
 
 # PIN1 expression and activity
-k_auxin_pin1 = 0 #.005 #.003 #.0001
-k_cuc_pin1 = 0 #.1 #.01
 k_pin1_synth = 0 #1
 k_pin1_decay = 0 #.02 #.1 # .004
-k_pin1_effi_basal = .02 #.02 #.01   # = auxin mol. transp. / ( PIN1 molecule * cycle )
-k_pin1_effi_cuc = 0 #.04 #.1 # CUC effect on PIN1 efficiency [0 = no effect]
+k_auxin_pin1 = 0 #.005 #.003 #.0001
+k_cuc_pin1 = 0 #.1 #.01
+k_pin1_effi_basal = .005 #.02 #.01   # = auxin mol. transp. / ( PIN1 molecule * cycle )
+k_pin1_effi_cuc = .01 #.04 #.1 # CUC effect on PIN1 efficiency [0 = no effect]
 
 # CUC expression
 k_cuc_synth = 0 #.01 #.35
-k_md_cuc = .1
+k_md_cuc = .08 #0.1
 k_pd_cuc = .1
 k_adab_cuc = 0
 k_auxin_cuc = .002 #.0005 #.01
 k_cuc_decay = .1
 
-# Series simulations for parameter value exploration
-is_series = False # Specifies whether simulation is a single run or a series
+# Series of simulations for parameter value exploration
+is_series = True # Specifies whether simulation is a single run or a series
 series_param_a = { # If is_series = True, this overrides value of the chosen parameter
-    'name': 'auxin_noise["limit"]',
-	'min': 4,
-	'max': 4,
-	'num_points': 50
+    'name': 'k_md_auxin_synth',
+	'min': 0,
+	'max': .05,
+	'num_points': 6
 }
 
 # Batch of simulations for automation
 is_batch = True # Specifies whether simulation is a batch of simulations
 batch_params = { # If is_series = True, this overrides value of the chosen parameter
     1: {
-        'k_md_cuc': .1,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0  
+        'pin1_polarity': '"utg_smith2006"'
     },
     2: {
-        'k_md_cuc': .1,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0.25,
-        'k_md_auxin_synth': 0  
+        'pin1_polarity': '"dual"',
+        'k_pin1_effi_basal': .01,
+        'k_pin1_effi_cuc': 0,
+        'k_md_cuc': .11,
+        'template_proximodistal_axis': 'np.array([0,0,0,0,0,0,0,0,1,3,5,8,9,9,9], dtype=float)'
     },
     3: {
-        'k_md_cuc': .1,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0.01
+        'k_md_cuc': 0
     },
     4: {
-        'k_md_cuc': .1,
-        'k_auxin_synth': 1,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0  
-    },
-    5: {
+        'pin1_polarity': '"dual"',
+        'k_pin1_effi_basal': .01,
+        'k_pin1_effi_cuc': 0,
         'k_md_cuc': 0,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0  
+        'template_proximodistal_axis': 'np.array([0,0,0,0,0,0,0,0,1,3,5,8,9,9,9], dtype=float)'
     },
-    6: {
-        'k_md_cuc': 0,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0.25,
-        'k_md_auxin_synth': 0  
-    },
-    7: {
-        'k_md_cuc': 0,
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0.01
-    },
-    8: {
-        'k_md_cuc': 0,
-        'k_auxin_synth': 1,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0  
-    }
 }
 
 ## Templates with initial values
 
 template_middle_domain = np.array([0,0,4,6,9,9,9,6,4,0,0], dtype=float)
 
-template_proximodistal_axis = np.array([0,0,0,0,0,0,0,0,1,3,5,8,9,9], dtype=float)
+template_proximodistal_axis = np.array([0,0,0,0,0,0,1,3,5,8,9,9,9,9,9], dtype=float)
+#template_proximodistal_axis = np.array([0,0,0,0,0,0,0,0,1,3,5,8,9,9,9], dtype=float)
 
 template_auxin = np.array(
     [
+        [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
@@ -175,6 +149,7 @@ template_auxin = np.array(
 
 template_cuc = np.array(
     [
+        [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0],
@@ -209,21 +184,6 @@ template_pin1 = np.array(
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4]
-        ],
-        [
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
-            [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4]
         ],
@@ -241,9 +201,28 @@ template_pin1 = np.array(
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4]
         ],
         [
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4],
+            [4,4,4,4,4,4,4,4,4,4,4]
+        ],
+        [
+            [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
             [4,4,4,4,4,4,4,4,4,4,4],
