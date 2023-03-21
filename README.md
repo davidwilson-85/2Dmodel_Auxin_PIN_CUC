@@ -6,7 +6,14 @@ The cell grid represents the margin epidermis of a developing leaf (middle domai
 
 ## How to use it
 
-Set parameters in file `params.py`. See comment inside the file for explanation of each parameter.
+Tested with Python 3.8.2, numpy X.X.X, pandas X.X.X, seaborn X.X.X, matplotlib X.X.X, scypi X.X.X, shutil X.X.X
+
+Set parameters in `params_template.py` or an identically formated .py file copy. See comment inside the file for explanation of each parameter.
+
+Run model:
+```
+python3 run_model.py params.py
+```
 
 3 possible ways to run the model:
 
