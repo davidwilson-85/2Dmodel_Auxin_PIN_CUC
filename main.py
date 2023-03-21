@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-import time, os, shutil, datetime
+import time, datetime, importlib, sys
 import numpy as np
 from scipy.integrate import odeint
 
-import importlib
-
-import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
+#import params as pr
 import inputs as ip
 import regulatory_network as rn
 import func_graph

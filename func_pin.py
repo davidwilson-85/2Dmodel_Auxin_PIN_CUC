@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
+import importlib, sys, math
 import numpy as np
-import math
 
-import params as pr
+#import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import inputs as ip
 
 from scipy.integrate import odeint

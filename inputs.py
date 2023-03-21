@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import importlib, sys
 import numpy as np
 from PIL import Image
-import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
+#import params as pr
 
 '''
 # === LOAD TEMPLATE DATA

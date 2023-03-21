@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import math, os, shutil, cv2, glob, datetime
+import math, os, cv2, glob, importlib, sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 
 import inputs as ip
-import params as pr
+#import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import auxiliary as aux
 
 

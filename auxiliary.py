@@ -4,9 +4,12 @@
 Auxiliary functions go here
 '''
 
-import shutil, datetime
+import shutil, importlib, sys
+
 import inputs as ip
-import params as pr
+#import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
+
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -188,7 +191,8 @@ def write_to_log(timestamp):
 
     timestamp = str(timestamp).replace('-','_')
     name_log_file = 'sim_logs/params_' + timestamp + '.py'
-    shutil.copy('params.py', name_log_file)
+    params_file = sys.argv[1]
+    shutil.copy(params_file, name_log_file)
 
 
 def write_to_log_old(timestamp):

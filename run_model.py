@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import time, os, shutil, datetime
+import time, os, shutil, datetime, sys
 import numpy as np
 
 import importlib
 
 from main import run
-import params as pr
+#import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import inputs as ip
 
 import tests.check as check
@@ -88,7 +89,8 @@ def run_batch():
 	batch_id = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 	batch_dir = 'out_batch/batch_' + str(batch_id)
 	os.mkdir(batch_dir)
-	shutil.copy('params.py', batch_dir)
+	params_file = sys.argv[1]
+	shutil.copy(params_file, batch_dir)
 
 	for sim_id, sim in pr.batch_params.items():
 		
@@ -121,7 +123,6 @@ def run_batch():
 			shutil.copytree(pr.img_dest_folder, sim_dir, dirs_exist_ok=True)
 			shutil.copy('graphs/auxin_profile_multiple.png', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.png')
 			shutil.copy('graphs/auxin_profile_multiple.csv', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.csv')
-
 
 
 if __name__ == '__main__':

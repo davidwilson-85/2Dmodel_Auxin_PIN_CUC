@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+import random, importlib, sys
 import numpy as np
-import math
-import random
 
-import params as pr
+#import params as pr
+pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import inputs as ip
 
 
@@ -58,7 +58,14 @@ def auxin_custom_manipulation(iteration, sim_time):
 			if pr.auxin_noise['limit'] > 0 \
 			and iteration >= pr.auxin_noise['iteration_interval'][0] \
 			and iteration < pr.auxin_noise['iteration_interval'][1]:
+				
+				# Convert % to absolute limits for current cell, then take random number within limits 
+				noise_lim_cell = auxin_cell * ( pr.auxin_noise['limit'] / 100 )
+				#noise = random.uniform(-noise_lim_cell, noise_lim_cell)
+				
+				# This is old system using predefined absolute limits
 				noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
+				
 				#print(noise)
 
 			# Calculate change in auxin concentration
@@ -75,80 +82,6 @@ def auxin_custom_manipulation(iteration, sim_time):
 				and sim_time >= pr.auxin_perfect_sinks['time_interval'][0] \
 				and sim_time < pr.auxin_perfect_sinks['time_interval'][1]:
 					auxin_cell_updated = pr.auxin_perfect_sinks['value']
-			
-			if auxin_cell_updated < 0:
-				auxin_cell_updated = float(1E-6)
-				
-			ip.auxin[y,x] = auxin_cell_updated
-
-
-def auxin_homeostasis_old(iteration, sim_time):
-	
-	'''
-	This function implements all changes in auxin concentration in which there
-	is not communication between cells. These processes can be:
-	- Basal (global) de novo synthesis
-	- Basal (global) turnover
-	- Local synthesis (e.g. CUC effect on YUC)
-	- Local degradation
-	- Local exogenous application, etc
-	- Noise: random variation in concentration 
-
-	A' = h * ( k(synth) - A*k(decay) + custom_synth_degr + CUC*k(CY) ) + noise
-
-	Params:
-	* sim_time: Iteration of the simulation. This is used for local auxin synth/degr
-	
-	'''
-
-	# Define simpler aliases
-	h = pr.euler_h
-	k_auxin_synth = pr.k_auxin_synth
-	k_auxin_degr = pr.k_auxin_degr
-	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
-	k_md_auxin_synth = pr.k_md_auxin_synth
-		
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-			
-			# Simplify var names
-			auxin_cell = ip.auxin[y,x]
-			cuc_cell = ip.cuc[y,x]
-			md_cell = ip.middle_domain[x]
-			
-			# Local/custom auxin synth/degr and noise...
-			current_cell = (y,x)
-			custom_synth, custom_degr, noise = 0, 0, 0
-
-			if pr.auxin_custom_synth['value'] > 0:
-				if current_cell in pr.auxin_custom_synth['cells'] \
-				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
-				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
-					custom_synth = pr.auxin_custom_synth['value']
-			
-			if pr.auxin_custom_degr['value'] > 0:
-				if current_cell in pr.auxin_custom_degr['cells'] \
-				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
-				and sim_time < pr.auxin_custom_degr['time_interval'][1]:
-					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
-			
-			# Noise
-			if pr.auxin_noise['limit'] > 0 \
-			and iteration >= pr.auxin_noise['iteration_interval'][0] \
-			and iteration < pr.auxin_noise['iteration_interval'][1]:
-				noise = auxin_cell * ( 1 + random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit']) )
-			
-			# Calculate change in auxin concentration
-			auxin_cell_updated = auxin_cell + \
-				h * ( \
-					k_auxin_synth - \
-					k_auxin_degr * auxin_cell + \
-					k_cuc_auxin_synth * cuc_cell + \
-					k_md_auxin_synth * md_cell + \
-					custom_synth - \
-					custom_degr \
-				) \
-				+ noise
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = float(1E-6)
@@ -236,21 +169,6 @@ def auxin_diffusion():
 			fluxes_in = fluxes[1,y,x] + fluxes[3,y,x] + fluxes[5,y,x] + fluxes[7,y,x]
 			
 			auxin[y,x] = auxin[y,x] - fluxes_out + fluxes_in
-
-
-def auxin_noise():
-
-	'''
-	NOW INTEGRATED IN AUXIN HOMEOSTASIS FUNCTION
-	'''
-
-	for y in range(ip.tissue_rows):
-		for x in range(ip.tissue_columns):
-		
-			ip.auxin[y,x] = ip.auxin[y,x] * 1 + ( random.uniform(-pr.auxin_noise_factor, pr.auxin_noise_factor) )
-		
-			if ip.auxin[y,x] < 0:
-				ip.auxin[y,x] = float(0.0000001)
 
 
 def pin_on_auxin():
@@ -461,6 +379,80 @@ def pin_on_auxin_old(k_pin1_transp):
 			# Update the auxin concentration in each cell
 			total_efflux = transpVectors[0,y,x] + transpVectors[1,y,x] + transpVectors[2,y,x] + transpVectors[3,y,x]
 			auxin[y,x] = auxin[y,x] - total_efflux + transpFromTop + transpFromRight + transpFromBottom + transpFromLeft
+
+
+def auxin_homeostasis_old(iteration, sim_time):
+	
+	'''
+	This function implements all changes in auxin concentration in which there
+	is not communication between cells. These processes can be:
+	- Basal (global) de novo synthesis
+	- Basal (global) turnover
+	- Local synthesis (e.g. CUC effect on YUC)
+	- Local degradation
+	- Local exogenous application, etc
+	- Noise: random variation in concentration 
+
+	A' = h * ( k(synth) - A*k(decay) + custom_synth_degr + CUC*k(CY) ) + noise
+
+	Params:
+	* sim_time: Iteration of the simulation. This is used for local auxin synth/degr
+	
+	'''
+
+	# Define simpler aliases
+	h = pr.euler_h
+	k_auxin_synth = pr.k_auxin_synth
+	k_auxin_degr = pr.k_auxin_degr
+	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
+	k_md_auxin_synth = pr.k_md_auxin_synth
+		
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+			
+			# Simplify var names
+			auxin_cell = ip.auxin[y,x]
+			cuc_cell = ip.cuc[y,x]
+			md_cell = ip.middle_domain[x]
+			
+			# Local/custom auxin synth/degr and noise...
+			current_cell = (y,x)
+			custom_synth, custom_degr, noise = 0, 0, 0
+
+			if pr.auxin_custom_synth['value'] > 0:
+				if current_cell in pr.auxin_custom_synth['cells'] \
+				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
+				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
+					custom_synth = pr.auxin_custom_synth['value']
+			
+			if pr.auxin_custom_degr['value'] > 0:
+				if current_cell in pr.auxin_custom_degr['cells'] \
+				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
+				and sim_time < pr.auxin_custom_degr['time_interval'][1]:
+					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
+			
+			# Noise
+			if pr.auxin_noise['limit'] > 0 \
+			and iteration >= pr.auxin_noise['iteration_interval'][0] \
+			and iteration < pr.auxin_noise['iteration_interval'][1]:
+				noise = auxin_cell * ( 1 + random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit']) )
+			
+			# Calculate change in auxin concentration
+			auxin_cell_updated = auxin_cell + \
+				h * ( \
+					k_auxin_synth - \
+					k_auxin_degr * auxin_cell + \
+					k_cuc_auxin_synth * cuc_cell + \
+					k_md_auxin_synth * md_cell + \
+					custom_synth - \
+					custom_degr \
+				) \
+				+ noise
+			
+			if auxin_cell_updated < 0:
+				auxin_cell_updated = float(1E-6)
+				
+			ip.auxin[y,x] = auxin_cell_updated
 
 
 if __name__ == '__main__':
