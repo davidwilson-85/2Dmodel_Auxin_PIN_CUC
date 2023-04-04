@@ -4,7 +4,12 @@ import time, datetime, importlib, sys
 import numpy as np
 from scipy.integrate import odeint
 
-pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
+try:
+	pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
+except IndexError:
+	print('Please specify a parameters file as the first argument.')
+	quit()
+
 #import params as pr
 import inputs as ip
 import regulatory_network as rn
