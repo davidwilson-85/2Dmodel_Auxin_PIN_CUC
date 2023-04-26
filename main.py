@@ -7,7 +7,7 @@ from scipy.integrate import odeint
 try:
 	pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 except IndexError:
-	print('Please specify a parameters file as the first argument.')
+	print('Argument missing. Please specify a parameters file as the first argument.')
 	quit()
 
 #import params as pr
@@ -23,7 +23,7 @@ import auxiliary as aux
 def run(series_num_total = False, series_num = False):
 
 	"""
-	Simulation loop function. Is called by run_model.py/run_model_new.py 
+	Simulation loop function. Called by run_model.py 
 	
 	Params:
 		series_num_total: When model is run as part of a series, this indicates the total number of simulations in the series.

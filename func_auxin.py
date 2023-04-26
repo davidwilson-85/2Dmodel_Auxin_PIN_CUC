@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import random, importlib, sys
+import random, importlib, sys, math
 import numpy as np
 
 #import params as pr
@@ -26,10 +26,79 @@ def auxin_custom_manipulation(iteration, sim_time):
 
 	# Define simpler aliases
 	h = pr.euler_h
-	k_auxin_synth = pr.k_auxin_synth
-	k_auxin_degr = pr.k_auxin_degr
-	k_cuc_auxin_synth = pr.k_cuc_auxin_synth
-	k_md_auxin_synth = pr.k_md_auxin_synth
+		
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+			
+			# Simplify var names
+			auxin_cell = ip.auxin[y,x]
+
+			current_cell = (y,x)
+			custom_synth, custom_degr, noise = 0, 0, 0
+
+			# Perfect sources and sinks (overwrites noise and synthesis/degradation)
+			if pr.auxin_perfect_sources['active'] == True:
+				if current_cell in pr.auxin_perfect_sources['cells'] \
+				and sim_time >= pr.auxin_perfect_sources['time_interval'][0] \
+				and sim_time < pr.auxin_perfect_sources['time_interval'][1]:
+					auxin_cell = pr.auxin_perfect_sources['value']
+			if pr.auxin_perfect_sinks['active'] == True:
+				if current_cell in pr.auxin_perfect_sinks['cells'] \
+				and sim_time >= pr.auxin_perfect_sinks['time_interval'][0] \
+				and sim_time < pr.auxin_perfect_sinks['time_interval'][1]:
+					auxin_cell = pr.auxin_perfect_sinks['value']
+			
+			# Local/custom auxin synth/degr and noise...
+			if pr.auxin_custom_synth['value'] > 0:
+				if current_cell in pr.auxin_custom_synth['cells'] \
+				and sim_time >= pr.auxin_custom_synth['time_interval'][0] \
+				and sim_time < pr.auxin_custom_synth['time_interval'][1]:
+					custom_synth = pr.auxin_custom_synth['value']
+			if pr.auxin_custom_degr['value'] > 0:
+				if current_cell in pr.auxin_custom_degr['cells'] \
+				and sim_time >= pr.auxin_custom_degr['time_interval'][0] \
+				and sim_time < pr.auxin_custom_degr['time_interval'][1]:
+					custom_degr = pr.auxin_custom_degr['value'] * auxin_cell
+			
+			# Noise
+			if pr.auxin_noise['limit'] > 0 \
+			and iteration >= pr.auxin_noise['iteration_interval'][0] \
+			and iteration < pr.auxin_noise['iteration_interval'][1]:
+				# Convert % to absolute limits for current cell, then take random number within limits 
+				noise_lim_cell = auxin_cell * ( pr.auxin_noise['limit'] / 100 )
+				noise = random.uniform(-noise_lim_cell, noise_lim_cell)
+				# This is old system using predefined absolute limits
+				#noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
+				#print(noise)
+
+			# Calculate change in auxin concentration and correct negative values if necessary
+			auxin_cell_updated = auxin_cell + h * ( custom_synth - custom_degr ) + noise
+			#if math.isnan(auxin_cell_updated) == True: print(auxin_cell_updated)
+			if auxin_cell_updated < 0:
+				auxin_cell_updated = float(1E-6)
+			
+			# Update auxin array
+			ip.auxin[y,x] = auxin_cell_updated
+
+
+def auxin_custom_manipulation_previous(iteration, sim_time):
+	
+	'''
+	This function implements some changes in auxin:
+	- Local exogenous application, etc
+	- Noise: random variation in concentration
+
+	Inputs and outputs:
+	- Function does not have parameter inputs. It reads pr.template_auxin
+	- Function does not return any objects. It writes to pr.template_auxin
+	
+	Params:
+	- sim_time: Iteration of the simulation. This is used for custom (local) auxin synth/degr
+	
+	'''
+
+	# Define simpler aliases
+	h = pr.euler_h
 		
 	for y in range(ip.tissue_rows):
 		for x in range(ip.tissue_columns):
@@ -61,10 +130,10 @@ def auxin_custom_manipulation(iteration, sim_time):
 				
 				# Convert % to absolute limits for current cell, then take random number within limits 
 				noise_lim_cell = auxin_cell * ( pr.auxin_noise['limit'] / 100 )
-				#noise = random.uniform(-noise_lim_cell, noise_lim_cell)
+				noise = random.uniform(-noise_lim_cell, noise_lim_cell)
 				
 				# This is old system using predefined absolute limits
-				noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
+				#noise = random.uniform(-pr.auxin_noise['limit'], pr.auxin_noise['limit'])
 				
 				#print(noise)
 
@@ -85,7 +154,11 @@ def auxin_custom_manipulation(iteration, sim_time):
 			
 			if auxin_cell_updated < 0:
 				auxin_cell_updated = float(1E-6)
-				
+			
+
+
+
+			
 			ip.auxin[y,x] = auxin_cell_updated
 
 

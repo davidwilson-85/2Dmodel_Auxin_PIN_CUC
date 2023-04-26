@@ -21,7 +21,6 @@ def model_regulatory_network(init_values, t):
     
     k_AS = pr.k_auxin_synth
     k_CA = pr.k_cuc_auxin_synth
-    k_AA = pr.k_auxin_auxin_synth
     k_MDA = pr.k_md_auxin_synth
     k_AT = pr.k_auxin_degr
 
@@ -36,14 +35,13 @@ def model_regulatory_network(init_values, t):
     k_CP = pr.k_cuc_pin1
     k_PT = pr.k_pin1_decay
 
-    '''
-    if A < pr.k_auxin_auxin_synth_thr:
-        dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
-    else:
-        dA_dt = k_AS + A * k_AA + C * k_CA + MD * k_MDA - A * k_AT
-    '''
-    #dA_dt = k_AS + .0001 * A**2 + C * k_CA + MD * k_MDA - A * k_AT
-    dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT
+    # Effect of auxin on auxin synthesis
+    AA_Vmax = pr.AA_Vmax
+    AA_n = pr.AA_n
+    AA_k_05 = pr.AA_k_05
+    AA = ( ( AA_Vmax * A**AA_n) / ( AA_k_05**AA_n + A**AA_n ) )
+
+    dA_dt = k_AS + C * k_CA + MD * k_MDA - A * k_AT + MD * AA
     
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
     

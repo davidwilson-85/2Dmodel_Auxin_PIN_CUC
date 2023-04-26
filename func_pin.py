@@ -142,7 +142,7 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 	# Calculate normalization factor (eq. denominator)
 	norm_factor = b**auxin_top + b**auxin_right + b**auxin_bottom + b**auxin_left
 
-	# Calculate PIN1 allocation at each cell face
+	# Calculate PIN1 allocation to each cell face
 	pin1[0] = total_pin1 * ( b**auxin_top / norm_factor )
 	pin1[1] = total_pin1 * ( b**auxin_right / norm_factor )
 	pin1[2] = total_pin1 * ( b**auxin_bottom / norm_factor )
