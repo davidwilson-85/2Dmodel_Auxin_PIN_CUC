@@ -83,6 +83,7 @@ def run(series_num_total = False, series_num = False):
 
 		# Track simulation
 		aux.track_simulation(iteration, nbr_iterations)
+		#aux.make_kymograph(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
 		#ip.cuc[3:10,4:9] = 3

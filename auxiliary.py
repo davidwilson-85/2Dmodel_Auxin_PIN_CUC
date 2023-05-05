@@ -16,11 +16,12 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 import pandas as pd
 import seaborn as sns
+from PIL import Image, ImageDraw
 
 
 def track_simulation(iteration, nbr_iterations):
     """
-    Creates a graph x=simtime y=total level of auxin etc. This can be useful to detect bugs (for example, if there is not synth nor degr of auxin, total value has to remain constant).
+    Creates a graph x=simtime y=total level of auxin, etc. This can be useful to detect bugs (for example, if there was not synth nor degr of auxin in a simulation, total value should remain constant).
     
     Detects when simulation has reached stationary state. This can be known by comparing every sim step with the previous one. Values to compare are the levels of auxin/PIN1/CUC. Comparisons are done cell wise, changes are considered as absolute, and the changes in all cells in the grid are added together. If combined absolute changes are less than a certain threshold value, stationary state has been reached. Simulation can be stopped then.
     """
@@ -35,7 +36,7 @@ def track_simulation(iteration, nbr_iterations):
     cuc_allcells = ip.cuc.sum()
     ip.cuc_allcells_historic.append(cuc_allcells)
 
-    if iteration == 0 :
+    if iteration == 0:
         ip.auxin_auxiliary = ip.auxin.copy()
         ip.pin1_auxiliary = ip.pin1.copy()
         ip.cuc_auxiliary = ip.cuc.copy()
@@ -83,6 +84,43 @@ def track_simulation(iteration, nbr_iterations):
         plt.close()
 
         print('Created plot: levels')
+
+
+def make_kymograph(iteration, nbr_iterations):
+    '''docstring'''
+
+    if iteration == 0:
+        global data_kymograph
+        data_kymograph = []
+
+    # Create the y values of graph
+    data_kymograph.append(ip.auxin[:,5].copy())
+
+    if iteration == nbr_iterations:
+
+        # make fig
+        width = 5000
+        height = 700
+        patch_w = 1
+        patch_h = 40
+        im = Image.new('RGB', size=(width,height))
+        draw = ImageDraw.Draw(im, 'RGBA')
+
+        for t, profile in enumerate(data_kymograph):
+            for cell, auxin in enumerate(profile):
+                c = int(auxin)
+                x_ref = t * patch_w
+                y_ref = cell * patch_h
+                draw.polygon([
+                    (x_ref,y_ref),
+                    (x_ref+patch_w,y_ref),
+                    (x_ref+patch_w,y_ref+patch_h),
+                    (x_ref,y_ref+patch_h)],
+                    fill=(c, c, c)
+                )
+        
+        # Save image
+        im.save('graphs/kymograph.png')
 
 
 def create_line_plot_single(timestamp, series_num, series_num_total):
