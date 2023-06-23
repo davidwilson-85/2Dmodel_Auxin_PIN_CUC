@@ -1,11 +1,55 @@
 #!/usr/bin/env python
 
-import importlib, sys
+import importlib, sys, random
 import numpy as np
 #import params as pr
 pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import inputs as ip
 
+
+def cuc_custom_manipulation(iteration):
+	
+	'''
+	This function implements some changes in cuc:
+	- Noise: random variation in concentration
+
+	Inputs and outputs:
+	- Function does not have parameter inputs. It reads pr.template_auxin
+	- Function does not return any objects. It writes to pr.template_auxin
+	
+	Params:
+	- sim_time: Iteration of the simulation. This is used for custom (local) auxin synth/degr
+	
+	'''
+
+	# Define simpler aliases
+	h = pr.euler_h
+		
+	for y in range(ip.tissue_rows):
+		for x in range(ip.tissue_columns):
+			
+			# Simplify var names
+			cuc_cell = ip.cuc[y,x]
+
+			custom_synth, custom_degr, noise = 0, 0, 0
+			
+			# Noise
+			if pr.cuc_noise['limit'] > 0 \
+			and iteration >= pr.cuc_noise['iteration_interval'][0] \
+			and iteration < pr.cuc_noise['iteration_interval'][1]:
+				# Convert % to absolute limits for current cell, then take random number within limits 
+				noise_lim_cell = cuc_cell * ( pr.cuc_noise['limit'] / 100 )
+				noise = random.uniform(-noise_lim_cell, noise_lim_cell)
+				#print(noise)
+
+			# Calculate change in CUC concentration and correct negative values if necessary
+			cuc_cell_updated = cuc_cell + noise
+			#if math.isnan(cuc_cell_updated) == True: print(auxin_cell_updated)
+			if cuc_cell_updated < 0:
+				cuc_cell_updated = float(1E-6)
+			
+			# Update CUC array
+			ip.cuc[y,x] = cuc_cell_updated
 	
 def cuc_expression():
 
