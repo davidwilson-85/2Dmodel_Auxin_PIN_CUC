@@ -34,6 +34,7 @@ def model_regulatory_network(init_values, t):
     k_AP = pr.k_auxin_pin1
     k_CP = pr.k_cuc_pin1
     k_PT = pr.k_pin1_decay
+    k_MDP = pr.k_md_pin1
 
     # Effect of auxin on auxin synthesis
     AA_Vmax = pr.AA_Vmax
@@ -45,10 +46,10 @@ def model_regulatory_network(init_values, t):
     
     dC_dt = k_CS + MD * k_MDC - A * C * k_AC - PD * C * k_PDC - C * k_CT
     
-    dPt_dt = k_PS + A * k_AP + C * k_CP - Pt * k_PT
-    dPr_dt = k_PS + A * k_AP + C * k_CP - Pr * k_PT
-    dPb_dt = k_PS + A * k_AP + C * k_CP - Pb * k_PT
-    dPl_dt = k_PS + A * k_AP + C * k_CP - Pl * k_PT
+    dPt_dt = k_PS + A * k_AP + C * k_CP + MD * k_MDP - Pt * k_PT
+    dPr_dt = k_PS + A * k_AP + C * k_CP + MD * k_MDP - Pr * k_PT
+    dPb_dt = k_PS + A * k_AP + C * k_CP + MD * k_MDP - Pb * k_PT
+    dPl_dt = k_PS + A * k_AP + C * k_CP + MD * k_MDP - Pl * k_PT
     
     dMD_dt = 0
     dPD_dt = 0

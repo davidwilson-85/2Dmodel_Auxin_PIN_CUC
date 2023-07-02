@@ -16,6 +16,7 @@ import regulatory_network as rn
 import func_graph
 import func_auxin
 import func_pin
+import func_cuc
 
 import auxiliary as aux
 
@@ -75,6 +76,8 @@ def run(series_num_total = False, series_num = False):
 			func_auxin.auxin_diffusion()
 		func_pin.pin_polarity()
 		func_auxin.pin_on_auxin()
+
+		if pr.cuc_noise['limit'] > 0: func_cuc.cuc_custom_manipulation(iteration)
 		
 		# Limit / correct values out of bound (e.g. auxin < 0)?
 		#for y in range(ip.tissue_rows):
@@ -86,9 +89,11 @@ def run(series_num_total = False, series_num = False):
 		#aux.make_kymograph(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		#ip.cuc[3:10,4:9] = 3
+		#if sim_time < 100: ip.cuc[:] = 0
 		#ip.cuc[4:9,5:8] = 5
 		#ip.cuc[5:8,4:7] = 8
+		#ip.auxin[:,0] = 30
+		#ip.auxin[:,10] = 30
 		
 	print("%s seconds" % (time.time() - start_time))
 		

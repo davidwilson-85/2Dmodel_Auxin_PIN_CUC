@@ -69,20 +69,57 @@ def pin_polarity():
 		for x in range(ip.auxin.shape[1]):
 
 			if pr.pin1_polarity == 'utg_smith2006':
-				pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
+				ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_utg_smith2006(y, x, ip.auxin, 1)
 
 			if pr.pin1_polarity == 'wtf_abley2016':
-				pin_wtf_abley2016_odeint_solver(y, x)
+				ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_wtf_abley2016_odeint_solver(y, x, 1)
 			
 			if pr.pin1_polarity == 'dual':
-				
-				if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
-					pin_wtf_abley2016_odeint_solver(y, x)
-				else:
-					pin_utg_smith2006(y, x, ip.auxin, ip.pin1[:,y,x], pr.k_UTG)
+				pin_dual(y, x)
 
 
-def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
+def pin_dual(y, x):
+
+	'''
+	Function to partition the PIN1 molecules in a cell based on their phosphorylation status and then polarize them.
+	See Bayer 2009 for an alternative implementation of this concept. 
+	
+	What it does:
+	1. Calculates the proportion of unphosphorylated PIN1 (PIN1_u) and phosphorylated PIN1 (PIN1_p)
+	2. Calls the functions pin_utg_smith2006() providing PIN1_u and pin_wtf_instant() providing PIN1_p
+	3. For each cell face, merges the amounts of PIN1_u and PIN1_p and stores it in ip.pin1. 
+	'''
+
+	# Simplify var names
+	cuc = ip.cuc
+	Kcp = pr.pin1_pho_k05
+	H = pr.pin1_pho_H
+
+	# Calculate proportion of phosphorylated and unphosphorylated PIN molecules in the cell
+	fraction_pin1_p = cuc[y,x]**H / (Kcp**H + cuc[y,x]**H)
+	fraction_pin1_u = 1 - fraction_pin1_p
+
+	pin1_u_t, pin1_u_r, pin1_u_b, pin1_u_l = pin_utg_smith2006(y, x, ip.auxin, fraction_pin1_u)
+	pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l = pin_wtf_instant(y, x, fraction_pin1_p)
+
+	# Calculate total PIN allocation to each cell face
+	ip.pin1[0,y,x] = pin1_u_t + pin1_p_t
+	ip.pin1[1,y,x] = pin1_u_r + pin1_p_r
+	ip.pin1[2,y,x] = pin1_u_b + pin1_p_b
+	ip.pin1[3,y,x] = pin1_u_l + pin1_p_l
+
+	pin1_u_total = pin1_u_t + pin1_u_r + pin1_u_b + pin1_u_l
+	pin1_p_total = pin1_p_t + pin1_p_r + pin1_p_b + pin1_p_l
+
+	if (y, x) == (500, 6):
+		print('=======================================================')
+		print('fraction_pin1_u', fraction_pin1_u, 'fraction_pin1_p', fraction_pin1_p)
+		print('pin_u', pin1_u_t, pin1_u_r, pin1_u_b, pin1_u_l, pin1_u_total)
+		print('pin_p', pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l, pin1_p_total)
+		print('total', pin1_u_total+pin1_p_total)
+
+
+def pin_utg_smith2006(y, x, auxin, fraction_pin1_u):
 
 	'''
 	Auxin affects PIN1 subcellular localization (up-the-gradient model = UTG)
@@ -101,18 +138,18 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 	'''
 	
 	# Base of exponential function to regulate UTG responsiveness
-	b = k_UTG
+	k = pr.k_UTG
 
 	# Regulation of k_UTG by m-l axis (suppression of polarity convergences by abaxial or adaxial identity, like KAN1 an KAN2)
 	# Map range of MD values to (1 - k_UTG) and overwrite b accorging to the position of the cell in the m-l axis
 	# slope = (output_end - output_start) / (input_end - input_start)
 	# output = output_start + slope * (input - input_start)
 	if pr.md_on_pin1_UTG == True:
-		slope = (b - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
-		b = 1 + slope * (ip.middle_domain[x] - np.amin(ip.middle_domain))
+		slope = (k - 1) / np.amax(ip.middle_domain) - np.amin(ip.middle_domain)
+		k = 1 + slope * (ip.middle_domain[x] - np.amin(ip.middle_domain))
 	
 	# Current PIN1 total amount in the cell
-	total_pin1 = pin1[0] + pin1[1] + pin1[2] + pin1[3]
+	pin1_u_total = ( ip.pin1[0,y,x] + ip.pin1[1,y,x] + ip.pin1[2,y,x] + ip.pin1[3,y,x] ) * fraction_pin1_u
 
 	# Calculate auxin in neighbours (correcting in boundary cells)
 	# Top
@@ -140,19 +177,58 @@ def pin_utg_smith2006(y, x, auxin, pin1, k_UTG):
 		auxin_left = auxin[y,x]
 
 	# Calculate normalization factor (eq. denominator)
-	norm_factor = b**auxin_top + b**auxin_right + b**auxin_bottom + b**auxin_left
+	norm_factor = k**auxin_top + k**auxin_right + k**auxin_bottom + k**auxin_left
 
 	# Calculate PIN1 allocation to each cell face
-	pin1[0] = total_pin1 * ( b**auxin_top / norm_factor )
-	pin1[1] = total_pin1 * ( b**auxin_right / norm_factor )
-	pin1[2] = total_pin1 * ( b**auxin_bottom / norm_factor )
-	pin1[3] = total_pin1 * ( b**auxin_left / norm_factor )
+	pin1_u_t = pin1_u_total * ( k**auxin_top / norm_factor )
+	pin1_u_r = pin1_u_total * ( k**auxin_right / norm_factor )
+	pin1_u_b = pin1_u_total * ( k**auxin_bottom / norm_factor )
+	pin1_u_l = pin1_u_total * ( k**auxin_left / norm_factor )
 
-	#print pin1[0,y,x], pin1[1,y,x], pin1[2,y,x], pin1[3,y,x]	
-	#print utg_auxinRatioT, utg_auxinRatioR, utg_auxinRatioB, utg_auxinRatioL
+	return pin1_u_t, pin1_u_r, pin1_u_b, pin1_u_l
 
 
-def pin_wtf_abley2016_odeint_solver(y, x):
+def pin_wtf_instant(y, x, fraction_pin1_p):
+
+	'''
+	This function calculates PIN1 polarity based on the flux across a cell face. The rules are identical to 
+	implementations based of differential equation. However, this function assumes that polarization is instant, 
+	as in Smith 2006 and Jonsson 2006. Polarity is calculated as in Smith 2006 and Bayer 2009. I introduce a
+	constant b_flux that works in an anologous manner as b in Smith 2006.  
+	'''
+
+	# Calculate net flux at each cell face (out = positive; in = negative)
+	# To express it as molecules / time step, I divide by the step size (Euler h)
+	h = pr.euler_h
+	fd = ip.auxin_fluxes_diffusion
+	fp = ip.auxin_fluxes_pin1
+	net_flux_t = ( fd[0,y,x] - fd[1,y,x] + fp[0,y,x] - fp[1,y,x] ) / h
+	net_flux_r = ( fd[2,y,x] - fd[3,y,x] + fp[2,y,x] - fp[3,y,x] ) / h
+	net_flux_b = ( fd[4,y,x] - fd[5,y,x] + fp[4,y,x] - fp[5,y,x] ) / h
+	net_flux_l = ( fd[6,y,x] - fd[7,y,x] + fp[6,y,x] - fp[7,y,x] ) / h
+	# If net outflux is negative, there is no effect on PIN1 allocation to membrane, so flux is considered as if it was 0
+	if net_flux_t < 0: net_flux_t = 0
+	if net_flux_r < 0: net_flux_r = 0
+	if net_flux_b < 0: net_flux_b = 0
+	if net_flux_l < 0: net_flux_l = 0
+
+	# Current PIN1 total amount in the cell
+	pin1_p_total = ( ip.pin1[0,y,x] + ip.pin1[1,y,x] + ip.pin1[2,y,x] + ip.pin1[3,y,x] ) * fraction_pin1_p
+
+	# Calculate normalization factor (eq. denominator)
+	k = pr.k_WTF
+	norm_factor = k**net_flux_t + k**net_flux_r + k**net_flux_b + k**net_flux_l
+
+	# Calculate PIN1 allocation to each cell face
+	pin1_p_t = pin1_p_total * ( k**net_flux_t / norm_factor )
+	pin1_p_r = pin1_p_total * ( k**net_flux_r / norm_factor )
+	pin1_p_b = pin1_p_total * ( k**net_flux_b / norm_factor )
+	pin1_p_l = pin1_p_total * ( k**net_flux_l / norm_factor )
+
+	return pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l
+
+
+def pin_wtf_abley2016_odeint_solver(y, x, fraction_pin1_p):
 
 	# Calculate net flux at each cell face (out = positive; in = negative)
 	# To express it as molecules / time step, I divide by the step size (Euler h)
@@ -186,11 +262,15 @@ def pin_wtf_abley2016_odeint_solver(y, x):
 	
 	# Update current cell in PIN array with solution output
 	# Abley2016: If [PIN1](ij) reaches a threshold [], no more PIN1 can be allocated to membrane ij
-	pm = pr.k_WTF_pin1_max
-	ip.pin1[0,y,x] = cell_solution[-1,0] if cell_solution[-1,0] <= pm else pm
-	ip.pin1[1,y,x] = cell_solution[-1,1] if cell_solution[-1,1] <= pm else pm
-	ip.pin1[2,y,x] = cell_solution[-1,2] if cell_solution[-1,2] <= pm else pm
-	ip.pin1[3,y,x] = cell_solution[-1,3] if cell_solution[-1,3] <= pm else pm
+	pm = pr.k_WTF_pin1_max * fraction_pin1_p
+	if (y,x) == (600,6): print('pm', pr.k_WTF_pin1_max, pm)
+	
+	pin1_p_t = cell_solution[-1,0] * fraction_pin1_p if cell_solution[-1,0] <= pm else pm
+	pin1_p_r = cell_solution[-1,1] * fraction_pin1_p if cell_solution[-1,1] <= pm else pm
+	pin1_p_b = cell_solution[-1,2] * fraction_pin1_p if cell_solution[-1,2] <= pm else pm
+	pin1_p_l = cell_solution[-1,3] * fraction_pin1_p if cell_solution[-1,3] <= pm else pm
+
+	return pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l
 
 
 def pin_wtf_abley2016_odeint_model(init_values, t):

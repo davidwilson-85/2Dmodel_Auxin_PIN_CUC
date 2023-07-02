@@ -367,8 +367,8 @@ def pin_on_auxin():
 	cuc = ip.cuc
 	Kb = pr.k_pin1_effi_basal
 	Kp = pr.k_pin1_effi_pho
-	Kcp = pr.pin1_effi_k05
-	H = pr.pin1_effi_H
+	Kcp = pr.pin1_pho_k05
+	H = pr.pin1_pho_H
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1
@@ -396,10 +396,7 @@ def pin_on_auxin():
 					effs[y,x] = Kp
 				print(cuc[y,x], effs[y,x])
 	'''
-
-	if pr.pin1_polarity == 'dual':
-		effs.fill(Kb)
-
+	
 	if pr.pin1_polarity == 'utg_smith2006':
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
@@ -409,6 +406,8 @@ def pin_on_auxin():
 				# Compute the efficiency of the whole cell
 				effs[y,x] = ( Kb * fraction_pin1_u ) + ( Kp * fraction_pin1_p )
 				#print(cuc[y,x], effs[y,x])
+	else:
+		effs.fill(Kb)
 	
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
