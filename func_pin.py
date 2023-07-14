@@ -10,7 +10,7 @@ import inputs as ip
 from scipy.integrate import odeint
 
 
-def pin_expression():
+def pin_expression(): # NOW INTEGRATED IN ODEINT
 
 	'''
 	* Auxin promotes PIN1 expression.
@@ -77,12 +77,17 @@ def pin_polarity():
 			if pr.pin1_polarity == 'dual':
 				pin_dual(y, x)
 
+				#if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
+				#	ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_wtf_abley2016_odeint_solver(y, x, 1)
+				#else:
+				#	ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_utg_smith2006(y, x, ip.auxin, 1)
+
 
 def pin_dual(y, x):
 
 	'''
-	Function to partition the PIN1 molecules in a cell based on their phosphorylation status and then polarize them.
-	See Bayer 2009 for an alternative implementation of this concept. 
+	Function to partition the PIN1 molecules in a cell in two fractions (unphosphorylated and phosphorylated) based on theamount of CUC, and then polarize each fraction independently.
+	Ideas from Bayer 2009, where they describe a similar implementation of this concept. 
 	
 	What it does:
 	1. Calculates the proportion of unphosphorylated PIN1 (PIN1_u) and phosphorylated PIN1 (PIN1_p)
@@ -197,35 +202,93 @@ def pin_wtf_instant(y, x, fraction_pin1_p):
 	constant b_flux that works in an anologous manner as b in Smith 2006.  
 	'''
 
-	# Calculate net flux at each cell face (out = positive; in = negative)
-	# To express it as molecules / time step, I divide by the step size (Euler h)
-	h = pr.euler_h
-	fd = ip.auxin_fluxes_diffusion
-	fp = ip.auxin_fluxes_pin1
-	net_flux_t = ( fd[0,y,x] - fd[1,y,x] + fp[0,y,x] - fp[1,y,x] ) / h
-	net_flux_r = ( fd[2,y,x] - fd[3,y,x] + fp[2,y,x] - fp[3,y,x] ) / h
-	net_flux_b = ( fd[4,y,x] - fd[5,y,x] + fp[4,y,x] - fp[5,y,x] ) / h
-	net_flux_l = ( fd[6,y,x] - fd[7,y,x] + fp[6,y,x] - fp[7,y,x] ) / h
+	# Update the 'flux history' of cell y,x at each cell face (out = positive; in = negative)
+	pin_wtf_fluxhistory_odeint_solver(y,x)
+
+	# Create short aliases
+	k = pr.k_WTF
+	fh_t, fh_r, fh_b, fh_l = ip.auxin_fluxes_history[:,y,x]
+
+	# Current PIN1 total amount in the cell
+	pin1_p_total = ( ip.pin1[0,y,x] + ip.pin1[1,y,x] + ip.pin1[2,y,x] + ip.pin1[3,y,x] ) * fraction_pin1_p
+
+	# Calculate normalization factor (eq. denominator)
+	norm_factor = k**fh_t + k**fh_r + k**fh_b + k**fh_l
+
+	# Calculate PIN1 allocation to each cell face
+	pin1_p_t = pin1_p_total * ( k**fh_t / norm_factor )
+	pin1_p_r = pin1_p_total * ( k**fh_r / norm_factor )
+	pin1_p_b = pin1_p_total * ( k**fh_b / norm_factor )
+	pin1_p_l = pin1_p_total * ( k**fh_l / norm_factor )
+
+	return pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l
+
+
+def pin_wtf_fluxhistory_odeint_solver(y,x):
+
+	''' '''
+
+	# Create short aliases
+	fd = ip.auxin_fluxes_diffusion[:,y,x]
+	fp = ip.auxin_fluxes_pin1[:,y,x]
+	fh = ip.auxin_fluxes_history
+
+	# Compute net fluxes
+	net_flux_t = fd[0] - fd[1] + fp[0] - fp[1]
+	net_flux_r = fd[2] - fd[3] + fp[2] - fp[3]
+	net_flux_b = fd[4] - fd[5] + fp[4] - fp[5]
+	net_flux_l = fd[6] - fd[7] + fp[6] - fp[7]
 	# If net outflux is negative, there is no effect on PIN1 allocation to membrane, so flux is considered as if it was 0
 	if net_flux_t < 0: net_flux_t = 0
 	if net_flux_r < 0: net_flux_r = 0
 	if net_flux_b < 0: net_flux_b = 0
 	if net_flux_l < 0: net_flux_l = 0
 
-	# Current PIN1 total amount in the cell
-	pin1_p_total = ( ip.pin1[0,y,x] + ip.pin1[1,y,x] + ip.pin1[2,y,x] + ip.pin1[3,y,x] ) * fraction_pin1_p
+	# Gather initial values for ODEint
+	model_init_values = [
+		fh[0,y,x],
+		fh[1,y,x],
+		fh[2,y,x],
+		fh[3,y,x],
+		net_flux_t,
+		net_flux_r,
+		net_flux_b,
+		net_flux_l
+	]
 
-	# Calculate normalization factor (eq. denominator)
-	k = pr.k_WTF
-	norm_factor = k**net_flux_t + k**net_flux_r + k**net_flux_b + k**net_flux_l
+	# Solve
+	cell_solution = odeint(pin_wtf_fluxhistory_odeint_model, model_init_values, np.linspace(0, pr.euler_h, 2))
 
-	# Calculate PIN1 allocation to each cell face
-	pin1_p_t = pin1_p_total * ( k**net_flux_t / norm_factor )
-	pin1_p_r = pin1_p_total * ( k**net_flux_r / norm_factor )
-	pin1_p_b = pin1_p_total * ( k**net_flux_b / norm_factor )
-	pin1_p_l = pin1_p_total * ( k**net_flux_l / norm_factor )
+	# Update current cell in data arrays with solution output
+	ip.auxin_fluxes_history[0,y,x] = cell_solution[-1,0]
+	ip.auxin_fluxes_history[1,y,x] = cell_solution[-1,1]
+	ip.auxin_fluxes_history[2,y,x] = cell_solution[-1,2]
+	ip.auxin_fluxes_history[3,y,x] = cell_solution[-1,3]
 
-	return pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l
+
+def pin_wtf_fluxhistory_odeint_model(init_values, t):
+
+	''' '''
+
+	FHt, FHr, FHb, FHl, ft, fr, fb, fl = init_values
+
+	# Create short aliases
+	k_fF = pr.k_netflux_on_fluxhistory
+	k_FT = pr.k_fluxhistory_decay
+
+	# Define equations for rates of change
+	dFHt_dt = k_fF * ft - k_FT * FHt
+	dFHr_dt = k_fF * fr - k_FT * FHr
+	dFHb_dt = k_fF * fb - k_FT * FHb
+	dFHl_dt = k_fF * fl - k_FT * FHl
+	
+	dft_dt = 0
+	dfr_dt = 0
+	dfl_dt = 0
+	dfb_dt = 0
+	
+	return [dFHt_dt, dFHr_dt, dFHb_dt, dFHl_dt, dft_dt, dfr_dt, dfb_dt, dfl_dt]
+
 
 
 def pin_wtf_abley2016_odeint_solver(y, x, fraction_pin1_p):
@@ -258,7 +321,7 @@ def pin_wtf_abley2016_odeint_solver(y, x, fraction_pin1_p):
 	]
 
 	# Solve
-	cell_solution = odeint(pin_wtf_abley2016_odeint_model, model_init_values, np.linspace(0, pr.euler_h, 2))
+	cell_solution = odeint(pin_wtf_abley2016_odeint_model, model_init_values, np.linspace(0, h, 2))
 	
 	# Update current cell in PIN array with solution output
 	# Abley2016: If [PIN1](ij) reaches a threshold [], no more PIN1 can be allocated to membrane ij

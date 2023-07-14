@@ -50,6 +50,9 @@ proximodistal_axis = pr.template_proximodistal_axis
 # auxin_fluxes_pin1: fluxes through PIN1 transporters
 auxin_fluxes_diffusion = np.zeros(shape=(10,tissue_rows,tissue_columns)) # Z: T_out, T_in, R_out, R_in ... netXvector, netYvector 
 auxin_fluxes_pin1 = np.zeros(shape=(12,tissue_rows,tissue_columns), dtype=(float)) # 3D array = (attribute, column, row)
+# Fluxes history buffers changes in fluxes and gives stability to the model (see Bayer 2009)
+auxin_fluxes_history = np.zeros(shape=(4,tissue_rows,tissue_columns))
+
 #array_auxin_net_fluxes = np.zeros(shape=(2,tissue_rows,tissue_columns)) # where z[0] => dx and z[1] => dy
 
 # Arrays to store values and track simulation
