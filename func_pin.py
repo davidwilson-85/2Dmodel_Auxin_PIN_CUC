@@ -75,18 +75,16 @@ def pin_polarity():
 				ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_wtf_abley2016_odeint_solver(y, x, 1)
 			
 			if pr.pin1_polarity == 'dual':
-				pin_dual(y, x)
-
-				#if int(ip.cuc[y,x]) >= pr.cuc_threshold_pin1:
-				#	ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_wtf_abley2016_odeint_solver(y, x, 1)
-				#else:
-				#	ip.pin1[0,y,x], ip.pin1[1,y,x], ip.pin1[2,y,x], ip.pin1[3,y,x] = pin_utg_smith2006(y, x, ip.auxin, 1)
+				# Update the 'flux history' of cell y,x
+				pin_wtf_fluxhistory_odeint_solver(y,x)
+				# Solve polarity of cell y,x
+				pin_dual(y,x)
 
 
 def pin_dual(y, x):
 
 	'''
-	Function to partition the PIN1 molecules in a cell in two fractions (unphosphorylated and phosphorylated) based on theamount of CUC, and then polarize each fraction independently.
+	Function to partition the PIN1 molecules in a cell in two fractions (unphosphorylated and phosphorylated) based on the amount of CUC, and then polarize each fraction independently.
 	Ideas from Bayer 2009, where they describe a similar implementation of this concept. 
 	
 	What it does:
@@ -97,11 +95,11 @@ def pin_dual(y, x):
 
 	# Simplify var names
 	cuc = ip.cuc
-	Kcp = pr.pin1_pho_k05
-	H = pr.pin1_pho_H
+	kCP = pr.pin1_pho_k05
+	hc = pr.pin1_pho_hc
 
 	# Calculate proportion of phosphorylated and unphosphorylated PIN molecules in the cell
-	fraction_pin1_p = cuc[y,x]**H / (Kcp**H + cuc[y,x]**H)
+	fraction_pin1_p = cuc[y,x]**hc / (kCP**hc + cuc[y,x]**hc)
 	fraction_pin1_u = 1 - fraction_pin1_p
 
 	pin1_u_t, pin1_u_r, pin1_u_b, pin1_u_l = pin_utg_smith2006(y, x, ip.auxin, fraction_pin1_u)
@@ -112,16 +110,6 @@ def pin_dual(y, x):
 	ip.pin1[1,y,x] = pin1_u_r + pin1_p_r
 	ip.pin1[2,y,x] = pin1_u_b + pin1_p_b
 	ip.pin1[3,y,x] = pin1_u_l + pin1_p_l
-
-	pin1_u_total = pin1_u_t + pin1_u_r + pin1_u_b + pin1_u_l
-	pin1_p_total = pin1_p_t + pin1_p_r + pin1_p_b + pin1_p_l
-
-	if (y, x) == (500, 6):
-		print('=======================================================')
-		print('fraction_pin1_u', fraction_pin1_u, 'fraction_pin1_p', fraction_pin1_p)
-		print('pin_u', pin1_u_t, pin1_u_r, pin1_u_b, pin1_u_l, pin1_u_total)
-		print('pin_p', pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l, pin1_p_total)
-		print('total', pin1_u_total+pin1_p_total)
 
 
 def pin_utg_smith2006(y, x, auxin, fraction_pin1_u):
@@ -203,7 +191,7 @@ def pin_wtf_instant(y, x, fraction_pin1_p):
 	'''
 
 	# Update the 'flux history' of cell y,x at each cell face (out = positive; in = negative)
-	pin_wtf_fluxhistory_odeint_solver(y,x)
+	#pin_wtf_fluxhistory_odeint_solver(y,x)
 
 	# Create short aliases
 	k = pr.k_WTF
@@ -234,10 +222,10 @@ def pin_wtf_fluxhistory_odeint_solver(y,x):
 	fh = ip.auxin_fluxes_history
 
 	# Compute net fluxes
-	net_flux_t = fd[0] - fd[1] + fp[0] - fp[1]
-	net_flux_r = fd[2] - fd[3] + fp[2] - fp[3]
-	net_flux_b = fd[4] - fd[5] + fp[4] - fp[5]
-	net_flux_l = fd[6] - fd[7] + fp[6] - fp[7]
+	net_flux_t = ( fd[0] - fd[1] + fp[0] - fp[1] ) / pr.euler_h
+	net_flux_r = ( fd[2] - fd[3] + fp[2] - fp[3] ) / pr.euler_h
+	net_flux_b = ( fd[4] - fd[5] + fp[4] - fp[5] ) / pr.euler_h
+	net_flux_l = ( fd[6] - fd[7] + fp[6] - fp[7] ) / pr.euler_h
 	# If net outflux is negative, there is no effect on PIN1 allocation to membrane, so flux is considered as if it was 0
 	if net_flux_t < 0: net_flux_t = 0
 	if net_flux_r < 0: net_flux_r = 0
@@ -290,18 +278,16 @@ def pin_wtf_fluxhistory_odeint_model(init_values, t):
 	return [dFHt_dt, dFHr_dt, dFHb_dt, dFHl_dt, dft_dt, dfr_dt, dfb_dt, dfl_dt]
 
 
-
 def pin_wtf_abley2016_odeint_solver(y, x, fraction_pin1_p):
 
 	# Calculate net flux at each cell face (out = positive; in = negative)
 	# To express it as molecules / time step, I divide by the step size (Euler h)
-	h = pr.euler_h
 	fd = ip.auxin_fluxes_diffusion
 	fp = ip.auxin_fluxes_pin1
-	net_flux_t = ( fd[0,y,x] - fd[1,y,x] + fp[0,y,x] - fp[1,y,x] ) / h
-	net_flux_r = ( fd[2,y,x] - fd[3,y,x] + fp[2,y,x] - fp[3,y,x] ) / h
-	net_flux_b = ( fd[4,y,x] - fd[5,y,x] + fp[4,y,x] - fp[5,y,x] ) / h
-	net_flux_l = ( fd[6,y,x] - fd[7,y,x] + fp[6,y,x] - fp[7,y,x] ) / h
+	net_flux_t = ( fd[0,y,x] - fd[1,y,x] + fp[0,y,x] - fp[1,y,x] ) / pr.euler_h
+	net_flux_r = ( fd[2,y,x] - fd[3,y,x] + fp[2,y,x] - fp[3,y,x] ) / pr.euler_h
+	net_flux_b = ( fd[4,y,x] - fd[5,y,x] + fp[4,y,x] - fp[5,y,x] ) / pr.euler_h
+	net_flux_l = ( fd[6,y,x] - fd[7,y,x] + fp[6,y,x] - fp[7,y,x] ) / pr.euler_h
 	# If net outflux is negative, there is no effect on PIN1 allocation to membrane, so flux is considered as if it was 0
 	if net_flux_t < 0: net_flux_t = 0
 	if net_flux_r < 0: net_flux_r = 0

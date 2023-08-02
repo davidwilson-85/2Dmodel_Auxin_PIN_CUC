@@ -368,7 +368,7 @@ def pin_on_auxin():
 	Kb = pr.k_pin1_effi_basal
 	Kp = pr.k_pin1_effi_pho
 	Kcp = pr.pin1_pho_k05
-	H = pr.pin1_pho_H
+	hc = pr.pin1_pho_hc
 	tissue_rows = ip.tissue_rows
 	tissue_columns = ip.tissue_columns
 	fluxes_pin1 = ip.auxin_fluxes_pin1
@@ -401,7 +401,7 @@ def pin_on_auxin():
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
 				# Calculate proportion of phosphorylated and unphosphorylated PIN molecules in the cell
-				fraction_pin1_p = cuc[y,x]**H / (Kcp**H + cuc[y,x]**H)
+				fraction_pin1_p = cuc[y,x]**hc / (Kcp**hc + cuc[y,x]**hc)
 				fraction_pin1_u = 1 - fraction_pin1_p
 				# Compute the efficiency of the whole cell
 				effs[y,x] = ( Kb * fraction_pin1_u ) + ( Kp * fraction_pin1_p )

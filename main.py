@@ -38,7 +38,7 @@ def run(series_num_total = False, series_num = False):
 	"""
 
 	# Calculate number of iterations based on simulation time and step size
-	nbr_iterations = int(pr.simulation_time / pr.euler_h)
+	nbr_iterations = int(pr.simulation_time_total / pr.euler_h)
 
 	timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
@@ -51,7 +51,7 @@ def run(series_num_total = False, series_num = False):
 	# Perform simulation cycles
 	for iteration in range(nbr_iterations + 1):
 		
-		sim_time = iteration * pr.euler_h
+		simulation_time_current = iteration * pr.euler_h
 		
 		# Print iteration to terminal
 		if iteration < nbr_iterations:
@@ -71,7 +71,7 @@ def run(series_num_total = False, series_num = False):
 		rn.solve_rn_model()
 
 		# SOLVE REMAINING PROCESSES
-		func_auxin.auxin_custom_manipulation(iteration, sim_time)
+		func_auxin.auxin_custom_manipulation(iteration, simulation_time_current)
 		if pr.k_auxin_diffusion > 0:
 			func_auxin.auxin_diffusion()
 		func_pin.pin_polarity()
@@ -89,11 +89,7 @@ def run(series_num_total = False, series_num = False):
 		#aux.make_kymograph(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
-		#if sim_time < 100: ip.cuc[:] = 0
-		#ip.cuc[4:9,5:8] = 5
-		#ip.cuc[5:8,4:7] = 8
-		#ip.auxin[:,0] = 30
-		#ip.auxin[:,10] = 30
+		#if simulation_time_current < 30: ip.cuc[:] = 0
 		
 	print("%s seconds" % (time.time() - start_time))
 		

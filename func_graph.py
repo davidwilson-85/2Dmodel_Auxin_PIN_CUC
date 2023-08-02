@@ -90,9 +90,9 @@ def create_cell_plot(timestamp, iteration, series_num = 0):
 				# Write auxin concentration (magenta)
 				#ImageDraw.Draw(im).text((x+10,y+5), str(round(auxin[i,j],1)), fill=(255, 0, 255))
 				# Write PIN1 total concentration (yellow)
-				#ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
+				ImageDraw.Draw(im).text((x+10,y+20), str(round( (pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j]) ,1)), fill=(255, 255, 0))
 				# Write CUC concentration (white)
-				ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
+				#ImageDraw.Draw(im).text((x+10,y+35), str(round(cuc[i,j],1)), fill=(255, 255, 255))
 			
 			x = x + cellSide
 		
