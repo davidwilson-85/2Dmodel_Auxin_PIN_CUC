@@ -200,14 +200,26 @@ def pin_wtf_instant(y, x, fraction_pin1_p):
 	# Current PIN1 total amount in the cell
 	pin1_p_total = ( ip.pin1[0,y,x] + ip.pin1[1,y,x] + ip.pin1[2,y,x] + ip.pin1[3,y,x] ) * fraction_pin1_p
 
-	# Calculate normalization factor (eq. denominator)
-	norm_factor = k**fh_t + k**fh_r + k**fh_b + k**fh_l
+	if pr.wtf_instant_exponential == True:
+		# Calculate normalization factor (eq. denominator)
+		norm_factor = k**fh_t + k**fh_r + k**fh_b + k**fh_l
+		# Calculate PIN1 allocation to each cell face
+		pin1_p_t = pin1_p_total * ( k**fh_t / norm_factor )
+		pin1_p_r = pin1_p_total * ( k**fh_r / norm_factor )
+		pin1_p_b = pin1_p_total * ( k**fh_b / norm_factor )
+		pin1_p_l = pin1_p_total * ( k**fh_l / norm_factor )
 
-	# Calculate PIN1 allocation to each cell face
-	pin1_p_t = pin1_p_total * ( k**fh_t / norm_factor )
-	pin1_p_r = pin1_p_total * ( k**fh_r / norm_factor )
-	pin1_p_b = pin1_p_total * ( k**fh_b / norm_factor )
-	pin1_p_l = pin1_p_total * ( k**fh_l / norm_factor )
+	if pr.wtf_instant_exponential == False:
+		# Alternative function
+		# Calculate normalization factor (eq. denominator)
+		norm_factor = fh_t + fh_r + fh_b + fh_l
+		if norm_factor == 0.0: norm_factor = float(1/1e10)
+		#print(norm_factor, fh_t, fh_r, fh_b, fh_l)
+		# Calculate PIN1 allocation to each cell face
+		pin1_p_t = pin1_p_total * ( fh_t / norm_factor )
+		pin1_p_r = pin1_p_total * ( fh_r / norm_factor )
+		pin1_p_b = pin1_p_total * ( fh_b / norm_factor )
+		pin1_p_l = pin1_p_total * ( fh_l / norm_factor )
 
 	return pin1_p_t, pin1_p_r, pin1_p_b, pin1_p_l
 

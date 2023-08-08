@@ -397,6 +397,7 @@ def pin_on_auxin():
 				print(cuc[y,x], effs[y,x])
 	'''
 	
+	'''
 	if pr.pin1_polarity == 'utg_smith2006':
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
@@ -408,6 +409,16 @@ def pin_on_auxin():
 				#print(cuc[y,x], effs[y,x])
 	else:
 		effs.fill(Kb)
+	'''
+
+	for y in range(tissue_rows):
+		for x in range(tissue_columns):
+			# Calculate proportion of phosphorylated and unphosphorylated PIN molecules in the cell
+			fraction_pin1_p = cuc[y,x]**hc / (Kcp**hc + cuc[y,x]**hc)
+			fraction_pin1_u = 1 - fraction_pin1_p
+			# Compute the efficiency of the whole cell
+			effs[y,x] = ( Kb * fraction_pin1_u ) + ( Kp * fraction_pin1_p )
+			#print(cuc[y,x], effs[y,x])
 	
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
