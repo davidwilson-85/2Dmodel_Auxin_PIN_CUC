@@ -72,8 +72,7 @@ def run(series_num_total = False, series_num = False):
 
 		# SOLVE REMAINING PROCESSES
 		func_auxin.auxin_custom_manipulation(iteration, simulation_time_current)
-		if pr.k_auxin_diffusion > 0:
-			func_auxin.auxin_diffusion()
+		func_auxin.auxin_diffusion()
 		func_pin.pin_polarity()
 		func_auxin.pin_on_auxin()
 

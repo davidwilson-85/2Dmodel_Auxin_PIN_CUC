@@ -149,7 +149,6 @@ if __name__ == '__main__':
 TO DO:
 * Try staggered cells
 * Try PD growth?
-* Try to move more things (like custom auxin synth and degradation) to ODEint model
 * Check if the order in which the functions are called has an effect on output of simulations
 
 '''

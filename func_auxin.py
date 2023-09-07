@@ -380,7 +380,7 @@ def pin_on_auxin():
 	effs = np.zeros(shape=(tissue_rows, tissue_columns))
 	
 	'''
-	# Older method (linear function with a cap)
+	# Older method to calculate the PIN efficiency of a cell (linear function with a cap)
 	if pr.pin1_polarity == 'dual':
 		effs.fill(Kb)
 	if pr.pin1_polarity == 'utg_smith2006':
@@ -397,7 +397,7 @@ def pin_on_auxin():
 				print(cuc[y,x], effs[y,x])
 	'''
 	
-	'''
+	# If model is UTGeff, calculate PIN efficiency of all cells and store in array
 	if pr.pin1_polarity == 'utg_smith2006':
 		for y in range(tissue_rows):
 			for x in range(tissue_columns):
@@ -409,23 +409,12 @@ def pin_on_auxin():
 				#print(cuc[y,x], effs[y,x])
 	else:
 		effs.fill(Kb)
-	'''
-
-	for y in range(tissue_rows):
-		for x in range(tissue_columns):
-			# Calculate proportion of phosphorylated and unphosphorylated PIN molecules in the cell
-			fraction_pin1_p = cuc[y,x]**hc / (Kcp**hc + cuc[y,x]**hc)
-			fraction_pin1_u = 1 - fraction_pin1_p
-			# Compute the efficiency of the whole cell
-			effs[y,x] = ( Kb * fraction_pin1_u ) + ( Kp * fraction_pin1_p )
-			#print(cuc[y,x], effs[y,x])
 	
+	# Compute PIN-mediated transport
 	for y in range(tissue_rows):
 		for x in range(tissue_columns):
 
-			# Calculate K as K basal + effect of CUC
-			# Kp = basal efficiency
-			# Kcp = cuc (phosphorilation) strength to increase efficiency
+			# Retrieve efficiencies to solve PIN mediated transport involving cell y,x
 			K_out = effs[y,x]
 			if y > 0:
 				K_fromT = effs[y-1,x]

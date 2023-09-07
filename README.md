@@ -2,55 +2,79 @@
 
 Model consisting on a cell grid to study the interactions between the plant hormone auxin, the PIN1 auxin efflux carrier, and the CUC transciption factors.
 
-The cell grid represents the margin epidermis of a developing leaf (middle domain flanked by abaxial and adaxial domains) during the satages when patterning of auxin sites occur.
+This model was used in [HERE REFERENCE TO PAPER] to study the patterning of auxin foci in the margin of plant leaves.
 
-## How to use it
+Tested with Python 3.8.2, scypi 1.3.3, numpy 1.23.3, pandas 1.2.3, matplotlib 3.4.0, seaborn 0.11.1, pillow 7.0.0.
 
-Tested with Python 3.8.2, numpy X.X.X, pandas X.X.X, seaborn X.X.X, matplotlib X.X.X, scypi X.X.X, shutil X.X.X
+## How to run models
 
-Set parameters in `params_template.py` or an identically formated .py file copy. See comment inside the file for explanation of each parameter.
+Set parameters in `params.py` or an identically formated `.py` file copy. See comments inside the file for explanation of each parameter.
 
 Run model:
 ```
-python3 run_model.py params.py
+python3 run_model.py params_file.py
 ```
 
-3 possible ways to run the model:
+There are 3 ways to run the model:
 
-* Single
-A single simulations that reads the parameter values from `params.py`
+### Single
 
-* Series
-A series of simuations that share the same parameters except for one that will vary within a linear space defined in variable `params.series_param_a`.
-Varying the value one parameter...
+A single simulation that reads the parameter values from `params.py`
 
-* Batch
-Batch of simulations that share the same parameters except those defined in the dictionary `params.batch_params`. Example to compare the effect of no local auxin creation, auxin creation in the CUC domain, and auxi creation in the middle domain:
+### Series
+
+A series of simuations that share the same parameters except for one that will vary within a linear space. In the parameters file, set `is_series` to `True` and define the variable and the min and max values in the dictionary `series_param_a`. Example:
+
+```
+series_param_a = {
+    'name': 'k_auxin_diffusion',
+	'min': .1,
+	'max': 1,
+	'num_points': 11
+```
+
+A series can be also used to run replicates, for example when Auxin or CUC noise is used. Example to run 10 replicates:
+
+```
+series_param_a = {
+    'name': 'dummy',
+	'min': 0,
+	'max': 0,
+	'num_points': 10
+```
+
+### Batch
+
+A batch of simulations that share the same parameters except those defined as follows: In the parameters file, set `is_batch` to `True` and define parameters and values in the dictionary `batch_params`. The informatoin in `batch_params` overrides the values specified normally in `params.py`.
+
+Example to compare the effect of auxin creation in the CUC domain versus in the middle domain (dfined in `template_middle_domain`):
+
 ```
 batch_params = {
-    1: {
-        'k_auxin_synth': .8,
-        'k_cuc_auxin_synth': 0,
-        'k_md_auxin_synth': 0  
-    },
-    2: {
-        'k_auxin_synth': .8,
+    'A': {
         'k_cuc_auxin_synth': 0.25,
         'k_md_auxin_synth': 0  
     },
-    3: {
-        'k_auxin_synth': .8,
+    'B': {
         'k_cuc_auxin_synth': 0,
         'k_md_auxin_synth': 0.01
     }
 }
 ```
-To simulate, run `run_model.py`.
+
+Batch and Series can be combined. In such case, a batch is hierarchiucally above the series.
+
+## View output of simulations
 
 To view simulation results, browse the folders 
-* images/
-* graphs/
+* `images/`
+* `graphs/`
 
-To reveiew simulation parameters / rerun a simulation:
-* sim_logs/
+If `is_batch` is set to `True`, the results appear in 
+
+* `out_batch/`
+
+To review simulation parameters / re-run a simulation:
+
+* `sim_logs/`
 
