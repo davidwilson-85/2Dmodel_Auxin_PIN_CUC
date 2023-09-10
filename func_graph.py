@@ -11,7 +11,7 @@ pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import auxiliary as aux
 
 
-def create_cell_plot(timestamp, iteration, series_num = 0):
+def create_cell_plot(timestamp, sim_dir, iteration, series_num = 0):
 
 	'''
 	Create cell grid using PIL
@@ -30,7 +30,7 @@ def create_cell_plot(timestamp, iteration, series_num = 0):
 	lut_cuc = ip.lut_cuc
 	array_afd = ip.auxin_fluxes_diffusion
 	array_afp = ip.auxin_fluxes_pin1
-	img_dest_folder = pr.img_dest_folder
+	img_dest_folder = sim_dir + '/images'
 	
 	# Customize element in image
 	draw_auxin = True
@@ -299,7 +299,7 @@ def create_heatmap(data, iteration):
 
 
 # Create video from images
-def create_video(timestamp):
+def create_video(timestamp, sim_dir):
 
 	'''
 	Check also:
@@ -315,8 +315,8 @@ def create_video(timestamp):
 
 	print('Creating video...')
 
-	image_folder = 'images'
-	video_name = 'videos/vid_' + str(timestamp) + '.mp4'
+	image_folder = sim_dir + '/images'
+	video_name = sim_dir + '/vid_' + str(timestamp) + '.mp4'
 
 	images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 	images.sort()
@@ -336,9 +336,12 @@ def create_video(timestamp):
 
 
 # Create gif from images
-def create_gif(timestamp, mode=''):
+def create_gif(timestamp, sim_dir, mode=''):
 	
 	'''
+
+	NOT IN USE AT THE MOMENT, NOT TESTED
+
 	Params:
 	- timestamp: string with date and time info
 	- mode: [bidir']; changes default unidirectional mode to bidirectional
@@ -350,8 +353,8 @@ def create_gif(timestamp, mode=''):
 	$ python3 func_graph.py
 	'''
 
-	image_folder = 'images/test/*.png'
-	gif_name = 'videos/gifAnim_' + str(timestamp) + '.gif'
+	image_folder = sim_dir + '/images'
+	gif_name = sim_dir + '/gifAnim_' + str(timestamp) + '.gif'
 	img, *imgs = [Image.open(f) for f in sorted(glob.glob(image_folder))]
 
 	# If bidirectional (yo-yo), append list of images in reversed order

@@ -19,7 +19,7 @@ import seaborn as sns
 from PIL import Image, ImageDraw
 
 
-def track_simulation(iteration, nbr_iterations):
+def track_simulation(sim_dir, iteration, nbr_iterations):
     """
     Creates a graph x=simtime y=total level of auxin, etc. This can be useful to detect bugs (for example, if there was not synth nor degr of auxin in a simulation, total value should remain constant).
     
@@ -80,7 +80,7 @@ def track_simulation(iteration, nbr_iterations):
             #ax.set_ylim(bottom=0)
 
         plt.xlabel('Simulation iteration')
-        fig1.savefig('graphs/levels.png', bbox_inches='tight')
+        fig1.savefig(sim_dir + '/levels.png', bbox_inches='tight')
         plt.close()
 
         print('Created plot: levels')
@@ -123,7 +123,7 @@ def make_kymograph(iteration, nbr_iterations):
         im.save('graphs/kymograph.png')
 
 
-def create_line_plot_single(timestamp, series_num, series_num_total):
+def create_line_plot_single(timestamp, sim_dir, series_num, series_num_total):
 
     """
     Creates a line plot representing the auxin profile in a chosen column (or row) of cells
@@ -147,7 +147,7 @@ def create_line_plot_single(timestamp, series_num, series_num_total):
 
     # Convert to Pandas dataframe and save as a csv file
     df = pd.DataFrame(values)
-    df.to_csv("graphs/auxin_profile.csv", index=False)
+    df.to_csv(sim_dir + "/auxin_profile.csv", index=False)
 
     # Make plot
     if series_num == series_num_total - 1:
@@ -160,14 +160,14 @@ def create_line_plot_single(timestamp, series_num, series_num_total):
         plt.xlabel('[Auxin] A.U.')
         plt.ylabel('Cell row')
         ax.annotate(timestamp, xy=(2, 1), xytext=(0.01, .99), textcoords='figure fraction', va='top', ha='left')
-        fig2.savefig('graphs/auxin_profile.png', bbox_inches='tight')
+        fig2.savefig(sim_dir + '/auxin_profile.png', bbox_inches='tight')
         #plt.colorbar(label="param value", orientation="vertical")
         plt.close()
 
         print('Created plot: auxin profile')
 
 
-def create_line_plot_multi(timestamp, series_num, series_num_total):
+def create_line_plot_multi(timestamp, sim_dir, series_num, series_num_total):
 
     """
     Function is called in the last iteration of each simulation and gathers the auxin values in the desired cells
@@ -190,7 +190,7 @@ def create_line_plot_multi(timestamp, series_num, series_num_total):
 
         # Convert to Pandas dataframe, transpose, and save as a csv file
         df = pd.DataFrame(auxin_series_historic).T
-        df.to_csv("graphs/auxin_profile_multiple.csv", index=False)
+        df.to_csv(sim_dir + "/auxin_profile_multiple.csv", index=False)
 
         # Create the y values of graph
         tissue_rows = ip.auxin.shape[0]
@@ -216,7 +216,7 @@ def create_line_plot_multi(timestamp, series_num, series_num_total):
         sm.set_array([])
         plt.colorbar(sm, ticks=np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points']), label=pr.series_param_a['name'])
 
-        fig2.savefig('graphs/auxin_profile_multiple.png', bbox_inches='tight')
+        fig2.savefig(sim_dir + '/auxin_profile_multiple.png', bbox_inches='tight')
 
         print('Created plot: auxin profile')
 

@@ -4,7 +4,7 @@ Model consisting on a cell grid to study the interactions between the plant horm
 
 This model was used in [HERE REFERENCE TO PAPER] to study the patterning of auxin foci in the margin of plant leaves.
 
-Tested with Python 3.8.2, scypi 1.3.3, numpy 1.23.3, pandas 1.2.3, matplotlib 3.4.0, seaborn 0.11.1, pillow 7.0.0.
+Tested with: `Python 3.8.2`, `scypi 1.3.3`, `numpy 1.23.3`, `pandas 1.2.3`, `matplotlib 3.4.0`, `seaborn 0.11.1`, `pillow 7.0.0`.
 
 ## How to run models
 
@@ -66,13 +66,9 @@ Batch and Series can be combined. In such case, a batch is hierarchiucally above
 
 ## View output of simulations
 
-To view simulation results, browse the folders 
-* `images/`
-* `graphs/`
+To view simulation results, browse the folder:
 
-If `is_batch` is set to `True`, the results appear in 
-
-* `out_batch/`
+* `output/timestamp`
 
 To review simulation parameters / re-run a simulation:
 

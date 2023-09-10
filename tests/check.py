@@ -10,23 +10,23 @@ def check_dirs():
     This function is executed every time the program runs but will only tipically do stuff after cloning from Github or after accidentally deleting any of the folders listed above.
     """
 
-    if not os.path.exists('videos'):
-        os.makedirs('videos')
+    #if not os.path.exists('videos'):
+    #    os.makedirs('videos')
     
-    if not os.path.exists('images'):
-        os.makedirs('images')
+    #if not os.path.exists('images'):
+    #    os.makedirs('images')
     
     if not os.path.exists('sim_logs'):
         os.makedirs('sim_logs')
     
-    if not os.path.exists('graphs'):
-        os.makedirs('graphs')
+    #if not os.path.exists('graphs'):
+    #    os.makedirs('graphs')
     
-    if not os.path.exists('templates/1D'):
-        os.makedirs('templates/1D')
+    #if not os.path.exists('templates/1D'):
+    #    os.makedirs('templates/1D')
     
-    if not os.path.exists('templates/2D'):
-        os.makedirs('templates/2D')
+    #if not os.path.exists('templates/2D'):
+    #    os.makedirs('templates/2D')
     
-    if not os.path.exists('out_batch'):
-        os.makedirs('out_batch')
+    if not os.path.exists('output'):
+        os.makedirs('output')

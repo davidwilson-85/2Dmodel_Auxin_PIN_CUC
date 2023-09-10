@@ -5,7 +5,7 @@ import numpy as np
 
 import importlib
 
-from main import run
+from main import main
 #import params as pr
 pr = importlib.import_module(sys.argv[1].split('.')[0], package=None)
 import inputs as ip
@@ -15,15 +15,23 @@ import tests.check as check
 # Do checks
 check.check_dirs()
 
+# Create unique identifier of simulation based on date and time
+timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
-def run_single(batch_sim_params = None):
+# Create simulation dirs
+sim_dir = 'output/sim_' + str(timestamp)
+os.mkdir(sim_dir)
+os.mkdir(sim_dir + '/images')
+
+# Copy params file inside simualation dir
+params_file = sys.argv[1]
+shutil.copy(params_file, sim_dir)
+
+
+def run_single(batch_sim_params=None):
 	'''
 	Runs a single simulation with the parameters specified in params.py
 	'''
-	
-	# Cleanup destination folder (remove and create)
-	shutil.rmtree(pr.img_dest_folder) 
-	os.mkdir(pr.img_dest_folder)
 
 	# Force reload the module inputs to reset all values to those in the parameters file (this is critical).
 	# Reassign parameters defined inside dict pr.batch_params and the parameter being overwritten in each simulation of the series.
@@ -35,10 +43,10 @@ def run_single(batch_sim_params = None):
 		importlib.reload(ip)
 	
 	# Run single simulation
-	run()
+	main(timestamp, sim_dir)
 
 
-def run_series(batch_sim_params = None):
+def run_series(batch_sim_params=None):
 	'''
 	Runs a series of simulations
 	Parameters are defined in params.py
@@ -47,8 +55,8 @@ def run_series(batch_sim_params = None):
 	'''
 	
 	# Cleanup destination folder (remove and create)
-	shutil.rmtree(pr.img_dest_folder) 
-	os.mkdir(pr.img_dest_folder)
+	#shutil.rmtree(pr.img_dest_folder) 
+	#os.mkdir(pr.img_dest_folder)
 
 	# Retrieve parameter that varies and range of values that it takes
 	param_a_space = np.linspace(pr.series_param_a['min'], pr.series_param_a['max'], pr.series_param_a['num_points'])
@@ -67,9 +75,9 @@ def run_series(batch_sim_params = None):
 		exec('pr.' + pr.series_param_a['name'] + '=' + str(series_val)) # exec() converts str to code
 		importlib.reload(ip)
 		
-		# Run
+		# Run single simulation part of a series
 		print('series_num: ' + str(key) + '; ' + pr.series_param_a['name'] + ' = ' + str(series_val))
-		run(series_num_total, series_num = key)
+		main(timestamp, sim_dir, series_num_total, series_num = key)
 
 
 def run_batch():
@@ -97,32 +105,40 @@ def run_batch():
 		importlib.reload(pr)
 		importlib.reload(ip)
 
-		# Make subdir for simulation
-		sim_dir = 'out_batch/batch_' + str(batch_id) + '/' + str(sim_id)
-		os.mkdir(sim_dir)
+		# Make subdir for simulation images
+		sim_imgs_subdir = sim_dir + '/' + str(sim_id)
+		os.mkdir(sim_imgs_subdir)
 
 		print('\nbatch element: ' + str(sim_id) + '; params: ' + str(sim))
 
 		# Run model and collect the output
 		
 		if pr.is_series == False:
+
+			# Cleanup destination folder (remove and create)
+			shutil.rmtree(sim_dir + '/images') 
+			os.mkdir(sim_dir + '/images')
 			
 			run_single(sim)
 
-			# Copy output to batch/simulation folder
-			shutil.copytree(pr.img_dest_folder, sim_dir, dirs_exist_ok=True)
-			shutil.copy('graphs/auxin_profile.png', batch_dir + '/auxin_profile_' + str(sim_id) + '.png')
-			shutil.copy('graphs/auxin_profile.csv', batch_dir + '/auxin_profile_' + str(sim_id) + '.csv')
-			shutil.copy('graphs/levels.png', batch_dir + '/levels_' + str(sim_id) + '.png')
+			# Move and rename files
+			shutil.copytree(sim_dir + '/images', sim_imgs_subdir, dirs_exist_ok=True)
+			os.rename(sim_dir + '/auxin_profile.csv', sim_dir + '/auxin_profile_' + str(sim_id) + '.csv')
+			os.rename(sim_dir + '/auxin_profile.png', sim_dir + '/auxin_profile_' + str(sim_id) + '.png')
+			os.rename(sim_dir + '/levels.png', sim_dir + '/levels_' + str(sim_id) + '.png')
+			os.rename(sim_dir + '/vid_' + timestamp + '.mp4', sim_dir + '/vid_' + str(sim_id) + '.mp4')
 
 		if pr.is_series == True:
 			
 			run_series(sim)
 
-			# Copy output to batch/simulation folder
-			shutil.copytree(pr.img_dest_folder, sim_dir, dirs_exist_ok=True)
-			shutil.copy('graphs/auxin_profile_multiple.png', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.png')
-			shutil.copy('graphs/auxin_profile_multiple.csv', batch_dir + '/auxin_profile_multiple_' + str(sim_id) + '.csv')
+			# Move and rename files
+			shutil.copytree(sim_dir + '/images', sim_imgs_subdir, dirs_exist_ok=True)
+			os.rename(sim_dir + '/auxin_profile_multiple.csv', sim_dir + '/auxin_profile_multiple_' + str(sim_id) + '.csv')
+			os.rename(sim_dir + '/auxin_profile_multiple.png', sim_dir + '/auxin_profile_multiple_' + str(sim_id) + '.png')
+	
+	# Remove generic image folder
+	shutil.rmtree(sim_dir + '/images')
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ import func_cuc
 import auxiliary as aux
 
 
-def run(series_num_total = False, series_num = False):
+def main(timestamp, sim_dir, series_num_total=False, series_num=False):
 
 	"""
 	Simulation loop function. Called by run_model.py 
@@ -40,7 +40,7 @@ def run(series_num_total = False, series_num = False):
 	# Calculate number of iterations based on simulation time and step size
 	nbr_iterations = int(pr.simulation_time_total / pr.euler_h)
 
-	timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
+	#timestamp = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
 
 	# Write params.py (initial state and simulation parameters) to log
 	aux.write_to_log(timestamp)
@@ -62,10 +62,10 @@ def run(series_num_total = False, series_num = False):
 		# OPTIONAL: DRAW CELL PLOT
 		if pr.is_series == False:
 			if (iteration * pr.euler_h) % pr.cell_plot_frequency == 0:
-				func_graph.create_cell_plot(timestamp, iteration)
+				func_graph.create_cell_plot(timestamp, sim_dir, iteration)
 		if pr.is_series == True:
 			if iteration == nbr_iterations:
-				func_graph.create_cell_plot(timestamp, iteration, series_num = series_num)
+				func_graph.create_cell_plot(timestamp, sim_dir, iteration, series_num=series_num)
 		
 		# SOLVE MODEL REGULATORY NETWORK
 		rn.solve_rn_model()
@@ -76,7 +76,8 @@ def run(series_num_total = False, series_num = False):
 		func_pin.pin_polarity()
 		func_auxin.pin_on_auxin()
 
-		if pr.cuc_noise['limit'] > 0: func_cuc.cuc_custom_manipulation(iteration)
+		if pr.cuc_noise['limit'] > 0:
+			func_cuc.cuc_custom_manipulation(iteration)
 		
 		# Limit / correct values out of bound (e.g. auxin < 0)?
 		#for y in range(ip.tissue_rows):
@@ -84,8 +85,9 @@ def run(series_num_total = False, series_num = False):
 		#		if ip.auxin[y,x] < 0: ip.auxin[y,x] = 0
 
 		# Track simulation
-		aux.track_simulation(iteration, nbr_iterations)
-		#aux.make_kymograph(iteration, nbr_iterations)
+		if pr.is_series == False:
+			aux.track_simulation(sim_dir, iteration, nbr_iterations)
+			#aux.make_kymograph(iteration, nbr_iterations)
 
 		# FOR TEMPORARY/TESTING FUNCTIONALY
 		#if simulation_time_current < 30: ip.cuc[:] = 0
@@ -94,13 +96,13 @@ def run(series_num_total = False, series_num = False):
 		
 	# Graph auxin profile in central column of cells
 	if pr.is_series == False:
-		aux.create_line_plot_single(timestamp, 0, 1)
+		aux.create_line_plot_single(timestamp, sim_dir, 0, 1)
 	if pr.is_series == True:
-		aux.create_line_plot_multi(timestamp, series_num, series_num_total)
+		aux.create_line_plot_multi(timestamp, sim_dir, series_num, series_num_total)
 
 	# Create video/gif files
 	if pr.is_series == False:
 		if pr.create_video == True:
-			func_graph.create_video(timestamp)
+			func_graph.create_video(timestamp, sim_dir)
 		if pr.create_gif == True:
-			func_graph.create_gif(timestamp)
+			func_graph.create_gif(timestamp, sim_dir)
