@@ -28,9 +28,9 @@ A series of simuations that share the same parameters except for one that will v
 ```
 series_param_a = {
     'name': 'k_auxin_diffusion',
-	'min': .1,
-	'max': 1,
-	'num_points': 11
+    'min': .1,
+    'max': 1,
+    'num_points': 11
 }
 ```
 
@@ -39,9 +39,9 @@ A series can be also used to run replicates, for example when Auxin or CUC noise
 ```
 series_param_a = {
     'name': 'dummy',
-	'min': 0,
-	'max': 0,
-	'num_points': 10
+    'min': 0,
+    'max': 0,
+    'num_points': 10
 }
 ```
 
