@@ -31,6 +31,7 @@ series_param_a = {
 	'min': .1,
 	'max': 1,
 	'num_points': 11
+}
 ```
 
 A series can be also used to run replicates, for example when Auxin or CUC noise is used. Example to run 10 replicates:
@@ -41,6 +42,7 @@ series_param_a = {
 	'min': 0,
 	'max': 0,
 	'num_points': 10
+}
 ```
 
 ### Batch
