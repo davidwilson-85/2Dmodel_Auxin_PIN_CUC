@@ -93,13 +93,6 @@ def run_batch():
 	3. Copy and rename desired output files to keep them for later.
 	'''
 
-	# Define batch unique id and create folder to contain all simulations, copy inside the params file
-	batch_id = str(datetime.datetime.now())[:19].replace(':','-').replace(' ','_')
-	batch_dir = 'out_batch/batch_' + str(batch_id)
-	os.mkdir(batch_dir)
-	params_file = sys.argv[1]
-	shutil.copy(params_file, batch_dir)
-
 	for sim_id, sim in pr.batch_params.items():
 		
 		importlib.reload(pr)
