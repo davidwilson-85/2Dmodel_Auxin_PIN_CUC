@@ -32,14 +32,16 @@ def create_cell_plot(timestamp, sim_dir, iteration, series_num = 0):
 	array_afp = ip.auxin_fluxes_pin1
 	img_dest_folder = sim_dir + '/images'
 	
-	# Customize element in image
+	# Customize elements in image
 	draw_auxin = True
 	draw_pin = True
 	draw_cuc = True
 	draw_values_text = False
 	draw_vectors_diff = False
-	draw_vectors_pin1 = False
-	draw_pin1_flux_directions = True
+	draw_vectors_pin1 = False # PIN-mediated auxin movement
+	draw_pin1_flux_directions = False # PIN-mediated auxin movement
+	draw_pin1_polarity = True # PIN polarity
+	draw_arrows = False # False / PIN_fluxes / PIN_polarity
 
 	# Vector magnification factor (only changes visualization)
 	vector_mag = 50
@@ -143,11 +145,6 @@ def create_cell_plot(timestamp, sim_dir, iteration, series_num = 0):
 
 		# These arrows indicate the net direction and the magnitude of PIN1-mediated auxin flux
 
-		#im_arrow_25 = Image.open('art/arrow_white_17x17_25.png')
-		#im_arrow_50 = Image.open('art/arrow_white_17x17_50.png')
-		#im_arrow_75 = Image.open('art/arrow_white_17x17_75.png')
-		#im_arrow_100 = Image.open('art/arrow_white_17x17_100.png')
-
 		for i in range(matrix_shape[0]):
 			
 			x = x_origin
@@ -167,6 +164,8 @@ def create_cell_plot(timestamp, sim_dir, iteration, series_num = 0):
 					im_arrow = ip.im_arrow_75
 				if array_afp[11,i,j] >= 15:
 					im_arrow = ip.im_arrow_100
+				
+				#im_arrow = ip.im_arrow_100
 
 				# Rotate arrow image and paste it in image
 				if array_afp[10,i,j] != 361.0:
@@ -179,6 +178,66 @@ def create_cell_plot(timestamp, sim_dir, iteration, series_num = 0):
 	
 		x = x_origin
 		y = y_origin
+	
+	if draw_pin1_polarity == True:
+		
+		# These arrows indicate the net PIN polarity
+
+		for i in range(matrix_shape[0]):
+			
+			x = x_origin
+			for j in range(matrix_shape[1]):
+
+				# Scale total PIN in cell to standard value (to be able to calculate pure polarity = relative comparison between faces)
+				pin1_sum_cell = pin1[0,i,j] + pin1[1,i,j] + pin1[2,i,j] + pin1[3,i,j]
+				pin1_t = ( pin1[0,i,j] / pin1_sum_cell ) * 10
+				pin1_r = ( pin1[1,i,j] / pin1_sum_cell ) * 10
+				pin1_b = ( pin1[2,i,j] / pin1_sum_cell ) * 10
+				pin1_l = ( pin1[3,i,j] / pin1_sum_cell ) * 10
+
+				# Option 1: Vector shows polarity and amount of PIN
+				#degrees, magnitude = vector_to_degrees(pin1[1,i,j] - pin1[3,i,j], pin1[2,i,j] - pin1[0,i,j])
+				#step1, step2, step3 = 4, 6, 8
+				
+				# Option 2: Pure polarity (= relative comparison between faces)
+				#degrees, magnitude = vector_to_degrees(pin1_r - pin1_l, pin1_b - pin1_t)
+				#step1, step2, step3 = 2.5, 5, 7.5
+				
+				# Option 3: Integrated polarity (takes into account the PIN in the neighbouring cells pointing to the current cell)
+				# Set default values:
+				itgr_pin1_t, itgr_pin1_r, itgr_pin1_b, itgr_pin1_l = 0, 0, 0, 0
+				if i > 0: itgr_pin1_t = pin1[0,i,j] - pin1[2,i-1,j]
+				if j < matrix_shape[1] - 1: itgr_pin1_r = pin1[1,i,j] - pin1[3,i,j+1]
+				if i < matrix_shape[0] - 1: itgr_pin1_b = pin1[2,i,j] - pin1[0,i+1,j]
+				if j > 0: itgr_pin1_l = pin1[3,i,j] - pin1[1,i,j-1]
+				
+				degrees, magnitude = vector_to_degrees(itgr_pin1_r - itgr_pin1_l, itgr_pin1_b - itgr_pin1_t)
+				step1, step2, step3 = 2.5, 5, 7.5
+
+				#print(pin1[0,i,j]+pin1[1,i,j]+pin1[2,i,j]+pin1[3,i,j])
+
+				# Select appropriate image from available ones
+				if magnitude < step1:
+					im_arrow = ip.im_arrow_25
+				if magnitude >= step1 and magnitude < step2:
+					im_arrow = ip.im_arrow_50
+				if magnitude >= step2 and magnitude < step3:
+					im_arrow = ip.im_arrow_75
+				if magnitude >= step3:
+					im_arrow = ip.im_arrow_100
+
+				# Rotate arrow image and paste it in image
+				if array_afp[10,i,j] != 361.0:
+					im_arrow_rotated = im_arrow.rotate(float(degrees) + 270)
+					im.paste(im_arrow_rotated, (x+16,y+16), im_arrow_rotated) # 3rd parameter is a mask (for transparency)
+
+				x = x + cellSide
+			
+			y = y + cellSide
+	
+		x = x_origin
+		y = y_origin
+	
 
 	# Draw text with timestamp and simulation time formatted appropriately
 	draw.polygon([(0,height-9),(200,height-9),(200,height),(0,height)], fill=(128,128,128))
