@@ -2,7 +2,12 @@
 
 Model consisting on a cell grid to study the interactions between the plant hormone auxin, the PIN1 auxin efflux carrier, and the CUC transciption factors.
 
-This model was used in [HERE REFERENCE TO PAPER] to study the patterning of auxin foci in the margin of plant leaves.
+This model was used in:
+
+Z. Hu, D. Wilson-Sánchez, N. Bhatia, M.I. Rast-Somssich, A. Wu, D. Vlad, L. McGuire, L.A. Nikolov, P. Laufs, X. Gan, S. Laurent, A. Runions, M. Tsiantis.<br>
+A CUC1/auxin genetic module links cell polarity to patterned tissue growth and leaf shape diversity in crucifer plants.<br>
+Proc. Natl. Acad. Sci. U.S.A. 121 (26) e2321877121, 2024.<br>
+https://doi.org/10.1073/pnas.2321877121
 
 Tested with: `Python 3.8.2`, `scypi 1.3.3`, `numpy 1.23.3`, `pandas 1.2.3`, `matplotlib 3.4.0`, `seaborn 0.11.1`, `pillow 7.0.0`.
 
